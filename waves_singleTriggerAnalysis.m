@@ -62,7 +62,8 @@ plotSingleHilbertCrossing(crossings{4},hilbertAmps{1},squeeze(FD),'Excitations',
 % startEndWave=[13617 14527]; %samples. Chosen manually from fig trig=5; singleChannel=113;
 startEndWave=[8620 9569]; %samples. Chosen manually from fig trig=14; singleChannel=113;
 load(Experiments.currentDataObj.layoutName)
-plotCrossingsPhysical(crossings{3},startEndWave,settingsMap,En,'Inhibitions',Experiments.currentDataObj.samplingFrequency,hilbertAmps{3})
+plotPhysicalTitle=['U4 Trig' num2str(trig) ' Channel ' num2str(singleChannel) ' Inhibitions: (samples ' num2str(startEndWave(1)) '-' num2str(startEndWave(2)) ')'];
+plotCrossingsPhysical(crossings{3}*sample2ms,startEndWave*sample2ms,En,hilbertAmps{3},'Title',plotPhysicalTitle)
 %past windows startEndWave=[6351 7173]; %samples. Chosen manually from fig startEndWave=[6351 7173];  startEndWave=[8700 8948];startEndWave=[9521 9773];startEndWave=[9090 10040];startEndWave=[9418 9786];startEndWave=[9137 9548]; %exitationstartEndWave=[9080 9589]; %exitation bottom to topstartEndWave=[9107 10030]; %exitation full periodstartEndWave=[16540 18460]; %exitation few crossings - spiralstartEndWave=[17980 18460]; %last exitationstartEndWave=[23450 24160]; %maybe another spiralstartEndWave=[22980 24160]; %another maybe another spiralstartEndWave=[13160 15300]; %for averagestartEndWave=[0 2000]; %twoGausses
 
 %export video
@@ -157,10 +158,8 @@ saveas(gcf,['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\Spike In Wav
 savefig(['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\Spike In Waves\Trig' num2str(trig) '_Time' num2str(startEndWave_ms(1)) '-' num2str(startEndWave_ms(2)) 'ms_Samples ' num2str(startEndWave(1)) '-' num2str(startEndWave(2)) ' - Inhibition Crossing Times.fig'])
 close gcf
 
-%%%%CORRECT USE OF PLOTCROSSINGPHYSICAL%%%%%
 plotPhysicalTitle=['U4 Trig' num2str(trig) ' Channel ' num2str(singleChannel) ' Inhibitions: (samples ' num2str(startEndWave(1)) '-' num2str(startEndWave(2)) ')'];
 plotCrossingsPhysical(crossings{3}*sample2ms,startEndWave*sample2ms,En,hilbertAmps{3},'Title',plotPhysicalTitle)
-% plotCrossingsPhysical(crossings{3},startEndWave,settingsMap,En,'Inhibitions',Experiments.currentDataObj.samplingFrequency,0)
 saveas(gcf,['\\sil2\Literature\Projects\corplex\progress reports\figs for PR 191124\Trig' num2str(trig) '_Time' num2str(startEndWave_ms(1)) '-' num2str(startEndWave_ms(2)) 'ms_Samples ' num2str(startEndWave(1)) '-' num2str(startEndWave(2)) ' - Physical Lag Plot.jpg'])
 savefig(['\\sil2\Literature\Projects\corplex\progress reports\figs for PR 191124\Trig' num2str(trig) '_Time' num2str(startEndWave_ms(1)) '-' num2str(startEndWave_ms(2)) 'ms_Samples ' num2str(startEndWave(1)) '-' num2str(startEndWave(2)) ' - Physical Lag Plot.fig'])
 close gcf
