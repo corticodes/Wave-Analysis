@@ -29,6 +29,15 @@ pulseFrames=100;
 distInSigmas=[1.5 1.5];
 tempOverlapInPulseFrames=0.7;
 
+% two coaxial gaussians
+gaussTXT='Gaussians - Two Coaxial';
+layoutSize=12;
+pulseFrames=100;
+distInSigmas=[0 0];
+% distInSigmas=[0 1];
+pixelsPerChannel=[51 51];
+tempOverlapInPulseFrames=0.65;
+gaussSigma=[2 4];
 
 % params for gaussian wave
 gaussTXT='Gaussian wave';
@@ -54,19 +63,9 @@ waveName=[gaussTXT '_gaussSigma' num2str(gaussSigma) '_distInSigmasX' num2str(di
 
 %% simulate gaussian and export
 
-
-% two coaxial gaussians
-gaussTXT='Gaussians - Two Coaxial';
-layoutSize=12;
-gaussSigma=[2 4];
-pulseFrames=100;
-distInSigmas=[0 0];
-tempOverlapInPulseFrames=0.65;
-pixelsPerChannel=[51 51];
-
 saveDir='E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\';
 saveParamsName='Radial Wave';
-videoDir=[saveDir filesep saveParamsName];    
+videoDir=[saveDir filesep waveName];    
 
 
 radialWave=simulateGaussians(layoutSize,gaussSigma,pulseFrames,distInSigmas,tempOverlapInPulseFrames,'x1',layoutSize/2,'y1',layoutSize/2);
@@ -76,16 +75,11 @@ HT=hilbert(squeeze(convertMovieToChannels(radialWave,En))').';
 HTabs=abs(HT);
 HTangle=angle(HT);
 
-[crossings,hilbertAmps] = getHilbertCrossings(HTabs,HTangle,1:size(HT,1));
-% plotAllHilbertCrossings(crossings,hilbertAmps,data*10,settingsMap);
-% plotSingleHilbertCrossing(crossings{1},hilbertAmps{1},data,'Maxima',settingsMap)
+[crossings,hilbertAmps] = getHilbertCrossings(HTabs,HTangle);
 
 startEndWave=[1 size(radialWave,3)]; %twoGausses
-keySet={'trig','singleChannel','window','nCh','bandpass_low','bandpass_high'};
-valueSet=[1,100,1,144,1,10];
-settingsMap=containers.Map(keySet,valueSet);
 
-plotCrossingsPhysical(crossings{1},startEndWave,settingsMap,En,'Maxima',30,hilbertAmps{1})
+plotCrossingsPhysical(crossings{1},startEndWave,flipud(En),hilbertAmps{1},'Units','frames')
 saveas(gcf,['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\' waveName ' - Physical Lag.jpg'])
 savefig(['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\' waveName ' - Physical Lag.fig'])
 close gcf
