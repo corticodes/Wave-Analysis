@@ -1,4 +1,4 @@
-function [] = plotSingleHilbertCrossing(singleCrossings,crossingsAmps,FD,crossingType,settingsMap,spikesPerChannel,dataTime,samplingFrequency)
+function [] = plotSingleHilbertCrossing(singleCrossings,crossingsAmps,FD,crossingType,varargin)
 %PLOTSINGLEHILBERTCROSSING plots the occurences of a specific crossings,
 %with color map indicating the hilbert amplitude
 %   singleCrossings are the specific crossings (upwards, downwards,
@@ -6,26 +6,30 @@ function [] = plotSingleHilbertCrossing(singleCrossings,crossingsAmps,FD,crossin
 %   crossingsAmps are the amplitudes at these times. 
 %   FD is the squeezed nChXnSamples filtered data from which hilbert and 
 %   the crossings were calculated
-%   crossingType is a string for the title, for example "maxima (upward
-%   crossings)"
-%   spikesPerChannel is nChX1 cell array, where spikesPerChannel{i} are all
-%   the spike times of channel i.
-%  If spikePerChannel,dataTime,samplingFrequency are not sent,
-%  plotAllHilbertCrossings will plot just the crossings and not the spikes
-%   settingsMap are matlab containers.Map containing {'trig','singleChannel','window','nCh','bandpass_low','bandpass_high'}
+%   crossingType (string) is the crossing type (minima/inhibition etc.)
+%   Varargins (given as 'Key'Value pairs:
+%      spikesPerChannel (nChX1) cell array, where spikesPerChannel{i} are 
+%           all the spike times of channel i. Must be sent with 
+%           dataTime,samplingFrequency. When these are sent spikes will 
+%           also be plotted.
+%      dataTime 1X2 the time in ms from the start of the recording to the 
+%           [first,last] sample in FD
+%      samplingFrequency (1x1) thesampling frequency (Hz)
+%      Title (string)
+%           Figure title
+%      singleChannel (1x1) examplary channel to plot FD. Default is 1
 
-if nargin~=5 && nargin~=8
-   disp('Wrong Number of Inputs Arguments')
-   return
+singleChannel=1;
+
+for i=1:2:length(varargin)
+   eval([varargin{i} '=varargin{' num2str(i+1) '};']);
 end
 
-mapKeys=keys(settingsMap);
-mapValues=values(settingsMap);
-for i=1:length(settingsMap)
-    eval([mapKeys{i} '=' num2str(mapValues{i}) ';']);
+if exist('spikesPerChannel','var') && (~exist('dataTime','var') || ~exist('samplingFrequency','var'))
+    error('Variable ''spikesPerChannel'' must be given together with ''dataTime'' and ''samplingFrequency'' (see function description)')
 end
 
-chNum=1:nCh;
+chNum=1:size(singleCrossings,1);
 
 sz=25;
 h(1)=scatter(singleCrossings(chNum(1),singleCrossings(chNum(1),:)~=0),chNum(1)*ones(1,numel(singleCrossings(chNum(1),singleCrossings(chNum(1),:)~=0))),sz,squeeze(crossingsAmps(1,singleCrossings(chNum(1),:)~=0)));
@@ -42,22 +46,24 @@ h(2)=plot(nan,nan,'b');
 h(3)=plot(nan,nan,'--k');
 h(4)=plot(nan,nan,'or');
 
-if nargin==8
+if exist('spikesPerChannel','var')
     for i=chNum
        findInd=find(spikesPerChannel{i}>dataTime(1) & spikesPerChannel{i}<dataTime(2));
        plot((spikesPerChannel{i}(findInd)-dataTime(1))*samplingFrequency/1000, i*ones(1,length(findInd)),'or');
     end
-    legend([h(1) h(2) h(3) h(4)],{crossingType,'Filtered Data','Current Channel','Spikes'})
+    legend([h(1) h(2) h(3) h(4)],{crossingType,'Filtered Data',['Current Channel (' num2str(singleChannel) ')'],'Spikes'})
 else
     legend([h(1) h(2) h(3)],{crossingType,'Filtered Data','Current Channel'})
 end
 
 
-title(['U4 Trig' num2str(trig) ' Channel ' num2str(singleChannel) ' ' crossingType])
+if exist('Title','var')
+    title(Title)
+end
 hcb=colorbar;
 title(hcb,'Hilbert Amplitude [uV]');
 xlabel('Samples')
-ylabel('Filtered Data [uV]')
+ylabel(['Filtered Data (Channel' num2str(singleChannel) ') [uV]'])
 
 end
 

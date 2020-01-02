@@ -146,8 +146,9 @@ saveas(gcf,['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\Spike In Wav
 savefig(['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\Spike In Waves\Trig' num2str(trig) ' - All Crossings'])
 close gcf
 
-plotSingleHilbertCrossing(crossings{3},hilbertAmps{1},squeeze(FD),'Inhibitions',settingsMap,spikesPerChannel,[startTimes(1) startTimes(1)+window_ms],Experiments.currentDataObj.samplingFrequency)
-plotSingleHilbertCrossing(crossings{3},hilbertAmps{1},squeeze(FD),'Inhibitions',settingsMap)
+plotTitle=['U4 Trig' num2str(trig) ' Inhibitions'];
+plotSingleHilbertCrossing(crossings{3},hilbertAmps{3},squeeze(FD),'Inhibitions','spikesPerChannel',spikesPerChannel,'dataTime', [startTimes(1) startTimes(1)+window_ms],'samplingFrequency',Experiments.currentDataObj.samplingFrequency,'Title',plotTitle)
+plotSingleHilbertCrossing(crossings{3},hilbertAmps{1},squeeze(FD),'Title',plotTitle)
 dcm_obj = datacursormode(gcf);
 c_info = getCursorInfo(dcm_obj);
 [DP1,DP2]=c_info.Position;
