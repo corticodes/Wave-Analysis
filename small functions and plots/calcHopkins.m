@@ -21,6 +21,7 @@ function hopkins = calcHopkins(sampleCoordinates,n,varargin)
 %
 %   Future Plans: Allow sampleCoordinates to be nSamplesXd
 
+d=2;
 subspaceLimisMethod='dataRange';
 nMedianDeviations=1;
 
@@ -45,6 +46,7 @@ else
     end
     
 end
+%%{ 
 scatter(sampleCoordinates(:,1),sampleCoordinates(:,2))
 line(linspace(range(1,1),range(2,1),100),ones(1,100)*range(1,2));
 line(linspace(range(1,1),range(2,1),100),ones(1,100)*range(2,2));
@@ -52,7 +54,9 @@ line(ones(1,100)*range(1,1),linspace(range(1,2),range(2,2),100));
 line(ones(1,100)*range(2,1),linspace(range(1,2),range(2,2),100));
 line(ones(1,100)*dataMED(1),linspace(range(1,2),range(2,2),100),'Color','r');
 line(linspace(range(1,1),range(2,1),100),ones(1,100)*dataMED(2),'Color','r');
-%{
+pause
+%%}
+%%{
 for j=1:n
     %generate m random sampling origins
     sampOrgs=rand(m,2);
@@ -74,7 +78,7 @@ for j=1:n
         w(i)=min([dists(1:(randSamples(i)-1));dists((randSamples(i)+1):nSamples)]);
     end
 
-    hopkins(j)=sum(u)/sum(u+w);
+    hopkins(j)=sum(u.^d)/sum(u.^d+w.^d);
     
 %     figure;
 %     scatter(sampleCoordinates(:,1),sampleCoordinates(:,2))
@@ -89,6 +93,6 @@ end
 % hold on
 % scatter(sampOrgs(:,1),sampOrgs(:,2),'r','filled')
 % scatter(sampleCoordinates(randSamples,1),sampleCoordinates(randSamples,2),'b','filled')
-%}
+%%}
 end
 
