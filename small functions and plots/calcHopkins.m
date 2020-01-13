@@ -11,52 +11,74 @@ function hopkins = calcHopkins(sampleCoordinates,n,varargin)
 %               the components of all the data points in the i'th axis.
 %               This is the default method.
 %
-%               'medianRange': Set limit by number of Median absolute
-%               deviation from Median (in each direction). Effective for data the
-%                outlayers.
+%               'madRange': Set limit in each dimention by number of 
+%               Median absolute deviation from center. Center is median if
+%               centerIsAverage is 0 (defualt) or average if 1. This method 
+%               is effective for data with outlayers.
+%               'stdRange': Set limit in each dimention by number of 
+%               standart deviation from center. Center is median if
+%               centerIsAverage is 0 (defualt) or average if 1.
+%       'centerIsAverage' (logical 1x1): How to define the center of the 
+%       range in the case subspaceLimisMethod is 'madRange'. If 0
+%       (default) center is the median of the data. Else it is the average.
 %       'nMedianDeviations': Number of median deviations to be included
 %       inside range: range will be median+-nMedianDeviations from each
 %       side. Default is 1. subspaceLimisMethod must be
-%       set to medianRange for this to have an effect.
+%       set to madRange for this to have an effect.
 %
-%   Future Plans: Allow sampleCoordinates to be nSamplesXd
+%   Future Plans: Allow sampleCoordinates to be nSample sXd
 
 d=2;
 subspaceLimisMethod='dataRange';
+centerIsAverage=0;
 nMedianDeviations=1;
+plotRange=0;
 
 for i=1:2:numel(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
 end
 
+rangeByDataLim=strcmp(subspaceLimisMethod,'dataRange');
+
+    
 hopkins=zeros(1,n);
 
 nSamples=size(sampleCoordinates,1);
-m=max(round(nSamples/10),1); %sampling origins
+m=max(round(nSamples/10),1) %sampling origins
 
 if strcmp(subspaceLimisMethod,'dataRange')
     range=[min(sampleCoordinates);max(sampleCoordinates)];
 else
-    if ~strcmp(subspaceLimisMethod,'medianRange')
-        error('Wrong value given for subspaceLimisMethod. Should be either ''dataRange'' or ''medianRange''');
+    if centerIsAverage
+        dataCenter=mean(sampleCoordinates);
     else
-        dataMED=median(sampleCoordinates);
+        dataCenter=median(sampleCoordinates);
+    end
+    if strcmp(subspaceLimisMethod,'madRange')
         dataMAD=mad(sampleCoordinates);
-        range=[dataMED-nMedianDeviations*dataMAD;dataMED+nMedianDeviations*dataMAD];
+        range=[dataCenter-nMedianDeviations*dataMAD;dataCenter+nMedianDeviations*dataMAD];
+    else
+        if ~strcmp(subspaceLimisMethod,'stdRange')
+            error('Wrong value given for subspaceLimisMethod. Should be either ''dataRange'', ''madRange'' or ''stdRange''');
+        else
+            dataSTD=std(sampleCoordinates);
+            range=[dataCenter-nMedianDeviations*dataSTD;dataCenter+nMedianDeviations*dataSTD];
+        end
     end
     
 end
-%%{ 
-scatter(sampleCoordinates(:,1),sampleCoordinates(:,2))
-line(linspace(range(1,1),range(2,1),100),ones(1,100)*range(1,2));
-line(linspace(range(1,1),range(2,1),100),ones(1,100)*range(2,2));
-line(ones(1,100)*range(1,1),linspace(range(1,2),range(2,2),100));
-line(ones(1,100)*range(2,1),linspace(range(1,2),range(2,2),100));
-line(ones(1,100)*dataMED(1),linspace(range(1,2),range(2,2),100),'Color','r');
-line(linspace(range(1,1),range(2,1),100),ones(1,100)*dataMED(2),'Color','r');
-pause
-%%}
-%%{
+if plotRange 
+    scatter(sampleCoordinates(:,1),sampleCoordinates(:,2))
+    line(linspace(range(1,1),range(2,1),100),ones(1,100)*range(1,2));
+    line(linspace(range(1,1),range(2,1),100),ones(1,100)*range(2,2));
+    line(ones(1,100)*range(1,1),linspace(range(1,2),range(2,2),100));
+    line(ones(1,100)*range(2,1),linspace(range(1,2),range(2,2),100));
+    if ~rangeByDataLim
+        line(ones(1,100)*dataCenter(1),linspace(range(1,2),range(2,2),100),'Color','r');
+        line(linspace(range(1,1),range(2,1),100),ones(1,100)*dataCenter(2),'Color','r');
+    end
+end
+
 for j=1:n
     %generate m random sampling origins
     sampOrgs=rand(m,2);
@@ -93,6 +115,5 @@ end
 % hold on
 % scatter(sampOrgs(:,1),sampOrgs(:,2),'r','filled')
 % scatter(sampleCoordinates(randSamples,1),sampleCoordinates(randSamples,2),'b','filled')
-%%}
 end
 
