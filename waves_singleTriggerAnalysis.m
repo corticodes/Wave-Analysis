@@ -40,16 +40,17 @@ plotHilbert(squeeze(FD(singleChannel,1,:)),HTabs(singleChannel,:),HTangle(single
 
 %% Crossings analysis
 %get crossings
-[crossings,hilbertAmps] = getHilbertCrossings(HTabs,HTangle,1:nCh);
+[crossings,hilbertAmps] = getHilbertCrossings(HTabs,HTangle);
 
 %plot all crossings
-spikesPerChannel = getSpikesPerChannel(ticPath,nCh);
+spikesPerChannel = getSpikesPerChannel(ticPath);
+binSpikes = getSpikeBinMatByChannel(ticPath,nCh,start_times_ms,end_times_ms,sampling_rate);
 
 plotAllHilbertCrossings(crossings,hilbertAmps,squeeze(FD),settingsMap,spikesPerChannel,[startTimes(1) startTimes(1)+window_ms],Experiments.currentDataObj.samplingFrequency)
 plotAllHilbertCrossings(crossings,hilbertAmps,squeeze(FD),settingsMap)
 
 %plot single crossings
-plotSingleHilbertCrossing(crossings{1},hilbertAmps{1},squeeze(FD),'Maxima (upward crossings)',settingsMap,spikesPerChannel,[startTimes(1) startTimes(1)+window_ms],Experiments.currentDataObj.samplingFrequency)
+plotSingleHilbertCrossing(crossings{1},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Maxima (upward crossings)',spikesPerChannel,[startTimes(1) startTimes(1)+window_ms],Experiments.currentDataObj.samplingFrequency)
 plotSingleHilbertCrossing(crossings{2},hilbertAmps{1},squeeze(FD),'Minima (downward crossings)',settingsMap)
 plotSingleHilbertCrossing(crossings{3},hilbertAmps{1},squeeze(FD),'Inhibitions',settingsMap)
 plotSingleHilbertCrossing(crossings{3},hilbertAmps{1},squeeze(FD),'Inhibitions',settingsMap,spikesPerChannel,[startTimes(1) startTimes(1)+window_ms],Experiments.currentDataObj.samplingFrequency)
@@ -118,7 +119,7 @@ ticPath='E:\Yuval\Analysis\spikeSorting\sample data\U4\U4_071014_Images3001_layo
 
 load(Experiments.currentDataObj.layoutName)
 nCh=120; %number of channels - in code this will channels arrays will be 1:nCh
-spikesPerChannel = getSpikesPerChannel(ticPath,nCh);
+spikesPerChannel = getSpikesPerChannel(ticPath);
 
 trig=1;
 singleChannel=113;
@@ -196,6 +197,7 @@ noMeandData=(spikeCoordinates-meanData);
 
 % f=plotWaveSpikes(spikeCoordinates,size(En),cidx2,cmeans2.*stdData+meanData);
 f=plotWaveSpikes(spikeCoordinates,size(En),cidx2,cmeans2+meanData);
+plotWaveSpikes(spikeCoordinates,size(En))
 title(['Clustered Spikes - Trig' num2str(trig) ' Time' num2str(startEndWave_ms(1)) '-' num2str(startEndWave_ms(2)) 'ms Samples ' num2str(startEndWave(1)) '-' num2str(startEndWave(2))])
 savefig(['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\Spike In Waves\Trig' num2str(trig) '_Time' num2str(startEndWave_ms(1)) '-' num2str(startEndWave_ms(2)) 'ms_Samples ' num2str(startEndWave(1)) '-' num2str(startEndWave(2)) ' - Clustered Spikes.fig'])
 saveas(gcf,['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\Spike In Waves\Trig' num2str(trig) '_Time' num2str(startEndWave_ms(1)) '-' num2str(startEndWave_ms(2)) 'ms_Samples ' num2str(startEndWave(1)) '-' num2str(startEndWave(2)) ' - Clustered Spikes.jpg'])
@@ -204,8 +206,8 @@ saveas(gcf,['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\Spike In Wav
 
 
 %%Get PCA scores and calc hopkins
-spikeCoordinates=normedData;
-% spikeCoordinates=noMeandData;
+% spikeCoordinates=normedData;
+spikeCoordinates=noMeandData;
 [coeff,score,latent] = pca(spikeCoordinates);
 %Show new axis
 f=figure;
@@ -241,6 +243,8 @@ close(f)
 
 
 hopkins=calcHopkins(score(:,1:2),100000);
+hopkins=calcHopkins(score(:,1:2),100000,'subspaceLimisMethod','medianRange','plotRange',1,'nMedianDeviations',2);
+
 meanHopkins=mean(hopkins)
 steHopkins=std(hopkins)/sqrt(100000)
 

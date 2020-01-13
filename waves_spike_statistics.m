@@ -39,7 +39,7 @@ window_tot_ms=1500; %ms i.e. look at window from 375-1000ms after triggers
 startTimes=triggers{5}(trigsNums); %ms
 
 %get spikes per channel
-% spikesPerChannel = getSpikesPerChannel(ticPath,nCh);
+% spikesPerChannel = getSpikesPerChannel(ticPath);
 
 
 [closestHistogram,spikeRate,binSpikes,relevantTIC,nRelevant,roundSpikePhase,neuronMostFrequentPhase,neuronMostFrequentPhaseCount,frequentPhaseProbabilityForNeuron,nNeurons,spikesPerChannel,HTabs,HTangle,FDsequence,HTsequence,timeSequence,data,FD,HT] ...
@@ -160,12 +160,15 @@ plot(smoothedneuronPhaseCount(1,:),'r')
 
 
 %cluster by gaussian fitting
-phaseBin=1;
+phaseBin=60;
 enhaceResBy=phaseBin;
 filtSize=phaseBin/2;
 % gaussFiltSize=round(enhaceResBy/3);
+[relevantTIC,nRelevant,tIc] = getRelevantSpikes(ticPath,startTimes,window_tot_ms,numel(trigsNums));
+spikePhase = getSpikePhase(relevantTIC,HTangle,timeSequence); 
+
 [neuronFiringPhaseRateSmoothed,phaseBinCentersSmoothed,f] = calcPhaseRaster(relevantTIC,spikePhase,numel(unique(relevantTIC(3,:))),'phaseBin',phaseBin,'plotRaster',1,'enhaceResBy',enhaceResBy,'filtSize',filtSize);
-gaussParams=fitGaussians(neuronFiringPhaseRateLargeBinResized);
+gaussParams=fitGaussians(neuronFiringPhaseRateSmoothed);
 paramsCorrs = corrcoef(gaussParams');
 
 tree = linkage(paramsCorrs,'average');
@@ -259,7 +262,7 @@ plotTitle(getAmplitudes(HTabs,nHilAmps),ampRateW2,['Average Firing Rate Per Hilb
 
 %% redo most frequent phase with wider window
 
-spikesPerChannel = getSpikesPerChannel(ticPath,nCh);
+spikesPerChannel = getSpikesPerChannel(ticPath);
 ignoreSample=4000; %ignore first 200ms
 window_tot_ms=1500; %ms i.e. look at window from 375-1000ms after triggers
 startTimes=triggers{5}(trigsNums); %ms
