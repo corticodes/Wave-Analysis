@@ -9,12 +9,12 @@ function [] = exportVideo(data,videoDir,frameRate,pixelsPerChannel,varargin)
     %       Video will contain "sparks" in the right times and channels, 
     %       marking spikes that accured in that channel. Columns are (y,x,sample) 
     %   spikeFrameLength:
-    %       Sparks will last spikeFrameLength frames (default is 50)
+    %       Sparks will last spikeFrameLength frames (default is 10)
     %   pixelsPerSpike (1X1):
     %       size for each spike in pixel. Spikes are drawn before channel
     %       expansion, so final spike size will be
-    %       (2*pixelsPerSpike*pixelsPerChannel)X(2*pixelsPerSpike*pixelsPerChannel)
-    %       Default is 10
+    %       (pixelsPerSpike*pixelsPerChannel)X(pixelsPerSpike*pixelsPerChannel)
+    %       Default is 1
     %   particlePath (nSamplesX2):
     %       x,y position of a particle to be drawn throughout movie.
     %   particleSize (1X1):
@@ -22,8 +22,9 @@ function [] = exportVideo(data,videoDir,frameRate,pixelsPerChannel,varargin)
     %       Default is 10.
 
 
-spikeFrameLength=50;
+spikeFrameLength=10;
 particleSize=10;
+pixelsPerSpike=1;
 
 frameHeight=size(data,1);
 frameWidth=size(data,2);
