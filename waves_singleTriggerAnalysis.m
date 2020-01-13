@@ -50,11 +50,12 @@ plotAllHilbertCrossings(crossings,hilbertAmps,squeeze(FD),settingsMap,spikesPerC
 plotAllHilbertCrossings(crossings,hilbertAmps,squeeze(FD),settingsMap)
 
 %plot single crossings
+plotSingleHilbertCrossing(crossings{1},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Maxima (upward crossings)')
 plotSingleHilbertCrossing(crossings{1},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Maxima (upward crossings)',spikesPerChannel,[startTimes(1) startTimes(1)+window_ms],Experiments.currentDataObj.samplingFrequency)
-plotSingleHilbertCrossing(crossings{2},hilbertAmps{1},squeeze(FD),'Minima (downward crossings)',settingsMap)
-plotSingleHilbertCrossing(crossings{3},hilbertAmps{1},squeeze(FD),'Inhibitions',settingsMap)
-plotSingleHilbertCrossing(crossings{3},hilbertAmps{1},squeeze(FD),'Inhibitions',settingsMap,spikesPerChannel,[startTimes(1) startTimes(1)+window_ms],Experiments.currentDataObj.samplingFrequency)
-plotSingleHilbertCrossing(crossings{4},hilbertAmps{1},squeeze(FD),'Excitations',settingsMap)
+plotSingleHilbertCrossing(crossings{2},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Minima (downward crossings)',settingsMap)
+plotSingleHilbertCrossing(crossings{3},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Inhibitions',settingsMap)
+plotSingleHilbertCrossing(crossings{3},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Inhibitions',settingsMap,spikesPerChannel,[startTimes(1) startTimes(1)+window_ms],Experiments.currentDataObj.samplingFrequency)
+plotSingleHilbertCrossing(crossings{4},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Excitations',settingsMap)
 
 %Plot Physical lags of first crossing in a window
 % startEndWave=[8858 9867]; %samples. Chosen manually from fig trig=10;
@@ -148,8 +149,8 @@ savefig(['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\Spike In Waves\
 close gcf
 
 plotTitle=['U4 Trig' num2str(trig) ' Inhibitions'];
-plotSingleHilbertCrossing(crossings{3},hilbertAmps{3},squeeze(FD),'Inhibitions','spikesPerChannel',spikesPerChannel,'dataTime', [startTimes(1) startTimes(1)+window_ms],'samplingFrequency',Experiments.currentDataObj.samplingFrequency,'Title',plotTitle)
-plotSingleHilbertCrossing(crossings{3},hilbertAmps{1},squeeze(FD),'Title',plotTitle)
+plotSingleHilbertCrossing(crossings{3},hilbertAmps{3},squeeze(FD(singleChannel,1,:)),'Inhibitions','spikesPerChannel',spikesPerChannel,'dataTime', [startTimes(1) startTimes(1)+window_ms],'samplingFrequency',Experiments.currentDataObj.samplingFrequency,'Title',plotTitle)
+plotSingleHilbertCrossing(crossings{3},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Title',plotTitle)
 dcm_obj = datacursormode(gcf);
 c_info = getCursorInfo(dcm_obj);
 [DP1,DP2]=c_info.Position;

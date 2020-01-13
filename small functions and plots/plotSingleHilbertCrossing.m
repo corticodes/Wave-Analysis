@@ -4,7 +4,7 @@ function [] = plotSingleHilbertCrossing(singleCrossings,crossingsAmps,FD,crossin
 %   singleCrossings are the specific crossings (upwards, downwards,
 %   inhibition or excitation) as recived by getHilbertCrossings.
 %   crossingsAmps are the amplitudes at these times. 
-%   FD is the squeezed nChXnSamples filtered data from which hilbert and 
+%   FD is the squeezed 1XnSamples filtered data from which hilbert and 
 %   the crossings were calculated
 %   crossingType (string) is the crossing type (minima/inhibition etc.)
 %   Varargins (given as 'Key'Value pairs:
@@ -17,7 +17,6 @@ function [] = plotSingleHilbertCrossing(singleCrossings,crossingsAmps,FD,crossin
 %      samplingFrequency (1x1) thesampling frequency (Hz)
 %      Title (string)
 %           Figure title
-%      singleChannel (1x1) examplary channel to plot FD. Default is 1
 
 singleChannel=1;
 
@@ -37,7 +36,7 @@ hold on
 for i=chNum(2:end)
         scatter(singleCrossings(i,singleCrossings(chNum(i),:)~=0),i*ones(1,numel(singleCrossings(i,singleCrossings(chNum(i),:)~=0))),sz,crossingsAmps(i,singleCrossings(chNum(i),:)~=0));
 end
-h(2)=plot(FD(singleChannel,:),'b');
+h(2)=plot(FD,'b');
 h(3)=plot(0:size(FD,2),singleChannel*ones(1,size(FD,2)+1),'--k');
 
 %legend hack
