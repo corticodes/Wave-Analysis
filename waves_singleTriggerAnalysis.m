@@ -7,9 +7,9 @@ nCh=120; %number of channels - in code this will channels arrays will be 1:nCh
 bandpass=[12 34];
 ticPath='E:\Yuval\Analysis\spikeSorting\sample data\U4\U4_071014_Images3001_layout_100_12x12_gridSorter FROM MARK.mat';
 
-keySet={'trig','singleChannel','window','nCh','bandpass_low','bandpass_high'};
-valueSet=[trig,singleChannel,window_ms,nCh,bandpass(1),bandpass(2)];
-settingsMap=containers.Map(keySet,valueSet);
+% keySet={'trig','singleChannel','window','nCh','bandpass_low','bandpass_high'};
+% valueSet=[trig,singleChannel,window_ms,nCh,bandpass(1),bandpass(2)];
+% settingsMap=containers.Map(keySet,valueSet);
 
 %% Get Data and Triggers
 Experiments=getRecording('E:\Yuval\Analysis\spikeSorting\cleanCheck.xlsx','recNames=U4_071014_Images3');
@@ -133,9 +133,9 @@ spikeFrameLength=50;
 frameRate=200;
 sample2ms=1000/Experiments.currentDataObj.samplingFrequency; %ms=samples*sample2ms
 
-keySet={'trig','singleChannel','window','nCh','bandpass_low','bandpass_high'};
-valueSet=[trig,singleChannel,window_ms,nCh,bandpass(1),bandpass(2)];
-settingsMap=containers.Map(keySet,valueSet);
+% keySet={'trig','singleChannel','window','nCh','bandpass_low','bandpass_high'};
+% valueSet=[trig,singleChannel,window_ms,nCh,bandpass(1),bandpass(2)];
+% settingsMap=containers.Map(keySet,valueSet);
 
 startTimes=triggers{5}(trig); %ms
 [data,time]=Experiments.currentDataObj.getData([],startTimes,window_ms);
@@ -143,6 +143,7 @@ startTimes=triggers{5}(trig); %ms
 
 % plotHilbert(squeeze(FD(singleChannel,1,:)),HTabs(singleChannel,:),HTangle(singleChannel,:),time,trig,singleChannel)
 [crossings,hilbertAmps] = getHilbertCrossings(HTabs,HTangle);
+binSpikes = getSpikeBinMatByChannel(ticPath,startTimes(1), startTimes(1)+window_ms,Experiments.currentDataObj.samplingFrequency);
 
 % plotAllHilbertCrossings(crossings,hilbertAmps,squeeze(FD),settingsMap);
 Title=['U4 Trig' num2str(trig) ' Channel ' num2str(singleChannel) ' All Crossings'];
@@ -153,14 +154,13 @@ close gcf
 
 plotTitle=['U4 Trig' num2str(trig) ' Inhibitions'];
 
-binSpikes = getSpikeBinMatByChannel(ticPath,startTimes(1), startTimes(1)+window_ms,Experiments.currentDataObj.samplingFrequency);
 plotSingleHilbertCrossing(crossings{3},hilbertAmps{3},squeeze(FD(singleChannel,1,:)),'Inhibitions',singleChannel,'Spikes',binSpikes,'Title',plotTitle)
 plotSingleHilbertCrossing(crossings{3},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Inhibitions',singleChannel,'Title',plotTitle)
 dcm_obj = datacursormode(gcf);
 c_info = getCursorInfo(dcm_obj);
 [DP1,DP2]=c_info.Position;
 startEndWave=[min([DP1(1) DP2(1)]) max([DP1(1) DP2(1)])];
-% startEndWave=[23222 23833];
+% startEndWave=[23222 23833]; %startEndWave=[12149 13264];
 startEndWave_ms=startEndWave/Experiments.currentDataObj.samplingFrequency*1000+startTimes;
 saveas(gcf,['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\Spike In Waves\Trig' num2str(trig) '_Time' num2str(startEndWave_ms(1)) '-' num2str(startEndWave_ms(2)) 'ms_Samples ' num2str(startEndWave(1)) '-' num2str(startEndWave(2)) ' - Inhibition Crossing Times.jpg'])
 savefig(['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\Spike In Waves\Trig' num2str(trig) '_Time' num2str(startEndWave_ms(1)) '-' num2str(startEndWave_ms(2)) 'ms_Samples ' num2str(startEndWave(1)) '-' num2str(startEndWave(2)) ' - Inhibition Crossing Times.fig'])
@@ -213,11 +213,11 @@ saveas(gcf,['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\Spike In Wav
 
 %%Get PCA scores and calc hopkins
 % spikeCoordinates=normedData;
-spikeCoordinates=noMeandData;
-[coeff,score,latent] = pca(spikeCoordinates);
+spikeCoordinatesPCA=noMeandData;
+[coeff,score,latent] = pca(spikeCoordinatesPCA);
 %Show new axis
 f=figure;
-scatter3(spikeCoordinates(:,1),spikeCoordinates(:,2),spikeCoordinates(:,3));
+scatter3(spikeCoordinatesPCA(:,1),spikeCoordinatesPCA(:,2),spikeCoordinatesPCA(:,3));
 % hold on
 % multiplier1=100;
 % multiplier2=5;
@@ -248,10 +248,10 @@ close(f)
 % xlabel('PCA1'),ylabel('PCA2'),zlabel('PCA3')
 
 
-hopkins=calcHopkins(score(:,1:2),100000);
-hopkins=calcHopkins(score(:,1:2),100000,'subspaceLimisMethod','medianRange','plotRange',1,'nMedianDeviations',2);
+[hopkins,pvalue]=calcHopkins(score(:,1:2),100000);
+[hopkins,pvalue]=calcHopkins(score(:,1:2),100000,'subspaceLimisMethod','madRange','centerIsAverage',1,'plotRange',1,'nMedianDeviations',2)
 
-meanHopkins=mean(hopkins)
+% meanHopkins=mean(hopkins)
 steHopkins=std(hopkins)/sqrt(100000)
 
 

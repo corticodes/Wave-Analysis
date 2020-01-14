@@ -1,8 +1,8 @@
-function hopkins = calcHopkins(sampleCoordinates,n,varargin)
+function [hopkinsAVG,pValue] = calcHopkins(sampleCoordinates,n,varargin)
 %CALCHopkins calculates the Hopkins statistic for the samples given by
-%sampleCoordinates (nSamplesX2). It does this n times and returns a vector
-%of the n results
-%   Varargins (given as 'key','value' pairs
+%sampleCoordinates (nSamplesX2). It does this n times and returns the
+%average. It also returns the p-value (see explantion in output parameters)
+%   Varargins (given as 'key','value' pairs)
 %
 %       'subspaceLimisMethod': Set the limits of the sub-space in which to calc
 %       Hopkins. Possible values:
@@ -26,8 +26,16 @@ function hopkins = calcHopkins(sampleCoordinates,n,varargin)
 %       side. Default is 1. subspaceLimisMethod must be
 %       set to madRange for this to have an effect.
 %
-%   Future Plans: Allow sampleCoordinates to be nSample sXd
-
+%       Output
+%           pValue: The probability to get the hopkins value or higher 
+%           under the assumption of a beta distribution [1][2].
+%
+%       Refs:
+%       [1] HOPKINS, B. (1954), "A New Method of Determining the Type of Distribution of Plant Individuals," Annals of Botany, 18, 213-226
+%       [2] A.Adolfssona, M.Ackermana, N. C. Brownsteinb (2018), To Cluster, or Not to Cluster: An Analysis of Clusterability Methods, arXiv:1808.08317v1 [stat.ML] 24 Aug 2018
+%   Future Plans: 
+%       -Allow sampleCoordinates to be nSample sXd
+%       -Add option to perform PCA
 d=2;
 subspaceLimisMethod='dataRange';
 centerIsAverage=0;
@@ -44,7 +52,7 @@ rangeByDataLim=strcmp(subspaceLimisMethod,'dataRange');
 hopkins=zeros(1,n);
 
 nSamples=size(sampleCoordinates,1);
-m=max(round(nSamples/10),1) %sampling origins
+m=max(round(nSamples/10),1); %sampling origins
 
 if strcmp(subspaceLimisMethod,'dataRange')
     range=[min(sampleCoordinates);max(sampleCoordinates)];
@@ -109,6 +117,8 @@ for j=1:n
 %     scatter(sampleCoordinates(randSamples,1),sampleCoordinates(randSamples,2),'b','filled')
 %     close all
 end
+hopkinsAVG=mean(hopkins);
+pValue=betainc(hopkinsAVG,m,m,'upper'); %betainc is already normalized by beta(m,m)
 
 % 
 % scatter(sampleCoordinates(:,1),sampleCoordinates(:,2))
