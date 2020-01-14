@@ -46,8 +46,10 @@ plotHilbert(squeeze(FD(singleChannel,1,:)),HTabs(singleChannel,:),HTangle(single
 spikesPerChannel = getSpikesPerChannel(ticPath);
 binSpikes = getSpikeBinMatByChannel(ticPath,startTimes,startTimes+window_ms,Experiments.currentDataObj.samplingFrequency);
 
-plotAllHilbertCrossings(crossings,hilbertAmps,squeeze(FD),settingsMap,spikesPerChannel,[startTimes(1) startTimes(1)+window_ms],Experiments.currentDataObj.samplingFrequency)
-plotAllHilbertCrossings(crossings,hilbertAmps,squeeze(FD),settingsMap)
+
+Title=['U4 Trig' num2str(trig) ' Channel ' num2str(singleChannel) ' All Crossings'];
+plotAllHilbertCrossings(crossings,hilbertAmps,squeeze(FD(singleChannel,1,:)),singleChannel,'Spikes',binSpikes,'Title',Title);
+plotAllHilbertCrossings(crossings,hilbertAmps,squeeze(FD(singleChannel,1,:)),singleChannel);
 
 %plot single crossings
 plotSingleHilbertCrossing(crossings{1},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Maxima (upward crossings)',singleChannel,'Spikes',binSpikes)
@@ -143,7 +145,8 @@ startTimes=triggers{5}(trig); %ms
 [crossings,hilbertAmps] = getHilbertCrossings(HTabs,HTangle);
 
 % plotAllHilbertCrossings(crossings,hilbertAmps,squeeze(FD),settingsMap);
-plotAllHilbertCrossings(crossings,hilbertAmps,squeeze(FD),settingsMap,spikesPerChannel,[startTimes(1) startTimes(1)+window_ms],Experiments.currentDataObj.samplingFrequency);
+Title=['U4 Trig' num2str(trig) ' Channel ' num2str(singleChannel) ' All Crossings'];
+plotAllHilbertCrossings(crossings,hilbertAmps,squeeze(FD(singleChannel,1,:)),singleChannel,'Spikes',binSpikes,'Title',Title);
 saveas(gcf,['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\Spike In Waves\Trig' num2str(trig) ' - All Crossings.jpg'])
 savefig(['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\Spike In Waves\Trig' num2str(trig) ' - All Crossings'])
 close gcf
