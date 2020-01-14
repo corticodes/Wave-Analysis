@@ -1,4 +1,4 @@
-function [] = plotCrossingsPhysical(selectedCrossings,startEndWave,En,hilbertAmps,varargin)
+function f = plotCrossingsPhysical(selectedCrossings,startEndWave,En,hilbertAmps,varargin)
 %GETCROSSINGSINSPECIFICWINDOW uses IntensityPhysicalSpacePlot to plot the
 %time to the first crossing in selectedCrossings for each channel. It looks
 %at the window defined by startEndWave. t=0 is defined by the time that the 
@@ -20,7 +20,7 @@ function [] = plotCrossingsPhysical(selectedCrossings,startEndWave,En,hilbertAmp
 %       Figure title
 %TODO: Add option not to send hilbertAmps
 
-
+f=figure;
 Units='ms';
 
 for i=1:2:length(varargin)
