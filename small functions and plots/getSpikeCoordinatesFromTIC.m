@@ -4,7 +4,7 @@ function [spikeCoordinates] = getSpikeCoordinatesFromTIC(ticPath,startEndWave_ms
 %   spikeCoordinates are nSpikesX3 (y,x,samples) coordinates of the nSpikes
 %   spikes found in the window startEndWave_ms(1)-startEndWave_ms(2)
 
-spikesPerChannel=getSpikesPerChannel(ticPath,max(En(:)));
+spikesPerChannel=getSpikesPerChannel(ticPath);
 
 Elecs=sort(En(:));
 Elecs=Elecs(~isnan(Elecs));
