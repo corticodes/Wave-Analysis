@@ -44,18 +44,18 @@ plotHilbert(squeeze(FD(singleChannel,1,:)),HTabs(singleChannel,:),HTangle(single
 
 %plot all crossings
 spikesPerChannel = getSpikesPerChannel(ticPath);
-binSpikes = getSpikeBinMatByChannel(ticPath,nCh,start_times_ms,end_times_ms,sampling_rate);
+binSpikes = getSpikeBinMatByChannel(ticPath,startTimes,startTimes+window_ms,Experiments.currentDataObj.samplingFrequency);
 
 plotAllHilbertCrossings(crossings,hilbertAmps,squeeze(FD),settingsMap,spikesPerChannel,[startTimes(1) startTimes(1)+window_ms],Experiments.currentDataObj.samplingFrequency)
 plotAllHilbertCrossings(crossings,hilbertAmps,squeeze(FD),settingsMap)
 
 %plot single crossings
-plotSingleHilbertCrossing(crossings{1},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Maxima (upward crossings)')
-plotSingleHilbertCrossing(crossings{1},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Maxima (upward crossings)',spikesPerChannel,[startTimes(1) startTimes(1)+window_ms],Experiments.currentDataObj.samplingFrequency)
-plotSingleHilbertCrossing(crossings{2},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Minima (downward crossings)',settingsMap)
-plotSingleHilbertCrossing(crossings{3},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Inhibitions',settingsMap)
-plotSingleHilbertCrossing(crossings{3},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Inhibitions',settingsMap,spikesPerChannel,[startTimes(1) startTimes(1)+window_ms],Experiments.currentDataObj.samplingFrequency)
-plotSingleHilbertCrossing(crossings{4},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Excitations',settingsMap)
+plotSingleHilbertCrossing(crossings{1},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Maxima (upward crossings)','Spikes',binSpikes)
+plotSingleHilbertCrossing(crossings{1},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Maxima (upward crossings)','Spikes',binSpikes)
+plotSingleHilbertCrossing(crossings{2},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Minima (downward crossings)')
+plotSingleHilbertCrossing(crossings{3},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Inhibitions')
+plotSingleHilbertCrossing(crossings{3},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Inhibitions','Spikes',binSpikes)
+plotSingleHilbertCrossing(crossings{4},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Excitations')
 
 %Plot Physical lags of first crossing in a window
 % startEndWave=[8858 9867]; %samples. Chosen manually from fig trig=10;
@@ -149,7 +149,9 @@ savefig(['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\Spike In Waves\
 close gcf
 
 plotTitle=['U4 Trig' num2str(trig) ' Inhibitions'];
-plotSingleHilbertCrossing(crossings{3},hilbertAmps{3},squeeze(FD(singleChannel,1,:)),'Inhibitions','spikesPerChannel',spikesPerChannel,'dataTime', [startTimes(1) startTimes(1)+window_ms],'samplingFrequency',Experiments.currentDataObj.samplingFrequency,'Title',plotTitle)
+
+binSpikes = getSpikeBinMatByChannel(ticPath,startTimes(1), startTimes(1)+window_ms,Experiments.currentDataObj.samplingFrequency);
+plotSingleHilbertCrossing(crossings{3},hilbertAmps{3},squeeze(FD(singleChannel,1,:)),'Inhibitions','Spikes',binSpikes,'Title',plotTitle)
 plotSingleHilbertCrossing(crossings{3},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Title',plotTitle)
 dcm_obj = datacursormode(gcf);
 c_info = getCursorInfo(dcm_obj);
