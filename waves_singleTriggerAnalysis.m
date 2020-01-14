@@ -50,12 +50,12 @@ plotAllHilbertCrossings(crossings,hilbertAmps,squeeze(FD),settingsMap,spikesPerC
 plotAllHilbertCrossings(crossings,hilbertAmps,squeeze(FD),settingsMap)
 
 %plot single crossings
-plotSingleHilbertCrossing(crossings{1},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Maxima (upward crossings)','Spikes',binSpikes)
-plotSingleHilbertCrossing(crossings{1},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Maxima (upward crossings)','Spikes',binSpikes)
-plotSingleHilbertCrossing(crossings{2},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Minima (downward crossings)')
-plotSingleHilbertCrossing(crossings{3},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Inhibitions')
-plotSingleHilbertCrossing(crossings{3},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Inhibitions','Spikes',binSpikes)
-plotSingleHilbertCrossing(crossings{4},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Excitations')
+plotSingleHilbertCrossing(crossings{1},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Maxima (upward crossings)',singleChannel,'Spikes',binSpikes)
+plotSingleHilbertCrossing(crossings{1},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Maxima (upward crossings)',singleChannel,'Spikes',binSpikes)
+plotSingleHilbertCrossing(crossings{2},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Minima (downward crossings)',singleChannel)
+plotSingleHilbertCrossing(crossings{3},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Inhibitions',singleChannel)
+plotSingleHilbertCrossing(crossings{3},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Inhibitions',singleChannel,'Spikes',binSpikes)
+plotSingleHilbertCrossing(crossings{4},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Excitations',singleChannel)
 
 %Plot Physical lags of first crossing in a window
 % startEndWave=[8858 9867]; %samples. Chosen manually from fig trig=10;
@@ -119,10 +119,10 @@ ticPath='E:\Yuval\Analysis\spikeSorting\sample data\U4\U4_071014_Images3001_layo
 
 
 load(Experiments.currentDataObj.layoutName)
-nCh=120; %number of channels - in code this will channels arrays will be 1:nCh
+% nCh=120; %number of channels - in code this will channels arrays will be 1:nCh
 spikesPerChannel = getSpikesPerChannel(ticPath);
 
-trig=1;
+trig=14;
 singleChannel=113;
 window_ms=1500; %ms
 bandpass=[12 34];
@@ -151,8 +151,8 @@ close gcf
 plotTitle=['U4 Trig' num2str(trig) ' Inhibitions'];
 
 binSpikes = getSpikeBinMatByChannel(ticPath,startTimes(1), startTimes(1)+window_ms,Experiments.currentDataObj.samplingFrequency);
-plotSingleHilbertCrossing(crossings{3},hilbertAmps{3},squeeze(FD(singleChannel,1,:)),'Inhibitions','Spikes',binSpikes,'Title',plotTitle)
-plotSingleHilbertCrossing(crossings{3},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Title',plotTitle)
+plotSingleHilbertCrossing(crossings{3},hilbertAmps{3},squeeze(FD(singleChannel,1,:)),'Inhibitions',singleChannel,'Spikes',binSpikes,'Title',plotTitle)
+plotSingleHilbertCrossing(crossings{3},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Inhibitions',singleChannel,'Title',plotTitle)
 dcm_obj = datacursormode(gcf);
 c_info = getCursorInfo(dcm_obj);
 [DP1,DP2]=c_info.Position;

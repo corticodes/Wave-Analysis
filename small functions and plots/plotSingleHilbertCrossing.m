@@ -1,19 +1,18 @@
-function [] = plotSingleHilbertCrossing(singleCrossings,crossingsAmps,FD,crossingType,varargin)
+function [] = plotSingleHilbertCrossing(singleCrossings,crossingsAmps,FD,crossingType,channelShown,varargin)
 %PLOTSINGLEHILBERTCROSSING plots the occurences of a specific crossings,
-%with color map indicating the hilbert amplitude
+%with color map indicating the hilbert amplitude. It also plots filtered
+%data from a single exemplary channel
 %   singleCrossings are the specific crossings (upwards, downwards,
 %   inhibition or excitation) as recived by getHilbertCrossings.
 %   crossingsAmps are the amplitudes at these times. 
-%   FD is the squeezed 1XnSamples filtered data from which hilbert and 
-%   the crossings were calculated
+%   FD (1XnSamples) is the exemplary filtered data from a specific channel
 %   crossingType (string) is the crossing type (minima/inhibition etc.)
+%   channelShown is the channel number of the data being shown (FD)
 %   Varargins (given as 'Key'Value pairs:
 %      Spikes (logical nChXnSamples)
 %           Plots a red circle where Spikes is true
 %      Title (string)
 %           Figure title
-
-singleChannel=1;
 
 for i=1:2:length(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
@@ -28,7 +27,7 @@ for i=chNum(2:end)
         scatter(singleCrossings(i,singleCrossings(chNum(i),:)~=0),i*ones(1,numel(singleCrossings(i,singleCrossings(chNum(i),:)~=0))),sz,crossingsAmps(i,singleCrossings(chNum(i),:)~=0));
 end
 h(2)=plot(FD,'b');
-h(3)=plot(0:size(FD,2),singleChannel*ones(1,size(FD,2)+1),'--k');
+h(3)=plot(0:numel(FD),channelShown*ones(1,numel(FD)+1),'--k');
 
 %legend hack
 h(1)=plot(nan,nan,'ob');
@@ -41,7 +40,7 @@ if exist('Spikes','var')
        spikeInd=find(Spikes(i,:));
        plot(spikeInd, i*ones(1,length(spikeInd)),'or');
     end
-    legend([h(1) h(2) h(3) h(4)],{crossingType,'Filtered Data',['Current Channel (' num2str(singleChannel) ')'],'Spikes'})
+    legend([h(1) h(2) h(3) h(4)],{crossingType,'Filtered Data',['Current Channel (' num2str(channelShown) ')'],'Spikes'})
 else
     legend([h(1) h(2) h(3)],{crossingType,'Filtered Data','Current Channel'})
 end
@@ -53,7 +52,7 @@ end
 hcb=colorbar;
 title(hcb,'Hilbert Amplitude [uV]');
 xlabel('Samples')
-ylabel(['Filtered Data (Channel' num2str(singleChannel) ') [uV]'])
+ylabel(['Filtered Data (Channel' num2str(channelShown) ') [uV]'])
 
 end
 
