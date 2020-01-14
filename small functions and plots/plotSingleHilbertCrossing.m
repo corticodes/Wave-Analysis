@@ -8,13 +8,8 @@ function [] = plotSingleHilbertCrossing(singleCrossings,crossingsAmps,FD,crossin
 %   the crossings were calculated
 %   crossingType (string) is the crossing type (minima/inhibition etc.)
 %   Varargins (given as 'Key'Value pairs:
-%      spikesPerChannel (nChX1) cell array, where spikesPerChannel{i} are 
-%           all the spike times of channel i. Must be sent with 
-%           dataTime,samplingFrequency. When these are sent spikes will 
-%           also be plotted.
-%      dataTime 1X2 the time in ms from the start of the recording to the 
-%           [first,last] sample in FD
-%      samplingFrequency (1x1) thesampling frequency (Hz)
+%      Spikes (logical nChXnSamples)
+%           Plots a red circle where Spikes is true
 %      Title (string)
 %           Figure title
 
@@ -22,10 +17,6 @@ singleChannel=1;
 
 for i=1:2:length(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
-end
-
-if exist('spikesPerChannel','var') && (~exist('dataTime','var') || ~exist('samplingFrequency','var'))
-    error('Variable ''spikesPerChannel'' must be given together with ''dataTime'' and ''samplingFrequency'' (see function description)')
 end
 
 chNum=1:size(singleCrossings,1);
@@ -45,10 +36,10 @@ h(2)=plot(nan,nan,'b');
 h(3)=plot(nan,nan,'--k');
 h(4)=plot(nan,nan,'or');
 
-if exist('spikesPerChannel','var')
+if exist('Spikes','var')
     for i=chNum
-       findInd=find(spikesPerChannel{i}>dataTime(1) & spikesPerChannel{i}<dataTime(2));
-       plot((spikesPerChannel{i}(findInd)-dataTime(1))*samplingFrequency/1000, i*ones(1,length(findInd)),'or');
+       spikeInd=find(Spikes(i,:));
+       plot(spikeInd, i*ones(1,length(spikeInd)),'or');
     end
     legend([h(1) h(2) h(3) h(4)],{crossingType,'Filtered Data',['Current Channel (' num2str(singleChannel) ')'],'Spikes'})
 else
