@@ -1,4 +1,4 @@
-function f = plotCrossingsPhysical(selectedCrossings,startEndWave,En,hilbertAmps,varargin)
+function [PLM,f] = plotCrossingsPhysical(selectedCrossings,startEndWave,En,hilbertAmps,varargin)
 %GETCROSSINGSINSPECIFICWINDOW uses IntensityPhysicalSpacePlot to plot the
 %time to the first crossing in selectedCrossings for each channel. It looks
 %at the window defined by startEndWave. t=0 is defined by the time that the 
@@ -18,6 +18,12 @@ function f = plotCrossingsPhysical(selectedCrossings,startEndWave,En,hilbertAmps
 %       Units of crossing times and startEndWave. Default is ms.
 %   Title (string)
 %       Figure title
+%OUTPUT:
+%   PLM (1XnCh)
+%       Phase Latency Map - the times all channel reached the crossings
+%       for the first time, in same units as selectedCrossings. The time of
+%       first channel to cross is defined as t=0. Channels which did not 
+%       cross will contain NaNs.
 %TODO: Add option not to send hilbertAmps
 
 f=figure;
@@ -60,6 +66,11 @@ if exist('Title','var')
 end 
 
 % xlabel(['Note: Channels with no crossings in window is assigned the value of ' num2str((nullValue-firstCrossing)*sample2ms) 'ms'],'Color',[1 1 1]*0.5,'FontSize',9)
+
+
+if exists('PLM','var')
+    PLM=pT;
+end
 
 end
 
