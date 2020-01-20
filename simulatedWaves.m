@@ -84,26 +84,40 @@ saveas(gcf,['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\
 savefig(['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\' waveName ' - Physical Lag.fig'])
 close gcf
 
+%% Physical plot for simulated wave
+
+load('E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\spike simulations\continuous2 wave max prob 003\Spike Wave - Spikes and Hopkins.mat','spikeProbability')
+load('E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\spike simulations\continuous2 wave max prob 003\Spike Wave - Gauss Simulation Params.mat','layoutSize')
+
+simData=spikeProbability;
+En=reshape(1:(layoutSize^2),layoutSize,layoutSize);
+startEndWave=[1 size(simData,3)];
+
+HT=hilbert(squeeze(convertMovieToChannels(simData,En))').';
+HTabs=abs(HT);
+HTangle=angle(HT);
+
+[crossings,hilbertAmps] = getHilbertCrossings(HTabs,HTangle);
+
+
+plotCrossingsPhysical(crossings{1},startEndWave,flipud(En),hilbertAmps{1},'Units','frames')
+
+
+
+
+plotCrossingsPhysical(crossings{1},startEndWave,flipud(En),hilbertAmps{1},'Units','frames')
+
+
+
+
 
 
 %% simulate spikes and calc hopkins
 
-saveDir='E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\spike simulations';
+saveDir='E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\spike simulations\redo Hopkins';
 
 %%Params for spikes with probabilty by gaussians
-saveParamsName='Spike Wave';
-spikeProbability = simulateGaussians(layoutSize,gaussSigma,pulseFrames*2,distInSigmas,tempOverlapInPulseFrames);
-maxProb=0.005;
-spikeFrameLength=10;
-exportMovie=1;
-pixelsPerChannel=[51 51];
-pixelsPerSpike=1;
-cluster=1;
-normalizeSpikes=0;
-
-
-%%Params for spikes with probabilty by gaussians
-saveParamsName='Spike Wave';
+saveParamsName='Two Pulses Spike';
 spikeProbability = simulateGaussians(layoutSize,gaussSigma,pulseFrames*2,distInSigmas,tempOverlapInPulseFrames);
 maxProb=0.005;
 spikeFrameLength=10;
@@ -205,9 +219,12 @@ close(f)
 % xlabel('PCA1'),ylabel('PCA2'),zlabel('PCA3')
 
 
-hopkins=calcHopkins(score(:,1:2),100000);
-meanHopkins=mean(hopkins)
-steHopkins=std(hopkins)/sqrt(100000)
+[hopkins,pvalue]=calcHopkins(score(:,1:2),100000);
+[hopkins,pvalue]=calcHopkins(score(:,1:2),100000,'subspaceLimisMethod','medianRange','plotRange',1);
+[hopkins,pvalue]=calcHopkins(score(:,1:2),1000,'subspaceLimisMethod','madRange','plotRange',1,'nMedianDeviations',2,'centerIsAverage',1)
+
+% meanHopkins=mean(hopkins)
+% steHopkins=std(hopkins)/sqrt(100000)
 
 save([saveDir filesep saveParamsName ' - Gauss Simulation Params'],'layoutSize','gaussSigma','pulseFrames','distInSigmas','tempOverlapInPulseFrames')
 
@@ -245,6 +262,62 @@ saveas(gcf,['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\Spike In Wav
 savefig(['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\spike simulations\'])
 
 
+%% calc diptest for simulated data
+
+% spikesDir='E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\spike simulations\gaussian Wave hopkins 06';
+% distName='Spike by gaussian Wave';
+% spikesDir='E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\spike simulations\continuous2 wave max prob 003';
+% distName='Spike Wave';
+% spikesDir='E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\spike simulations\highly clustered example hopkins 07';
+% distName='Highly Clustered';
+
+%Get Spike data of 23222 23833 in trig1 by using script
+%waves_singleTriggerAnalysis.m
+
+spikesDir='E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\spike simulations\highly clustered example hopkins 07';
+distName='Highly Clustered';
+
+
+loadSpikeMat='Spikes and Hopkins';
+loadSimMat='Gauss Simulation Params';
+
+load([spikesDir filesep distName ' - ' loadSpikeMat '.mat'],'simulatedSpikesXYT','spikeProbability')
+load([spikesDir filesep distName ' - ' loadSimMat '.mat'],'layoutSize')
+% videoDir=[spikesDir filesep distName ' - Video Check'];
+videoDir=['\\sil2\Literature\Projects\corplex\progress reports\meetings\next\hopkins vs dip' filesep 'Real Data Wave1'];
+exportVideo(spikeProbability,videoDir,50,[51 51],'spikeCoordinates',simulatedSpikesXYT)
+% exportVideo(spikeProbability,videoDir,50,[1 1],'spikeCoordinates',simulatedSpikesXYT,'pixelsPerSpike',6)
+
+spikeCoordinates=simulatedSpikesXYT;
+
+plotWaveSpikes(spikeCoordinates,[layoutSize,layoutSize])
+
+distMat = calcSpikeDists(spikeCoordinates);
+% hist(distMat(1,2:end),50)
+% H=hist(distMat(1,2:end),50);
+
+pmin=1;
+for i=1:size(spikeCoordinates,1)
+    [dip, p] = hartigansdipsigniftest(sort(distMat(1,[1:(i-1) (i+1):end])), 5000);
+    if p<pmin
+        pmin=p;
+        imin=i;
+    end
+end
+pmin
+hist(distMat(1,[1:(imin-1) (imin+1):end]),50)
+xlabel('Distances')
+ylabel('Frequency')
+
+meanData=mean(spikeCoordinates);
+% stdData=std(spikeCoordinates);
+spikeCoordinatesNoMean=spikeCoordinates-meanData;
+[coeff,score,latent] = pca(spikeCoordinatesNoMean);
+scatter(score(:,1),score(:,2))
+hopkins=calcHopkins(score(:,1:2),100000);
+
+meanHopkins=mean(hopkins)
+steHopkins=std(hopkins)/sqrt(100000)
 
 %% calc gradient
 
