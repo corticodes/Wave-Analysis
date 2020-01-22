@@ -1,16 +1,3 @@
-%% old - to be deleted
-
-% % trig=10;
-% % singleChannel=66;
-% % window_ms=1500; %ms
-% % nCh=120; %number of channels - in code this will channels arrays will be 1:nCh
-% % bandpass=[12 34];
-
-% keySet={'trig','singleChannel','window','nCh','bandpass_low','bandpass_high'};
-% valueSet=[trig,singleChannel,window_ms,nCh,bandpass(1),bandpass(2)];
-% settingsMap=containers.Map(keySet,valueSet);
-
-
 %% simulate gaussians - parameters
 
 % two totally seperate gaussians
