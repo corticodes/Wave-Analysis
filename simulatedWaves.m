@@ -8,12 +8,20 @@ pulseFrames=100;
 distInSigmas=[2 2];
 tempOverlapInPulseFrames=0.01;
 
-% two gaussians slightly overlapping (time+space) (Needs Revision)
+% two gaussians slightly overlapping (time+space) (Needs Revision?)
 gaussTXT='Gaussians - Two Overlapping';
 layoutSize=12;
 gaussSigma=3;
 pulseFrames=100;
 distInSigmas=[1.5 1.5];
+tempOverlapInPulseFrames=0.7;
+
+% two gaussians slightly overlapping (time+space) same height
+gaussTXT='Gaussians - Two Overlapping';
+layoutSize=12;
+gaussSigma=3;
+pulseFrames=100;
+distInSigmas=[1.5 0];
 tempOverlapInPulseFrames=0.7;
 
 % two coaxial gaussians
@@ -50,6 +58,7 @@ waveName=[gaussTXT '_gaussSigma' num2str(gaussSigma) '_distInSigmasX' num2str(di
 
 %% simulate gaussian and export
 
+%radial
 saveDir='E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\';
 saveParamsName='Radial Wave';
 videoDir=[saveDir filesep waveName];    
@@ -70,6 +79,38 @@ plotCrossingsPhysical(crossings{1},startEndWave,flipud(En),hilbertAmps{1},'Units
 saveas(gcf,['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\' waveName ' - Physical Lag.jpg'])
 savefig(['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\' waveName ' - Physical Lag.fig'])
 close gcf
+
+%two gaussians
+
+saveDir='E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\Check Analytics';
+saveParamsName='Two Gaussians';
+videoDir=[saveDir filesep waveName];    
+
+
+waveData=simulateGaussians(layoutSize,gaussSigma,pulseFrames,distInSigmas,tempOverlapInPulseFrames);
+exportVideo(waveData,videoDir,30,pixelsPerChannel);
+
+HT=hilbert(squeeze(convertMovieToChannels(waveData,En))').';
+HTabs=abs(HT);
+HTangle=angle(HT);
+
+[crossings,hilbertAmps] = getHilbertCrossings(HTabs,HTangle);
+
+startEndWave=[1 size(waveData,3)]; %twoGausses
+
+plotCrossingsPhysical(crossings{1},startEndWave,flipud(En),hilbertAmps{1},'Units','frames')
+saveas(gcf,['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\' waveName ' - Physical Lag.jpg'])
+savefig(['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\' waveName ' - Physical Lag.fig'])
+close gcf
+
+% trace maximum
+maxPos=zeros(size(waveData,3),3);
+for i=1:size(waveData,3)
+   [y,x]=find(waveData(:,:,i)==max(max(waveData(:,:,i))),1);
+   maxPos(i,:)=[x,y,i];
+end
+exportVideo(waveData,[videoDir 'with max'],30,pixelsPerChannel,'particlePath',[maxPos(:,1) maxPos(:,2)]);
+
 
 %% Physical plot for simulated wave
 
