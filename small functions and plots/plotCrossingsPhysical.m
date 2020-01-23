@@ -68,7 +68,7 @@ end
 % xlabel(['Note: Channels with no crossings in window is assigned the value of ' num2str((nullValue-firstCrossing)*sample2ms) 'ms'],'Color',[1 1 1]*0.5,'FontSize',9)
 
 
-if exists('PLM','var')
+if exist('PLM','var')
     PLM=pT;
 end
 
