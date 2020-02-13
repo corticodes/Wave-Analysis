@@ -103,14 +103,14 @@ triggersToCheck=1:500;
 startTimesToCheck=triggers{5}(triggersToCheck); %ms
 [dataToCheck]=Experiments.currentDataObj.getData([],startTimesToCheck,window_ms);
 maxDiff=max(dataToCheck,[],[1,3]);
-strogResponse=find(maxDiff>(max(maxDiff)*0.5));
-imagesWithStrongRespons=VST.imgNames(VST.imgSequence(VST.order(strogResponse)));
+strongResponse=find(maxDiff>(max(maxDiff)*0.5));
+imagesWithStrongRespons=VST.imgNames(VST.imgSequence(VST.order(strongResponse)));
 [imagesWithStrongResponsUnique,ia,ic]=unique(imagesWithStrongRespons);
 countRepets=accumarray(ic,1);
 bar(1:length(countRepets),countRepets)
 % set(gca,'xticklabel',[])
 % text(1:length(countRepets),-1.5*ones(1,length(countRepets)),imagesWithStrongResponsUnique,'rotation',90)
-
+% strongResponse=[1,5,14,18,45,67,79,87,103,112,119,120,121,131,151,161,169,202,206,235,239,267,274,282,288,291,294,333,349,366,368,379,390,392,395,415,430,431,440,469,483,498,500];
 
 %% code for fast choosing and exporting wave figs and movies
 %running over "strogResponse" array. 
@@ -124,7 +124,8 @@ load(Experiments.currentDataObj.layoutName)
 % nCh=120; %number of channels - in code this will channels arrays will be 1:nCh
 spikesPerChannel = getSpikesPerChannel(ticPath);
 
-trig=14;
+% trig=18;
+trig=strongResponse(5);
 singleChannel=113;
 window_ms=1500; %ms
 bandpass=[12 34];
@@ -162,6 +163,7 @@ c_info = getCursorInfo(dcm_obj);
 startEndWave=[min([DP1(1) DP2(1)]) max([DP1(1) DP2(1)])];
 % startEndWave=[23222 23833]; %startEndWave=[12149 13264];
 startEndWave_ms=startEndWave/Experiments.currentDataObj.samplingFrequency*1000+startTimes;
+mkdir('\\sil2\Data\Wave Analysis\U4\Trials\Trial 1\Waves In Trial',['Samples' num2str(startEndWave(1)) '-' num2str(startEndWave(2)) '_Time' num2str(startEndWave_ms(1)) '-' num2str(startEndWave_ms(2))]);
 saveas(gcf,['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\Spike In Waves\Trig' num2str(trig) '_Time' num2str(startEndWave_ms(1)) '-' num2str(startEndWave_ms(2)) 'ms_Samples ' num2str(startEndWave(1)) '-' num2str(startEndWave(2)) ' - Inhibition Crossing Times.jpg'])
 savefig(['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\Spike In Waves\Trig' num2str(trig) '_Time' num2str(startEndWave_ms(1)) '-' num2str(startEndWave_ms(2)) 'ms_Samples ' num2str(startEndWave(1)) '-' num2str(startEndWave(2)) ' - Inhibition Crossing Times.fig'])
 close gcf
