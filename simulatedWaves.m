@@ -63,8 +63,7 @@ saveDir='E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\';
 saveParamsName='Radial Wave';
 videoDir=[saveDir filesep waveName];    
 
-
-radialWave=simulateGaussians(layoutSize,gaussSigma,pulseFrames,distInSigmas,tempOverlapInPulseFrames,'x1',layoutSize/2,'y1',layoutSize/2);
+radialWave=simulateGaussians(layoutSize,gaussSigma(1)^2,gaussSigma(2)^2,pulseFrames,distInSigmas,tempOverlapInPulseFrames,'x1',layoutSize/2,'y1',layoutSize/2,'distUnits','Sigma');
 exportVideo(radialWave,videoDir,30,pixelsPerChannel);
 
 HT=hilbert(squeeze(convertMovieToChannels(radialWave,En))').';
@@ -84,10 +83,10 @@ close gcf
 
 saveDir='E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\Check Analytics';
 saveParamsName='Two Gaussians';
-videoDir=[saveDir filesep waveName];    
+videoDir=[saveDir filesep waveName '2'];    
 
 
-waveData=simulateGaussians(layoutSize,gaussSigma,pulseFrames,distInSigmas,tempOverlapInPulseFrames);
+waveData=simulateGaussians(layoutSize,gaussSigma^2,gaussSigma^2,pulseFrames,distInSigmas,tempOverlapInPulseFrames,'distUnits','Sigma');
 exportVideo(waveData,videoDir,30,pixelsPerChannel);
 
 HT=hilbert(squeeze(convertMovieToChannels(waveData,En))').';
@@ -110,6 +109,36 @@ for i=1:size(waveData,3)
    maxPos(i,:)=[x,y,i];
 end
 exportVideo(waveData,[videoDir 'with max'],30,pixelsPerChannel,'particlePath',[maxPos(:,1) maxPos(:,2)]);
+
+
+% two elipsoids
+saveDir='E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\';
+saveParamsName='Spiral Wave';
+videoDir=[saveDir filesep 'Spiral'];    
+cov1=[1 0; 0 9];
+cov2=[4 0; 0 9];
+tempOverlapInPulseFrames=0.8;
+
+spiralWave=simulateGaussians(layoutSize,cov1,cov2,pulseFrames,[1 2],tempOverlapInPulseFrames,'x1',layoutSize/2,'y1',layoutSize/3);
+exportVideo(spiralWave,videoDir,30,pixelsPerChannel);
+
+HT=hilbert(squeeze(convertMovieToChannels(spiralWave,En))').';
+HTabs=abs(HT);
+HTangle=angle(HT);
+
+[crossings,hilbertAmps] = getHilbertCrossings(HTabs,HTangle);
+
+startEndWave=[1 size(radialWave,3)]; %twoGausses
+
+plotCrossingsPhysical(crossings{1},startEndWave,flipud(En),hilbertAmps{1},'Units','frames')
+saveas(gcf,['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\' waveName ' - Physical Lag.jpg'])
+savefig(['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\' waveName ' - Physical Lag.fig'])
+close gcf
+
+
+crossings2d = crossingsTo2D(crossings{1},flipud(En),startEndWave);
+[grad_x,grad_y] = calcGradient(crossings2d);
+quiver(grad_x,grad_y)
 
 
 %% Physical plot for simulated wave
@@ -146,7 +175,7 @@ saveDir='E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\spik
 
 %%Params for spikes with probabilty by gaussians
 saveParamsName='Two Pulses Spike';
-spikeProbability = simulateGaussians(layoutSize,gaussSigma,pulseFrames*2,distInSigmas,tempOverlapInPulseFrames);
+spikeProbability = simulateGaussians(layoutSize,gaussSigma^2,gaussSigma^2,pulseFrames*2,distInSigmas,tempOverlapInPulseFrames,'distUnits','Sigma');
 maxProb=0.005;
 spikeFrameLength=10;
 exportMovie=1;
@@ -389,6 +418,10 @@ close gcf
     
 %% simulate other waves
 
+%simulate two ellipsoid gaussians
+
+
+
 %simulate radial wave
 layoutSize=16; %chanel layout is layoutSizeXlayoutSize
 radFramesTot=2000; %how much frames from guassian appears till disappears
@@ -461,101 +494,63 @@ close(dataVideo);
 %}
 
 
-%% OLD CODE TO BE DELETED
-
-% simulatedPulses = simulateGaussians(layoutSize,gaussSigma,pulseFrames,distInSigmas,tempOverlapInPulseFrames,'x1',6,'y1',6);
-simulatedPulses = simulateGaussians(layoutSize,gaussSigma,pulseFrames*2,distInSigmas,tempOverlapInPulseFrames);
-[x_sim,y_sim,t_sim] = simulateSpikes(simulatedPulses,0.005);
-simulatedSpikesXYT=[x_sim,y_sim,t_sim];
-
-save('veryClusteredSpikes','layoutSize','gaussSigma','pulseFrames','distInSigmas','tempOverlapInPulseFrames','simulatedPulses','simulatedSpikesXYT')
-load('veryClusteredSpikes','layoutSize','gaussSigma','pulseFrames','distInSigmas','tempOverlapInPulseFrames','simulatedPulses','simulatedSpikesXYT')
 
 
-% channelData = convertMovieToChannels(simulatedPulses,En);
+%% Visualize two guassians 1d
+
+%define parameters
+deltaX=2; %distance between gaussian centers
+sigmaX=sqrt(0.25*deltaX); %gussians' std
+deltaT=2; %time different between times of peak height of the two guassians. Setting first peak to 0
+% deltaT=4;
+sigmaT=1; %gussians' std in time
 
 
-% videoName='twoGaussRevised.avi';
-videoDir=['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\' filesep waveName ' - Video'];
-
-% exportVideo(channelData,[1 size(channelData,2)],videoDir,30,settingsMap,En,[1 1])
-exportVideo(simulatedPulses,[videoDir ' retry'],30,[51 51],'spikeCoordinates',[y_sim,x_sim,t_sim],'spikeFrameLength',10)
-
-[x_sim,y_sim,t_sim]=deal(simulatedSpikesXYT(:,1),simulatedSpikesXYT(:,2),simulatedSpikesXYT(:,3));
-f=plotWaveSpikes([x_sim,y_sim,t_sim],[layoutSize layoutSize]);
-meanData=mean([x_sim,y_sim,t_sim]);
-stdData=std([x_sim,y_sim,t_sim]);
-zeroMeanData=[x_sim,y_sim,t_sim]-meanData;
-normedData=([x_sim,y_sim,t_sim]-meanData)./stdData;
-% normedData=([x_sim,y_sim,t_sim]-meanData);
-[cidx2,cmeans2] = kmeans(normedData,2,'replicates',5);
-% f=plotWaveSpikes([x_sim,y_sim,t_sim],[layoutSize layoutSize],cidx2,cmeans2+meanData);
-f=plotWaveSpikes([x_sim,y_sim,t_sim],[layoutSize layoutSize],cidx2,cmeans2.*stdData+meanData);
-
-[coeff_normed,score_normed,latent_normed] = pca(normedData);
-[coeff_zeroMean,score_zeroMean,latent_zeroMean] = pca(zeroMeanData);
+x0=sigmaX^2/deltaX;
+x_avg=0;
+tau=sigmaT^2/deltaT;
+t_avg=deltaT/2;
+A=exp(2*x_avg/x0+2*t_avg/tau); %x_avg should be set to zero but is here for completeness
+x1=-deltaX/2;
+x2=deltaX/2;
+t1=0;
+t2=deltaT;
+nPlots=5;
+plotLength=20;
 
 
+x=repmat(linspace(3*x1,3*x2,plotLength)',1,nPlots);
+t=repmat(linspace(t1,2*t2,nPlots),plotLength,1); %total will be the time of the second peak plus two temporal stds
 
+v=exp(-(t-t1).^2/(2*sigmaT^2)-(x-x1).^2/(2*sigmaX^2))+exp(-(t-t2).^2/(2*sigmaT^2)-(x-x2).^2/(2*sigmaX^2));
+plot(x,v)
+legend(['t=' num2str(t(1,1))], ['t=' num2str(t(1,2))],['t=' num2str(t(1,3))],['t=' num2str(t(1,4))],['t=' num2str(t(1,5))])
+xlabel(['DeltaX=' num2str(deltaX) ' SigmaX=' num2str(sigmaX) ' DeltaT=' num2str(deltaT) ' sigmaT=' num2str(sigmaT)])
 
-% % X=X-mean(X,2);   %zero-mean data
-% [U,S,V]=svd(normedData');  %svd
-% [m, n]=size(normedData');
-% S2=S(1:m,1:m); Values=S2^2/n;  %Eigenvalues
-% Vectors=U;                     %Eigenvectors
-% Amplitudes=S*conj(V');         %Orthognal amplitudes
-% plot(Amplitudes(1,:),Amplitudes(2,:),'r.');
-% daspect([1 1 1]);
-% xlim([-20 20]); ylim([-20 20]);
-% title('Orthognal Amplitudes');
+%% Calculate extremum second derivative over time
 
-scatter3(normedData(:,1),normedData(:,2),normedData(:,3))
-hold on
-arrow3(zeros(3),coeff_normed','b',0.9)
-figure
-scatter3(zeroMeanData(:,1),zeroMeanData(:,2),zeroMeanData(:,3))
-hold on
-arrow3(zeros(3),(coeff_zero Mean+meanData)','b',0.9)
+load('E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\spike simulations\highly clustered example hopkins 06\Highly Clustered - Spikes and Hopkins.mat','spikeProbability')
+load('E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\spike simulations\continuous1 wave max prob 003\Spike Wave - Spikes and Hopkins.mat','spikeProbability')
+gradX=[spikeProbability(:,2:12,:)-spikeProbability(:,1:11,:) zeros(12,1,size(spikeProbability,3))];
+gradY=[spikeProbability(2:12,:,:)-spikeProbability(1:11,:,:);zeros(1,12,size(spikeProbability,3))];
 
-hopkinsZeroMean=calcHopkins([score_zeroMean(:,1) score_zeroMean(:,2)],100000);
-meanHopkinsZeroMeans=mean(hopkinsZeroMean)
-steHopkinsZeroMeans=std(hopkinsZeroMean)/sqrt(100000)
+% [y,x,t] = ind2sub(size(gradX(:,:,2:end)),find(~gradX(:,:,2:end) & ~gradY(:,:,2:end)));
+extPos=[];
+% minPos=maxPos;
+% [maxPos,maximaBIN]=findPeak2d(spikeProbability(:,:,2));
+for i=1:size(spikeProbability,3)
+    extPosI=findPeak2d(spikeProbability(:,:,i));
+    for j=1:size(extPosI,1)
+        extPos=[extPos;extPosI(j,:),i];
+    end
+    extPosI=findPeak2d(-spikeProbability(:,:,i));
+    for j=1:size(extPosI,1)
+        extPos=[extPos;extPosI(j,:),i]
+        
+    end
+end
 
-hopkinsNormed=calcHopkins([score_normed(:,1) score_normed(:,2)],100000);
-meanHopkinsNormed=mean(hopkinsNormed);
-steHopkinsNormed=std(hopkinsNormed)/sqrt(100000);
+exportVideo(spikeProbability,['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\Check Analytics\MinAndMax2.avi'],30,[51 51],'spikeCoordinates',extPos,'spikeFrameLength',1)
 
-save('veryClusteredSpikes','layoutSize','gaussSigma','pulseFrames','distInSigmas','tempOverlapInPulseFrames','simulatedPulses','simulatedSpikesXYT','zeroMeanData','normedData','score_normed','coeff_zeroMean','score_normed','score_zeroMean','meanHopkinsZeroMeans','steHopkinsZeroMeans','steHopkinsNormed','meanHopkinsNormed')
-load('veryClusteredSpikes','layoutSize','gaussSigma','pulseFrames','distInSigmas','tempOverlapInPulseFrames','simulatedPulses','simulatedSpikesXYT','zeroMeanData','normedData','score_normed','coeff_zeroMean','score_normed','score_zeroMean','meanHopkinsZeroMeans','steHopkinsZeroMeans','steHopkinsNormed','meanHopkinsNormed')
-
-%rand dist
-[x,y,t] = simulateSpikes(ones(12,12,300),0.001);
-scatter3(x,y,t)
-scatter(x,y)
-simulatedSpikesXYT_random=[x y t];
-hopkinsRandDist=calcHopkins(simulatedSpikesXYT_random,100000);
-meanHopkinsRandDist=mean(hopkinsRandDist)
-steHopkinsRandDist=std(hopkinsRandDist)/sqrt(100000)
-%eq dist
-scatter(simulatedSpikesXY_EVEN(:,1),simulatedSpikesXY_EVEN(:,2))
-[X,Y]=meshgrid(1:12,1:12);
-simulatedSpikesXY_EVEN=[X(:) Y(:)];
-
-hopkinsEqDist=calcHopkins(simulatedSpikesXY_EVEN,100000);
-meanHopkinsEqDist=mean(hopkinsEqDist)
-steHopkinsEqDist=std(hopkinsEqDist)/sqrt(100000)
-
-plotWaveSpikes([x_sim,y_sim,t_sim],[layoutSize layoutSize]);
-
-scatter3(score(:,1),score(:,2),score(:,3))
-
-scatter(score_zeroMean(:,1),score_zeroMean(:,2))
-xlabel('pca1'),ylabel('pca2')
-figure
-scatter(score_normed(:,1),score_normed(:,2))
-xlabel('pca1 normed'),ylabel('pca2 normed')
-
-scatter(normedData(:,3),normedData(:,1))
-xlabel('t'),ylabel('y')
-[var(normedData(:,3)),var(score(:,1)),var(score(:,2))]
+% exportVideo(simulatedPulses,[videoDir ' retry'],30,[51 51],'spikeCoordinates',[y_sim,x_sim,t_sim],'spikeFrameLength',10)
 
