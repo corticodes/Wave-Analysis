@@ -254,8 +254,21 @@ ylim([0 600])
 
 
 %% calc spike rate vs amp
-nHilAmps=10;
-[ampRateW1,ampRateW2,nTimeStampsW1,nTimeStampsW2] = calcSpikeRatePerAmp(HTabs,timeSequence,spikesPerChannel,nHilAmps,timeBin1,timeBin2);
+[relevantTIC,nRelevant,tIc] = getRelevantSpikes(ticPath,startTimes,window_tot_ms,numel(trigsNums));
+spikeLFP = getSpikePhase(relevantTIC,FDsequence,timeSequence);
+spikeHilAmp = getSpikePhase(relevantTIC,HTabs,timeSequence);
+spikePhase = getSpikePhase(relevantTIC,HTangle,timeSequence);
+subplot(3,1,1)
+hist(spikePhase,500)
+title('Spike Phase histogram')
+subplot(3,1,2)
+hist(spikeHilAmp,500)
+title('Spike Hilbert Amplitude histogram')
+subplot(3,1,3)
+hist(spikeLFP,500)
+title('Spike LFP histogram')
+
+
 % plot(getAmplitudes(HTabs,nHilAmps),ampRateW1,'.')
 plotTitle(getAmplitudes(HTabs,nHilAmps),ampRateW1,['Average Firing Rate Per Hilbert Abs - ' num2str(timeBin1) 'ms Window'],'Hilbert Amplitude [uV]','Firing Rate [Spikes/s]',25,log(nTimeStampsW1),'Log Number of Amplitude Occurances')
 plotTitle(getAmplitudes(HTabs,nHilAmps),ampRateW2,['Average Firing Rate Per Hilbert Abs - ' num2str(timeBin2) 'ms Window'],'Hilbert Amplitude [uV]','Firing Rate [Spikes/s]',25,log(nTimeStampsW2),'Log Number of Amplitude Occurances')
