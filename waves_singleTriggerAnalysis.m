@@ -163,15 +163,15 @@ c_info = getCursorInfo(dcm_obj);
 startEndWave=[min([DP1(1) DP2(1)]) max([DP1(1) DP2(1)])];
 % startEndWave=[23222 23833]; %startEndWave=[12149 13264];
 startEndWave_ms=startEndWave/Experiments.currentDataObj.samplingFrequency*1000+startTimes;
-mkdir('\\sil2\Data\Wave Analysis\U4\Trials\Trial 1\Waves In Trial',['Samples' num2str(startEndWave(1)) '-' num2str(startEndWave(2)) '_Time' num2str(startEndWave_ms(1)) '-' num2str(startEndWave_ms(2))]);
-saveas(gcf,['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\Spike In Waves\Trig' num2str(trig) '_Time' num2str(startEndWave_ms(1)) '-' num2str(startEndWave_ms(2)) 'ms_Samples ' num2str(startEndWave(1)) '-' num2str(startEndWave(2)) ' - Inhibition Crossing Times.jpg'])
-savefig(['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\Spike In Waves\Trig' num2str(trig) '_Time' num2str(startEndWave_ms(1)) '-' num2str(startEndWave_ms(2)) 'ms_Samples ' num2str(startEndWave(1)) '-' num2str(startEndWave(2)) ' - Inhibition Crossing Times.fig'])
+mkdir(['\\sil2\Data\Wave Analysis\U4\Trials\Trial ' num2str(trig) '\Waves In Trial'],['Samples' num2str(startEndWave(1)) '-' num2str(startEndWave(2)) '_Time' num2str(startEndWave_ms(1)) '-' num2str(startEndWave_ms(2))]);
+saveas(gcf,['\\sil2\Data\Wave Analysis\U4\Trials\Trial ' num2str(trig) '\Waves In Trial\Samples' num2str(startEndWave(1)) '-' num2str(startEndWave(2)) '_Time' num2str(startEndWave_ms(1)) '-' num2str(startEndWave_ms(2)) '\Inhibition Crossing Times.jpg'])
+savefig(['\\sil2\Data\Wave Analysis\U4\Trials\Trial ' num2str(trig) '\Waves In Trial\Samples' num2str(startEndWave(1)) '-' num2str(startEndWave(2)) '_Time' num2str(startEndWave_ms(1)) '-' num2str(startEndWave_ms(2)) '\Inhibition Crossing Times.fig'])
 close gcf
 
 plotPhysicalTitle=['U4 Trig' num2str(trig) ' Channel ' num2str(singleChannel) ' Inhibitions: (samples ' num2str(startEndWave(1)) '-' num2str(startEndWave(2)) ')'];
 plotCrossingsPhysical(crossings{3}*sample2ms,startEndWave*sample2ms,En,hilbertAmps{3},'Title',plotPhysicalTitle)
-saveas(gcf,['\\sil2\Literature\Projects\corplex\progress reports\figs for PR 191124\Trig' num2str(trig) '_Time' num2str(startEndWave_ms(1)) '-' num2str(startEndWave_ms(2)) 'ms_Samples ' num2str(startEndWave(1)) '-' num2str(startEndWave(2)) ' - Physical Lag Plot.jpg'])
-savefig(['\\sil2\Literature\Projects\corplex\progress reports\figs for PR 191124\Trig' num2str(trig) '_Time' num2str(startEndWave_ms(1)) '-' num2str(startEndWave_ms(2)) 'ms_Samples ' num2str(startEndWave(1)) '-' num2str(startEndWave(2)) ' - Physical Lag Plot.fig'])
+saveas(gcf,['\\sil2\Data\Wave Analysis\U4\Trials\Trial ' num2str(trig) '\Waves In Trial\Samples' num2str(startEndWave(1)) '-' num2str(startEndWave(2)) '_Time' num2str(startEndWave_ms(1)) '-' num2str(startEndWave_ms(2)) '\Physical Lag Plot.jpg'])
+savefig(['\\sil2\Data\Wave Analysis\U4\Trials\Trial ' num2str(trig) '\Waves In Trial\Samples' num2str(startEndWave(1)) '-' num2str(startEndWave(2)) '_Time' num2str(startEndWave_ms(1)) '-' num2str(startEndWave_ms(2)) '\Physical Lag Plot.fig'])
 close gcf
 
 plotCrossings3d(crossings{3},startEndWave,settingsMap,En,'Inhibitions',Experiments.currentDataObj.samplingFrequency,inf)
@@ -179,10 +179,21 @@ plotCrossings3d(crossings{3},startEndWave,settingsMap,En,'Inhibitions',Experimen
 % movieSpikes=logical(convertChannelsToMovie(getSpikeBinMatByChannel(ticPath,nCh,startEndWave_ms(1),startEndWave_ms(2),Experiments.currentDataObj.samplingFrequency),En));
 spikeCoordinates=getSpikeCoordinatesFromTIC(ticPath,startEndWave_ms,flipud(En),Experiments.currentDataObj.samplingFrequency); %flip ud to match video flip
 
-videoDir=['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\checkthatItWorks2'];
-exportVideo(convertChannelsToMovie(squeeze(FD(:,1,startEndWave(1):startEndWave(2))),En),videoDir,frameRate,pixelsPerChannel)
-exportVideo(convertChannelsToMovie(squeeze(data(:,1,startEndWave(1):startEndWave(2))),En),videoDir,frameRate,pixelsPerChannel)
-exportVideo(convertChannelsToMovie(squeeze(data(:,1,startEndWave(1):startEndWave(2))),En),[videoDir ' With Spikes'],frameRate,pixelsPerChannel,'spikeCoordinates',spikeCoordinates,'spikeFrameLength',spikeFrameLength);
+videoDir=['\\sil2\Data\Wave Analysis\U4\Trials\Trial ' num2str(trig) '\Waves In Trial\Samples' num2str(startEndWave(1)) '-' num2str(startEndWave(2)) '_Time' num2str(startEndWave_ms(1)) '-' num2str(startEndWave_ms(2)) '\Video'];
+exportVideo(convertChannelsToMovie(squeeze(FD(:,1,startEndWave(1):startEndWave(2))),En),[videoDir ' - FD'],frameRate,pixelsPerChannel)
+exportVideo(convertChannelsToMovie(squeeze(data(:,1,startEndWave(1):startEndWave(2))),En),[videoDir ' - Raw'],frameRate,pixelsPerChannel)
+exportVideo(convertChannelsToMovie(squeeze(data(:,1,startEndWave(1):startEndWave(2))),En),[videoDir ' - Raw With Spikes'],frameRate,pixelsPerChannel,'spikeCoordinates',spikeCoordinates,'spikeFrameLength',spikeFrameLength);
+exportVideo(convertChannelsToMovie(squeeze(FD(:,1,startEndWave(1):startEndWave(2))),En),[videoDir ' - FD With Spikes'],frameRate,pixelsPerChannel,'spikeCoordinates',spikeCoordinates,'spikeFrameLength',spikeFrameLength);
+
+
+spikeCoordinates = getSpikeCoordinatesFromTIC(ticPath,startEndWave_ms,En,Experiments.currentDataObj.samplingFrequency);
+meanData=mean(spikeCoordinates);
+noMeandData=(spikeCoordinates-meanData);
+f=plotWaveSpikes(spikeCoordinates,size(En));
+
+savefig(['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\Spike In Waves\Trig' num2str(trig) '_Time' num2str(startEndWave_ms(1)) '-' num2str(startEndWave_ms(2)) 'ms_Samples ' num2str(startEndWave(1)) '-' num2str(startEndWave(2)) ' - Clustered Spikes.fig'])
+saveas(gcf,['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\Spike In Waves\Trig' num2str(trig) '_Time' num2str(startEndWave_ms(1)) '-' num2str(startEndWave_ms(2)) 'ms_Samples ' num2str(startEndWave(1)) '-' num2str(startEndWave(2)) ' - Clustered Spikes.jpg'])
+
 
 %% clustering
 
