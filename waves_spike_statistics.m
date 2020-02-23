@@ -258,14 +258,17 @@ ylim([0 600])
 spikeLFP = getSpikePhase(relevantTIC,FDsequence,timeSequence);
 spikeHilAmp = getSpikePhase(relevantTIC,HTabs,timeSequence);
 spikePhase = getSpikePhase(relevantTIC,HTangle,timeSequence);
+spikePhaseRAD=spikePhase;
+spikePhase=spikePhase*180/pi;
+spikePhase(spikePhase<=0)=spikePhase(spikePhase<=0)+360;
 subplot(3,1,1)
-hist(spikePhase,500)
+histogram(spikePhase,500,'Normalization','probability')
 title('Spike Phase histogram')
 subplot(3,1,2)
-hist(spikeHilAmp,500)
+histogram(spikeHilAmp,500,'Normalization','probability')
 title('Spike Hilbert Amplitude histogram')
 subplot(3,1,3)
-hist(spikeLFP,500)
+histogram(spikeLFP,500,'Normalization','probability')
 title('Spike LFP histogram')
 
 
@@ -293,7 +296,7 @@ f3=figure;
 % roundSpikePhaseNoWindow=roundSpikePhaseNoWindow*180/pi;
 % roundSpikePhaseNoWindow(roundSpikePhaseNoWindow<=0)=roundSpikePhaseNoWindow(roundSpikePhaseNoWindow<=0)+360;
 
-[neuronMostFrequentPhase,neuronMostFrequentPhaseCount,frequentPhaseProbabilityForNeuron,neuronTotSpikeCount] = calcNeuronFreqPhase(relevantTIC,spikePhase,'phaseWindowForInSize',20);
+[neuronMostFrequentPhase,neuronMostFrequentPhaseCount,frequentPhaseProbabilityForNeuron,neuronTotSpikeCount] = calcNeuronFreqPhase(relevantTIC,spikePhase,'phaseWindowForInSize',45);
 nNeurons=numel(neuronMostFrequentPhase);
 yyaxis right
 uniqueNeuronTotSpikeCount=unique(neuronTotSpikeCount);
@@ -308,7 +311,7 @@ scatter(1:nNeurons,neuronMostFrequentPhase,normedNeuronTotSpikeCount,frequentPha
 % colormap winter
 hcb=colorbar;
 title(hcb,'Phase Probability');
-title(['Neuron Most Frequent Phases - 100 Triggers - 20^o Window'])
+title(['Neuron Most Frequent Phases - 100 Triggers - 45^o Window'])
 xlabel('Neuron')
 ylabel('Phase [Degree]')
 ylim([0 360])
