@@ -112,14 +112,16 @@ exportVideo(waveData,[videoDir 'with max'],30,pixelsPerChannel,'particlePath',[m
 
 
 % two elipsoids
-saveDir='E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\';
+% saveDir='E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\';
+saveDir='\\sil2\Literature\Projects\corplex\progress reports\meetings\next\spiral\';
+
 saveParamsName='Spiral Wave';
-videoDir=[saveDir filesep 'Spiral'];    
-cov1=[1 0; 0 9];
-cov2=[4 0; 0 9];
+videoDir=[saveDir filesep 'Spiral2'];    
+cov1=[2 0; 0 9];
+cov2=[2 0; 0 9];
 tempOverlapInPulseFrames=0.8;
 
-spiralWave=simulateGaussians(layoutSize,cov1,cov2,pulseFrames,[1 2],tempOverlapInPulseFrames,'x1',layoutSize/2,'y1',layoutSize/3);
+spiralWave=simulateGaussians(layoutSize,cov1,cov2,pulseFrames,[2 2],tempOverlapInPulseFrames,'x1',layoutSize/2,'y1',layoutSize/3);
 exportVideo(spiralWave,videoDir,30,pixelsPerChannel);
 
 HT=hilbert(squeeze(convertMovieToChannels(spiralWave,En))').';
@@ -128,7 +130,7 @@ HTangle=angle(HT);
 
 [crossings,hilbertAmps] = getHilbertCrossings(HTabs,HTangle);
 
-startEndWave=[1 size(radialWave,3)]; %twoGausses
+startEndWave=[1 size(spiralWave,3)]; %twoGausses
 
 plotCrossingsPhysical(crossings{1},startEndWave,flipud(En),hilbertAmps{1},'Units','frames')
 saveas(gcf,['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\' waveName ' - Physical Lag.jpg'])
@@ -554,3 +556,55 @@ exportVideo(spikeProbability,['E:\Yuval\Analysis\DataAnalysis\waves and spike so
 
 % exportVideo(simulatedPulses,[videoDir ' retry'],30,[51 51],'spikeCoordinates',[y_sim,x_sim,t_sim],'spikeFrameLength',10)
 
+%% Simulate hopkins statistic statistics
+
+% layoutSize=12;
+% maxProb=0.3; %probability for a channel to contain a spike
+nSpikes=40; %hopkins cdf will be beta(nSpikes/10,nSpikes/10)
+hopkinsIterations=1;
+simulationIterations=1000;
+
+hopkinses=zeros(1,simulationIterations);
+for i=1:simulationIterations
+
+    [hopkinses(i),pvalue]=calcHopkins(rand(nSpikes,2),hopkinsIterations,'subspaceLimisMethod','madRange','nMedianDeviations',2,'centerIsAverage',1);
+%     [hopkins,pvalue]=calcHopkins(rand(nSpikes,2),hopkinsIterations,'subspaceLimisMethod','madRange','plotRange',1,'nMedianDeviations',2,'centerIsAverage',1);
+end
+
+% h=histogram(hopkinses,50,'Normalization','cdf');
+% cumdist=h.Values;
+% binEdges=h.BinEdges;
+[cumulativeHist,edges] = histcounts(hopkinses,500,'Normalization','cdf');
+[hopkinsHist,edges] = histcounts(hopkinses,500);
+[hopkinsHistProbability,edges] = histcounts(hopkinses,500,'Normalization','probability');
+bins=edges(1:end-1)+(edges(2)-edges(1))/2;
+hopkinsMean=hopkinsHistProbability*bins';
+hopkinsSTD=sqrt(hopkinsHistProbability*((bins-hopkinsMean).^2)');
+
+figure
+plot(bins,cumulativeHist)
+xlim([0 1])
+hold on
+fit=20;
+plot(0:0.01:1,betainc(0:0.01:1,nSpikes/10,nSpikes/10),'g')
+plot(0:0.01:1,betainc(0:0.01:1,nSpikes,nSpikes),'r')
+plot(0:0.01:1,betainc(0:0.01:1,fit,fit),'cyan')
+plot(0:0.01:1,betainc(0:0.01:1,nSpikes/10,nSpikes),'-k')
+plot(0:0.01:1,betainc(0:0.01:1,nSpikes,nSpikes/10),'*k')
+% legend('Hopkins CDF',['incomplete beta(x,' num2str(nSpikes/10) ',' num2str(nSpikes/10) ')'],['incomplete beta(x,' num2str(nSpikes) ',' num2str(nSpikes) ')'],['incomplete beta(x,' num2str(nSpikes/10) ',' num2str(nSpikes) ')'],['incomplete beta(x,' num2str(nSpikes/10) ',' num2str(nSpikes) ')'])
+legend('Hopkins CDF',['incomplete beta(x,' num2str(nSpikes/10) ',' num2str(nSpikes/10) ')'],['incomplete beta(x,' num2str(nSpikes) ',' num2str(nSpikes) ')'],['incomplete beta(x,' num2str(fit) ',' num2str(fit) ')'],['incomplete beta(x,' num2str(nSpikes/10) ',' num2str(nSpikes) ')'],['incomplete beta(x,' num2str(nSpikes/10) ',' num2str(nSpikes) ')'])
+legend('Hopkins CDF','incomplete beta(x,4,4)')
+
+%err function?
+erfcum=0.5*(1+erf(((0:0.01:1)-hopkinsMean)/(sqrt(2)*hopkinsSTD)));
+plot(bins,cumulativeHist)
+xlim([0 1])
+hold on
+plot((0:0.01:1),erfcum)
+legend('Hopkins CDF',['Norm Dist CDF' char(10) '(mu=' num2str(hopkinsMean) ', sigma=' num2str(hopkinsSTD)])
+
+%find the significant hopkins for when there are only nspikes/10 spikes
+hopkinValues=0:0.01:1;
+cumDist=betainc(hopkinValues,4,4);
+% plot(hopkinValues,cumDist)
+significantHopkins=hopkinValues(find(cumDist>0.95,1));
