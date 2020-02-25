@@ -25,6 +25,8 @@ function [hopkinsAVG,pValue] = calcHopkins(sampleCoordinates,n,varargin)
 %       inside range: range will be median+-nMedianDeviations from each
 %       side. Default is 1. subspaceLimisMethod must be
 %       set to madRange for this to have an effect.
+%       'plotRange' (logical 1x1): plot the datapoints and range in which
+%       hopkins was calculated. Default is 0.
 %
 %       Output
 %           pValue: The probability to get the hopkins value or higher 
@@ -76,6 +78,7 @@ else
     
 end
 if plotRange 
+    figure
     scatter(sampleCoordinates(:,1),sampleCoordinates(:,2))
     line(linspace(range(1,1),range(2,1),100),ones(1,100)*range(1,2));
     line(linspace(range(1,1),range(2,1),100),ones(1,100)*range(2,2));
