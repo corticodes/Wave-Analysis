@@ -23,14 +23,8 @@ binSpikes = getSpikeBinMatByChannel(ticPath,startTimes,startTimes+window_ms,Expe
 
 Title=['U4 Trig' num2str(trig) ' Channel ' num2str(singleChannel) ' All Crossings'];
 
-% plotAllHilbertCrossings(crossings,hilbertAmps,squeeze(FD(singleChannel,1,:)),singleChannel,'Spikes',binSpikes,'Title',Title);
-% plotAllHilbertCrossings(crossings,hilbertAmps,squeeze(FD(singleChannel,1,:)),singleChannel);
-
-plotSingleHilbertCrossing(crossings{3},hilbertAmps{3},squeeze(FD(singleChannel,1,:)),'Inhibitions',singleChannel,'Spikes',binSpikes,'Title',Title)
-% plotSingleHilbertCrossing(crossings{3},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Inhibitions',singleChannel,'Title',plotTitle)
-
-
 sampleCrossings=getCrossingsBySamples(crossings{3},hilbertAmps{3});
 
-[clusterLimits] = findCrossingsClusters(sampleCrossings);
+[clusterLimits,nGoodClusters] = findCrossingsClusters(sampleCrossings);
 
+plotSingleHilbertCrossing(crossings{3},hilbertAmps{3},squeeze(FD(singleChannel,1,:)),'Inhibitions',singleChannel,'Spikes',binSpikes,'Title',Title,'clusterLimits',clusterLimits)

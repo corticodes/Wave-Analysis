@@ -13,6 +13,10 @@ function [f] = plotSingleHilbertCrossing(singleCrossings,crossingsAmps,FD,crossi
 %           Plots a red circle where Spikes is true
 %      Title (string)
 %           Figure title
+%      clusterLimits (nClusterX2)
+%           Plot also crossings clusters
+
+
 f=figure;
 for i=1:2:length(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
@@ -49,6 +53,18 @@ end
 if exist('Title','var')
     title(Title)
 end
+
+if exist('clusterLimits','var')
+    nClusters=size(clusterLimits,1);
+    for i=1:nClusters
+        plot(clusterLimits(i,:),[0 0],'LineWidth',2,'Color','k')
+        %remove added legend
+        hLegend = findobj(gcf, 'Type', 'Legend');
+        newLegend=hLegend.String(1:end-1);
+        legend(newLegend)
+    end
+end
+
 hcb=colorbar;
 title(hcb,'Hilbert Amplitude [uV]');
 xlabel('Samples')
