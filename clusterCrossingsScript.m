@@ -30,39 +30,7 @@ plotSingleHilbertCrossing(crossings{3},hilbertAmps{3},squeeze(FD(singleChannel,1
 % plotSingleHilbertCrossing(crossings{3},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Inhibitions',singleChannel,'Title',plotTitle)
 
 
-allowedInterClusterDistance=75; %from each side
 sampleCrossings=getCrossingsBySamples(crossings{3},hilbertAmps{3});
-collapsedSamp=any(sampleCrossings);
 
-smoothed=conv(collapsedSamp,ones(1,allowedInterClusterDistance),'same')>0;
+[clusterLimits] = findCrossingsClusters(sampleCrossings);
 
-% figure
-% plot(collapsedSamp(1,11961:12252),'o')
-% hold on
-% plot(smoothed(1,11961:12252),'.r')
-
-% plot(collapsedSamp,'o')
-% hold on
-% plot(smoothed,'.r')
-
-[L,n]=bwlabel(smoothed);
-plot(L,'.r')
-
-binSampleCrossings=~sampleCrossings==0;
-plotSingleHilbertCrossing(crossings{3},hilbertAmps{3},squeeze(FD(singleChannel,1,:)),'Inhibitions',singleChannel,'Spikes',binSpikes,'Title',Title);
-hold on
-goodClusters=[];
-for i=1:n
-   clusterInd=find(L==i);
-   crossingsPerChannel=sum(binSampleCrossings(:,clusterInd),2);
-   if all(crossingsPerChannel==1)
-        goodClusters=[goodClusters i];
-        clusterLimits=clusterInd(1)+[find(collapsedSamp(clusterInd(1):clusterInd(end)),1) find(collapsedSamp(clusterInd(1):clusterInd(end)),1,'last')];
-        plot(clusterLimits,[0 0],'LineWidth',2,'Color','k')
-        %remove added legend
-        hLegend = findobj(gcf, 'Type', 'Legend');
-        newLegend=hLegend.String(1:end-1);
-        legend(newLegend)
-   end
-   
-end
