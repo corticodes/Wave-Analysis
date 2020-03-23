@@ -1,4 +1,4 @@
-function [] = plotSingleHilbertCrossing(singleCrossings,crossingsAmps,FD,crossingType,channelShown,varargin)
+function [f] = plotSingleHilbertCrossing(singleCrossings,crossingsAmps,FD,crossingType,channelShown,varargin)
 %PLOTSINGLEHILBERTCROSSING plots the occurences of a specific crossings,
 %with color map indicating the hilbert amplitude. It also plots filtered
 %data from a single exemplary channel
@@ -13,7 +13,7 @@ function [] = plotSingleHilbertCrossing(singleCrossings,crossingsAmps,FD,crossin
 %           Plots a red circle where Spikes is true
 %      Title (string)
 %           Figure title
-
+f=figure;
 for i=1:2:length(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
 end
