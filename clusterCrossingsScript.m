@@ -23,7 +23,8 @@ binSpikes = getSpikeBinMatByChannel(ticPath,startTimes,startTimes+window_ms,Expe
 
 Title=['U4 Trig' num2str(trig) ' Channel ' num2str(singleChannel) ' All Crossings'];
 
-sampleCrossings=getCrossingsBySamples(crossings{3},hilbertAmps{3});
+% sampleCrossings=getCrossingsBySamples(crossings{3},hilbertAmps{3});
+sampleCrossingsWholeTrial=getCrossingsBySamples(crossings{3},hilbertAmps{3},'nSamples',size(binSpikes,2));
 
 [clusterLimits,nGoodClusters] = findCrossingsClusters(sampleCrossings);
 
