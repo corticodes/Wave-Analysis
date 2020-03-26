@@ -1,4 +1,4 @@
-function [clusterLimits,nGoodClusters] = findCrossingsClusters(sampleCrossings,varargin)
+function [clusterLimits,nGoodClusters,spikesPerCluster] = findCrossingsClusters(sampleCrossings,binSpikes,varargin)
 %findCrossingsClusters Summary of this function goes here
 %   Input:
 %       -  sampleCrossings: nChannelsXnSamples of all the crossings as given
@@ -6,7 +6,10 @@ function [clusterLimits,nGoodClusters] = findCrossingsClusters(sampleCrossings,v
 %       samples in which a crossing may or maynot occure in each channel.
 %       If a crossings occures, the numeric value indicates the hilbert
 %       amplitude. Otherwise it is zero).
-%       
+%       MUST BE THE SAME SIZE AS binSpikes (if binSpikes isn't empty)!!!
+%       -   binSpikes - nChXnSamples logical matrix with ones marking spike 
+%           times. This is the output of getSpikeBinMatByChannel function.
+%           If empty, spikesPerCluster will have be all zeros
 %       -  Varargins (given as 'Key'Value pairs):
 %           -   allowedInterClusterDistance (1x1): "Smoothing" Coefficient. Clusters
 %           are defined as consecutive crossing events in different
@@ -14,9 +17,11 @@ function [clusterLimits,nGoodClusters] = findCrossingsClusters(sampleCrossings,v
 %           allowedInterClusterDistance. Default is 75.
       
 %   Output:
-%           -   clusterLimits (nGoodClustersX2) - position (samples) of the
-%           first and last crossings in the cluster.
-%           -   nGoodClusters (1x1) - number of good clusters in trial
+%       -   clusterLimits (nGoodClustersX2) - position (samples) of the
+%       first and last crossings in the cluster.
+%       -   nGoodClusters (1x1) - number of good clusters in trial
+%       -   spikesPerCluster (nGoodClustersX1) - vector with number of
+%       spikes within each cluster
 %
 %   To do:
 %       -  Add option to identify crossing clusters where not all channels
@@ -25,6 +30,11 @@ function [clusterLimits,nGoodClusters] = findCrossingsClusters(sampleCrossings,v
 %       -  Add spikes as varargin, and choose only clusters with high spike
 %       count
 
+if isempty(binSpikes)
+    binSpikes=zeros(size(sampleCrossings));
+elseif size(sampleCrossings)~=size(binSpikes)
+   error('sampleCrossings and binSpikes must be the same size!')
+end
 
 allowedInterClusterDistance=75; %from each side
 
@@ -32,7 +42,10 @@ for i=1:2:length(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
 end
 
+
+
 collapsedSamp=any(sampleCrossings);
+spikesPerSample=sum(binSpikes);
 
 smoothed=conv(collapsedSamp,ones(1,allowedInterClusterDistance),'same')>0;
 
@@ -48,6 +61,7 @@ for i=1:n
    if all(crossingsPerChannel==1)
         nGoodClusters=nGoodClusters+1;
         clusterLimits(nGoodClusters,1:2)=clusterInd(1)+[find(collapsedSamp(clusterInd(1):clusterInd(end)),1) find(collapsedSamp(clusterInd(1):clusterInd(end)),1,'last')];
+        spikesPerCluster(nGoodClusters)=sum(spikesPerSample(clusterLimits(nGoodClusters,1):clusterLimits(nGoodClusters,2)));
    end
    
 end
