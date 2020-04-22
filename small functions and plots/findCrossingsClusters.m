@@ -7,6 +7,7 @@ function [clusterLimits,nGoodClusters,spikesPerCluster] = findCrossingsClusters(
 %       If a crossings occures, the numeric value indicates the hilbert
 %       amplitude. Otherwise it is zero).
 %       MUST BE THE SAME SIZE AS binSpikes (if binSpikes isn't empty)!!!
+%       for this you can use getCrossingsBySamples's nSamples varargin.
 %       -   binSpikes - nChXnSamples logical matrix with ones marking spike 
 %           times. This is the output of getSpikeBinMatByChannel function.
 %           If empty, spikesPerCluster will have be all zeros
@@ -55,6 +56,8 @@ binSampleCrossings=~sampleCrossings==0;
 
 
 nGoodClusters=0;
+clusterLimits=[];
+spikesPerCluster=[];
 for i=1:n
    clusterInd=find(L==i);
    crossingsPerChannel=sum(binSampleCrossings(:,clusterInd),2);
