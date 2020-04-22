@@ -15,7 +15,10 @@ function [f] = plotSingleHilbertCrossing(singleCrossings,crossingsAmps,FD,crossi
 %           Figure title
 %      clusterLimits (nClusterX2)
 %           Plot also crossings clusters
+%      plotLegend (logical)
+%           True to plot legend (default), False for no legend
 
+plotLegend=true;
 
 f=figure;
 for i=1:2:length(varargin)
@@ -33,20 +36,26 @@ end
 h(2)=plot(FD,'b');
 h(3)=plot(0:numel(FD),channelShown*ones(1,numel(FD)+1),'--k');
 
+if plotLegend
 %legend hack
 h(1)=plot(nan,nan,'ob');
 h(2)=plot(nan,nan,'b');
 h(3)=plot(nan,nan,'--k');
 h(4)=plot(nan,nan,'or');
+end
 
 if exist('Spikes','var')
     for i=chNum
        spikeInd=find(Spikes(i,:));
        plot(spikeInd, i*ones(1,length(spikeInd)),'or');
     end
-    legend([h(1) h(2) h(3) h(4)],{crossingType,'Filtered Data',['Current Channel (' num2str(channelShown) ')'],'Spikes'})
+    if plotLegend
+        legend([h(1) h(2) h(3) h(4)],{crossingType,'Filtered Data',['Current Channel (' num2str(channelShown) ')'],'Spikes'})
+    end
 else
-    legend([h(1) h(2) h(3)],{crossingType,'Filtered Data','Current Channel'})
+    if plotLegend
+        legend([h(1) h(2) h(3)],{crossingType,'Filtered Data','Current Channel'})
+    end
 end
 
 
@@ -58,10 +67,12 @@ if exist('clusterLimits','var')
     nClusters=size(clusterLimits,1);
     for i=1:nClusters
         plot(clusterLimits(i,:),[0 0],'LineWidth',2,'Color','k')
+        if plotLegend
         %remove added legend
-        hLegend = findobj(gcf, 'Type', 'Legend');
-        newLegend=hLegend.String(1:end-1);
-        legend(newLegend)
+            hLegend = findobj(gcf, 'Type', 'Legend');
+            newLegend=hLegend.String(1:end-1);
+            legend(newLegend)
+        end
     end
 end
 
