@@ -1,5 +1,6 @@
 function [clusterLimits,nGoodClusters,spikesPerCluster] = findCrossingsClusters(sampleCrossings,binSpikes,varargin)
-%findCrossingsClusters Summary of this function goes here
+%findCrossingsClusters finds clusters of crossings that are temporally
+%linked. For spatiotemporal continuity, use findContinuousClusters
 %   Input:
 %       -  sampleCrossings: nChannelsXnSamples of all the crossings as given
 %       by the function getCrossingsBySamples (columns are recording
