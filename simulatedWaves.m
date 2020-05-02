@@ -373,7 +373,7 @@ meanData=mean(spikeCoordinates);
 spikeCoordinatesNoMean=spikeCoordinates-meanData;
 [coeff,score,latent] = pca(spikeCoordinatesNoMean);
 scatter(score(:,1),score(:,2))
-hopkins=calcHopkins(score(:,1:2),100000);
+hopkins=calcHopkins(score(:,1:2),10000,'plotRange',1);
 
 meanHopkins=mean(hopkins)
 steHopkins=std(hopkins)/sqrt(100000)
@@ -561,7 +561,7 @@ exportVideo(spikeProbability,['E:\Yuval\Analysis\DataAnalysis\waves and spike so
 % layoutSize=12;
 % maxProb=0.3; %probability for a channel to contain a spike
 nSpikes=40; %hopkins cdf will be beta(nSpikes/10,nSpikes/10)
-hopkinsIterations=1;
+hopkinsIterations=1000;
 simulationIterations=1000;
 
 hopkinses=zeros(1,simulationIterations);
@@ -603,8 +603,31 @@ hold on
 plot((0:0.01:1),erfcum)
 legend('Hopkins CDF',['Norm Dist CDF' char(10) '(mu=' num2str(hopkinsMean) ', sigma=' num2str(hopkinsSTD)])
 
-%find the significant hopkins for when there are only nspikes/10 spikes
-hopkinValues=0:0.01:1;
-cumDist=betainc(hopkinValues,4,4);
-% plot(hopkinValues,cumDist)
-significantHopkins=hopkinValues(find(cumDist>0.95,1));
+% %find the significant hopkins for when there are only nspikes/10 spikes
+% hopkinValues=0:0.01:1;
+% cumDist=betainc(hopkinValues,4,4);
+% % plot(hopkinValues,cumDist)
+% significantHopkins=hopkinValues(find(cumDist>0.95,1));
+
+% find significant Hopkins Statistic for different number of spikes 25:
+hopkinsIterations=1000;
+simulationIterations=1000;
+nSpikes=20:60;
+nSpikes=159;
+sigHop=zeros(1,numel(nSpikes));
+for i=1:numel(sigHop)
+    i
+    n=nSpikes(i);
+    hopkinses=zeros(1,simulationIterations);
+    for j=1:simulationIterations
+        [hopkinses(j),pvalue]=calcHopkins(rand(n,2),hopkinsIterations,'subspaceLimisMethod','madRange','nMedianDeviations',2,'centerIsAverage',1);
+    end
+    [cumulativeHist,edges] = histcounts(hopkinses,500,'Normalization','cdf');
+    [hopkinsHist,edges] = histcounts(hopkinses,500);
+    [hopkinsHistProbability,edges] = histcounts(hopkinses,500,'Normalization','probability');
+    bins=edges(1:end-1)+(edges(2)-edges(1))/2;
+%     hopkinsMean=hopkinsHistProbability*bins';
+%     hopkinsSTD=sqrt(hopkinsHistProbability*((bins-hopkinsMean).^2)');
+    sigHop(i)=bins(min(find(cumulativeHist>0.95,1),numel(bins)));
+end
+
