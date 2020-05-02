@@ -17,7 +17,7 @@ function [clusterLimits,channels,times,spikesPerCluster] = findContinuousCluster
 %           If empty, spikesPerCluster will have be all zeros
 %       -   Varargins (given as 'Key',Value pairs):
 %           -   redundantAdjacentPeaks - merge two peaks  with this
-%           proximity (default is 10).
+%           proximity (default is 100).
 %           -   plotTrialsClusters (logical) - plot the results of this
 %           trial crossing clustering. deafult is false.
 
