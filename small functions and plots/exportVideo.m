@@ -80,12 +80,25 @@ else
     data2export=dataFramesGS_smoothed;
 end
 
-dataVideo = VideoWriter(videoDir);
-dataVideo.FrameRate=frameRate;
-open(dataVideo);
+
 
 data2export_uint8=uint8(data2export);
-writeVideo(dataVideo,data2export_uint8); 
+if ndims(data2export_uint8)==4
+    dataVideo = VideoWriter(videoDir);
+    dataVideo.FrameRate=frameRate;
+    open(dataVideo);
+    writeVideo(dataVideo,data2export_uint8); 
+
+else
+    dataVideo = VideoWriter(videoDir,'Grayscale AVI');
+    dataVideo.FrameRate=frameRate;
+    open(dataVideo);
+
+
+    for i=1:nFrames
+       writeVideo(dataVideo,data2export_uint8(:,:,i)); 
+    end
+end
 
 close(dataVideo);
 
