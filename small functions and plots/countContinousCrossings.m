@@ -42,76 +42,97 @@ neighborsSum=0;
 % check all neighbors. If they have crossing in temporal window, add 1 and 
 % run function on them
 
-%%%% DOWN %%%%%
-nextPosI=currentPosI+1;
-nextPosJ=currentPosJ;
-
-if nextPosI>=1 && nextPosI<=size(En,1) && nextPosJ>=1 && nextPosJ<=size(En,2) %make sure next channel is in layout
-    nextChannel=En(nextPosI,nextPosJ);
-    if ~isnan(nextChannel) && ~visited(nextChannel) %NaNs are not channels
-        closeCrossings=find(abs(allCrossings(nextChannel,:)-currentCrossingTime)<=maxTempDist);
-        if ~isempty(closeCrossings) %next chanel has a crossing within time window
-            nextCrossingTime=min(allCrossings(nextChannel,closeCrossings)); %find the closest crossing
-            [nChInWaveNext,visited,channels,times]=countContinousCrossings(nextPosI,nextPosJ,nextCrossingTime,allCrossings,visited,En,maxTempDist,channels,times);
-            neighborsSum=neighborsSum+1+nChInWaveNext;
-            channels=[channels nextChannel];
-            times=[times nextCrossingTime];
+%Go only down/up/left/right
+for nextPosI=(currentPosI-1):(currentPosI+1)
+    for nextPosJ=(currentPosJ-1):(currentPosJ+1)
+        if (nextPosI==currentPosI && nextPosJ~=currentPosJ) || (nextPosI~=currentPosI && nextPosJ==currentPosJ)
+            if nextPosI>=1 && nextPosI<=size(En,1) && nextPosJ>=1 && nextPosJ<=size(En,2) %make sure next channel is in layout
+                nextChannel=En(nextPosI,nextPosJ);
+                if ~isnan(nextChannel) && ~visited(nextChannel) %NaNs are not channels
+                    nextChannelCrossingsNoZeros=allCrossings(nextChannel,allCrossings(nextChannel,:)>0);
+                    closestCrossing=nextChannelCrossingsNoZeros(abs(nextChannelCrossingsNoZeros-currentCrossingTime)==min(abs(nextChannelCrossingsNoZeros-currentCrossingTime)));
+                    if ~isempty(closestCrossing) && abs(closestCrossing(1)-currentCrossingTime)<maxTempDist %next chanel has a crossing within time window
+                        closestCrossing=closestCrossing(1); %if there are two which is closest only take one of them
+                        [nChInWaveNext,visited,channels,times]=countContinousCrossings(nextPosI,nextPosJ,closestCrossing,allCrossings,visited,En,maxTempDist,channels,times);
+                        neighborsSum=neighborsSum+1+nChInWaveNext;
+                        channels=[channels nextChannel];
+                        times=[times closestCrossing];
+                    end
+                end
+            end
         end
     end
 end
-%%%% UP %%%%%
-nextPosI=currentPosI-1;
-nextPosJ=currentPosJ;
-
-
-if nextPosI>=1 && nextPosI<=size(En,1) && nextPosJ>=1 && nextPosJ<=size(En,2) %make sure next channel is in layout
-    nextChannel=En(nextPosI,nextPosJ);
-    if ~isnan(nextChannel) && ~visited(nextChannel) %NaNs are not channels
-        closeCrossings=find(abs(allCrossings(nextChannel,:)-currentCrossingTime)<=maxTempDist);
-        if ~isempty(closeCrossings) %next chanel has a crossing within time window
-            nextCrossingTime=min(allCrossings(nextChannel,closeCrossings)); %find the closest crossing
-            [nChInWaveNext,visited,channels,times]=countContinousCrossings(nextPosI,nextPosJ,nextCrossingTime,allCrossings,visited,En,maxTempDist,channels,times);
-            neighborsSum=neighborsSum+1+nChInWaveNext;
-            channels=[channels nextChannel];
-            times=[times nextCrossingTime];
-        end
-    end
-end
-%%%% RIGHT %%%%%
-nextPosI=currentPosI;
-nextPosJ=currentPosJ+1;
-
-
-if nextPosI>=1 && nextPosI<=size(En,1) && nextPosJ>=1 && nextPosJ<=size(En,2) %make sure next channel is in layout
-    nextChannel=En(nextPosI,nextPosJ);
-    if ~isnan(nextChannel) && ~visited(nextChannel) %NaNs are not channels
-        closeCrossings=find(abs(allCrossings(nextChannel,:)-currentCrossingTime)<=maxTempDist);
-        if ~isempty(closeCrossings) %next chanel has a crossing within time window
-            nextCrossingTime=min(allCrossings(nextChannel,closeCrossings)); %find the closest crossing
-            [nChInWaveNext,visited,channels,times]=countContinousCrossings(nextPosI,nextPosJ,nextCrossingTime,allCrossings,visited,En,maxTempDist,channels,times);
-            neighborsSum=neighborsSum+1+nChInWaveNext;
-            channels=[channels nextChannel];
-            times=[times nextCrossingTime];
-        end
-    end
-end
-%%%% LEFT %%%%%
-nextPosI=currentPosI;
-nextPosJ=currentPosJ-1;
-
-
-if nextPosI>=1 && nextPosI<=size(En,1) && nextPosJ>=1 && nextPosJ<=size(En,2) %make sure next channel is in layout
-    nextChannel=En(nextPosI,nextPosJ);
-    if ~isnan(nextChannel) && ~visited(nextChannel) %NaNs are not channels
-        closeCrossings=find(abs(allCrossings(nextChannel,:)-currentCrossingTime)<=maxTempDist);
-        if ~isempty(closeCrossings) %next chanel has a crossing within time window
-            nextCrossingTime=min(allCrossings(nextChannel,closeCrossings)); %find the closest crossing
-            [nChInWaveNext,visited,channels,times]=countContinousCrossings(nextPosI,nextPosJ,nextCrossingTime,allCrossings,visited,En,maxTempDist,channels,times);
-            neighborsSum=neighborsSum+1+nChInWaveNext;
-            channels=[channels nextChannel];
-            times=[times nextCrossingTime];
-        end
-    end
-end
+% nextPosI=currentPosI+1;
+% nextPosJ=currentPosJ;
+% 
+% if nextPosI>=1 && nextPosI<=size(En,1) && nextPosJ>=1 && nextPosJ<=size(En,2) %make sure next channel is in layout
+%     nextChannel=En(nextPosI,nextPosJ);
+%     if ~isnan(nextChannel) && ~visited(nextChannel) %NaNs are not channels
+%         nextChannelCrossingsNoZeros=allCrossings(nextChannel,allCrossings(nextChannel,:)>0);
+%         closestCrossing=nextChannelCrossingsNoZeros(abs(nextChannelCrossingsNoZeros-currentCrossingTime)==min(abs(nextChannelCrossingsNoZeros-currentCrossingTime)));
+%         if ~isempty(closestCrossing) && closestCrossing(1)<maxTempDist %next chanel has a crossing within time window
+%             closestCrossing=closestCrossing(1); %if there are two which is closest only take one of them
+%             [nChInWaveNext,visited,channels,times]=countContinousCrossings(nextPosI,nextPosJ,closestCrossing,allCrossings,visited,En,maxTempDist,channels,times);
+%             neighborsSum=neighborsSum+1+nChInWaveNext;
+%             channels=[channels nextChannel];
+%             times=[times closestCrossing];
+%         end
+%     end
+% end
+% %%%% UP %%%%%
+% nextPosI=currentPosI-1;
+% nextPosJ=currentPosJ;
+% 
+% 
+% if nextPosI>=1 && nextPosI<=size(En,1) && nextPosJ>=1 && nextPosJ<=size(En,2) %make sure next channel is in layout
+%     nextChannel=En(nextPosI,nextPosJ);
+%     if ~isnan(nextChannel) && ~visited(nextChannel) %NaNs are not channels
+%         closeCrossings=find(abs(allCrossings(nextChannel,:)-currentCrossingTime)<=maxTempDist);
+%         if ~isempty(closeCrossings) %next chanel has a crossing within time window
+%             nextCrossingTime=min(allCrossings(nextChannel,closeCrossings)); %find the closest crossing
+%             [nChInWaveNext,visited,channels,times]=countContinousCrossings(nextPosI,nextPosJ,nextCrossingTime,allCrossings,visited,En,maxTempDist,channels,times);
+%             neighborsSum=neighborsSum+1+nChInWaveNext;
+%             channels=[channels nextChannel];
+%             times=[times nextCrossingTime];
+%         end
+%     end
+% end
+% %%%% RIGHT %%%%%
+% nextPosI=currentPosI;
+% nextPosJ=currentPosJ+1;
+% 
+% 
+% if nextPosI>=1 && nextPosI<=size(En,1) && nextPosJ>=1 && nextPosJ<=size(En,2) %make sure next channel is in layout
+%     nextChannel=En(nextPosI,nextPosJ);
+%     if ~isnan(nextChannel) && ~visited(nextChannel) %NaNs are not channels
+%         closeCrossings=find(abs(allCrossings(nextChannel,:)-currentCrossingTime)<=maxTempDist);
+%         if ~isempty(closeCrossings) %next chanel has a crossing within time window
+%             nextCrossingTime=min(allCrossings(nextChannel,closeCrossings)); %find the closest crossing
+%             [nChInWaveNext,visited,channels,times]=countContinousCrossings(nextPosI,nextPosJ,nextCrossingTime,allCrossings,visited,En,maxTempDist,channels,times);
+%             neighborsSum=neighborsSum+1+nChInWaveNext;
+%             channels=[channels nextChannel];
+%             times=[times nextCrossingTime];
+%         end
+%     end
+% end
+% %%%% LEFT %%%%%
+% nextPosI=currentPosI;
+% nextPosJ=currentPosJ-1;
+% 
+% 
+% if nextPosI>=1 && nextPosI<=size(En,1) && nextPosJ>=1 && nextPosJ<=size(En,2) %make sure next channel is in layout
+%     nextChannel=En(nextPosI,nextPosJ);
+%     if ~isnan(nextChannel) && ~visited(nextChannel) %NaNs are not channels
+%         closeCrossings=find(abs(allCrossings(nextChannel,:)-currentCrossingTime)<=maxTempDist);
+%         if ~isempty(closeCrossings) %next chanel has a crossing within time window
+%             nextCrossingTime=min(allCrossings(nextChannel,closeCrossings)); %find the closest crossing
+%             [nChInWaveNext,visited,channels,times]=countContinousCrossings(nextPosI,nextPosJ,nextCrossingTime,allCrossings,visited,En,maxTempDist,channels,times);
+%             neighborsSum=neighborsSum+1+nChInWaveNext;
+%             channels=[channels nextChannel];
+%             times=[times nextCrossingTime];
+%         end
+%     end
+% end
 
 nChInWave=neighborsSum;
