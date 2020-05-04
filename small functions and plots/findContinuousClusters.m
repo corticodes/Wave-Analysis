@@ -104,7 +104,7 @@ for i=1:numel(PeakSamples)
     seedSample=crossings(seedCh,chCross);
     [seedPosI,seedPosJ]=find(En==seedCh); %position in layout
     %get the wave around the seed
-    [nChInWave,visited,clusterChannels,clusterTimes] = countContinousCrossings(seedPosI,seedPosJ,seedSample,crossings,false(1,max(En(:))),En,maxTempDist,[],[]);
+    [nChInWave,clusterChannels,clusterTimes] = countContinousCrossings(seedPosI,seedPosJ,seedSample,crossings,En,maxTempDist,[],[]);
     if nChInWave>=minChannelInWave
         nGoodClusters=nGoodClusters+1;
         clusterLimits(nGoodClusters,1:2)=[min(clusterTimes),max(clusterTimes)];
