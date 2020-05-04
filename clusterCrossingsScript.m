@@ -99,7 +99,8 @@ goodWavesNEW.channels={};
 goodWavesNEW.times={};
 nGoodWavesNEW=0;
     
-for trig=goodWaves.triggers(1:5)
+for trig=unique(goodWaves.triggers)
+% for trig=334
         startTimes=triggers{5}(trig); %ms
         [data,time]=Experiments.currentDataObj.getData([],startTimes,window_ms);
         [FD,HT,HTabs,HTangle] = BPnHilbert(data,bandpass);
@@ -107,7 +108,7 @@ for trig=goodWaves.triggers(1:5)
         binSpikes = getSpikeBinMatByChannel(ticPath,startTimes,startTimes+window_ms,Experiments.currentDataObj.samplingFrequency);
         disp(['crossing ' num2str(crossingType) 'trig ' num2str(trig)])
 %         [clusterLimits,channels,times,spikesPerCluster] = findContinuousClusters(crossings{crossingType},hilbertAmps{crossingType},En,maxTempDist,minChannelInWave,minAVGAmp,binSpikes,'redundantAdjacentPeaks',redundantAdjacentPeaks,'plotTrialsClusters',true);
-        [clusterLimits,channels,times,spikesPerCluster] = findContinuousClusters(crossings{crossingType},hilbertAmps{crossingType},En,maxTempDist,minChannelInWave,minAVGAmp,binSpikes,'redundantAdjacentPeaks',redundantAdjacentPeaks,'plotTrialsClusters',true);
+          [clusterLimits,channels,times,spikesPerCluster] = findContinuousClusters(crossings{crossingType},hilbertAmps{crossingType},En,maxTempDist,minChannelInWave,minAVGAmp,binSpikes,'redundantAdjacentPeaks',redundantAdjacentPeaks,'plotTrialsClusters',false);
         highSpikeCluster=find(spikesPerCluster>=35);
         %make sure this loop is necessary
         for j=1:numel(highSpikeCluster)
