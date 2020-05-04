@@ -83,7 +83,7 @@ redundantInd=find(diff(PeakSamples)<=redundantAdjacentPeaks,1);
 while ~isempty(redundantInd)
     pks=[pks(1:redundantInd); pks((redundantInd+2):end)];
    PeakSamples=[PeakSamples(1:redundantInd); PeakSamples((redundantInd+2):end)];
-    redundantInd=find(diff(PeakSamples)<=10,1);
+    redundantInd=find(diff(PeakSamples)<=redundantAdjacentPeaks,1);
 end
 if plotTrialsClusters
     scatter(PeakSamples,pks,25,'filled','k')
