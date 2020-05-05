@@ -28,7 +28,7 @@ startTimes=triggers{5}(1); %ms
 [FD,HT,HTabs,HTangle] = BPnHilbert(data,bandpass);
 [crossings,hilbertAmps] = getHilbertCrossings(HTabs,HTangle);
 binSpikes = getSpikeBinMatByChannel(ticPath,startTimes,startTimes+window_ms,Experiments.currentDataObj.samplingFrequency);
-[nChInWave,channels,times] = countContinousCrossings(currentPosI,currentPosJ,7301,crossings{3},En,20,[],[]);
+[nChInWave,channels,times] = countContinousCrossings(crossings{3},En,20,46,7301);
 
 
 
@@ -43,23 +43,24 @@ for crossingType=2:4
     goodWaves.clusterLimits=[];
     goodWaves.clusterSpikes=[];
     nGoodWaves=0;
-    for trig=1:2000
+    for trig=1:100
         startTimes=triggers{5}(trig); %ms
         [data,time]=Experiments.currentDataObj.getData([],startTimes,window_ms);
         [FD,HT,HTabs,HTangle] = BPnHilbert(data,bandpass);
         [crossings,hilbertAmps] = getHilbertCrossings(HTabs,HTangle);
         binSpikes = getSpikeBinMatByChannel(ticPath,startTimes,startTimes+window_ms,Experiments.currentDataObj.samplingFrequency);
         disp(['crossing ' crossingsNames{crossingType} 'trig ' num2str(trig)])
-        [clusterLimits,channels,times,spikesPerCluster] = findContinuousClusters(crossings{crossingType},hilbertAmps{crossingType},En,maxTempDist,minChannelInWave,minAVGAmp,binSpikes,'redundantAdjacentPeaks',redundantAdjacentPeaks,'plotTrialsClusters',true);
-        saveas(gcf,[filesPath 'trig ' num2str(trig) ' Clusters with peaks and captured.jpg'])
-        savefig([filesPath 'trig ' num2str(trig) ' Clusters with peaks and captured.fig'])
-        close gcf
+        [clusterLimits,channels,times,spikesPerCluster] = findContinuousClusters(crossings{crossingType},hilbertAmps{crossingType},En,maxTempDist,minChannelInWave,minAVGAmp,binSpikes,'redundantAdjacentPeaks',redundantAdjacentPeaks,'plotTrialsClusters',true,'spikesPerCluster',35);
+%         saveas(gcf,[filesPath 'trig ' num2str(trig) ' Clusters with peaks and captured.jpg'])
+%         savefig([filesPath 'trig ' num2str(trig) ' Clusters with peaks and captured.fig'])
+%         close gcf
         %        else
         %            [clusterLimits,channels,times,spikesPerCluster] = findContinuousClusters(crossings{crossingType},hilbertAmps{crossingType},En,maxTempDist,minChannelInWave,minAVGAmp,binSpikes,'redundantAdjacentPeaks',redundantAdjacentPeaks);
         %        end
         
         highSpikeCluster=find(spikesPerCluster>=35);
-        %make sure this loop is necessary
+        %This loop is no longer necessary - spike count is done right inside
+        %findContinousCluster. Loop some other way (just over all output)
         for j=1:numel(highSpikeCluster)
             nGoodWaves=nGoodWaves+1;
             goodWaves.triggers(nGoodWaves)=trig;
@@ -99,7 +100,8 @@ goodWavesNEW.channels={};
 goodWavesNEW.times={};
 nGoodWavesNEW=0;
     
-for trig=unique(goodWaves.triggers)
+% for trig=unique(goodWaves.triggers)
+for trig=1:100
 % for trig=334
         startTimes=triggers{5}(trig); %ms
         [data,time]=Experiments.currentDataObj.getData([],startTimes,window_ms);
@@ -110,7 +112,7 @@ for trig=unique(goodWaves.triggers)
 %         [clusterLimits,channels,times,spikesPerCluster] = findContinuousClusters(crossings{crossingType},hilbertAmps{crossingType},En,maxTempDist,minChannelInWave,minAVGAmp,binSpikes,'redundantAdjacentPeaks',redundantAdjacentPeaks,'plotTrialsClusters',true);
           [clusterLimits,channels,times,spikesPerCluster] = findContinuousClusters(crossings{crossingType},hilbertAmps{crossingType},En,maxTempDist,minChannelInWave,minAVGAmp,binSpikes,'redundantAdjacentPeaks',redundantAdjacentPeaks,'plotTrialsClusters',false);
         highSpikeCluster=find(spikesPerCluster>=35);
-        %make sure this loop is necessary
+        %This loop is no longer needed, just use minSpikesPerCluster varargin
         for j=1:numel(highSpikeCluster)
             nGoodWavesNEW=nGoodWavesNEW+1;
             goodWavesNEW.triggers(nGoodWavesNEW)=trig;
@@ -121,4 +123,91 @@ for trig=unique(goodWaves.triggers)
 
         end
 end
-    
+
+
+%% optimize parameters
+
+%clustering params
+% maxTempDist=40;
+% minChannelInWave=100;
+% minAVGAmp=20;
+% redundantAdjacentPeaks=150;
+trigs=1:1000;
+% maxTempDist=45:15:60;
+% minChannelInWave=40:60:100;
+% minAVGAmp=[20 40];
+% redundantAdjacentPeaks=[50 100 150];
+% minSpikesPerCluster=[10 35 45];
+maxTempDist=20:20:60;
+minChannelInWave=60:30:120;
+minAVGAmp=10:10:40;
+redundantAdjacentPeaks=100:50:250;
+minSpikesPerCluster=30:5:50;
+
+%Create all possible combinations
+nMaxTempDist=numel(maxTempDist);
+nminChannelInWave=numel(minChannelInWave);
+nminAVGAmp=numel(minAVGAmp);
+nredundantAdjacentPeaks=numel(redundantAdjacentPeaks);
+nminSpikesPerCluster=numel(minSpikesPerCluster);
+
+nTotParams=nMaxTempDist*nminChannelInWave*nminAVGAmp*nredundantAdjacentPeaks*nminSpikesPerCluster;
+
+maxTempDistPERM=nan(1,nTotParams);
+minChannelInWavePERM=nan(1,nTotParams);
+minAVGAmpPERM=nan(1,nTotParams);
+redundantAdjacentPeaksPERM=nan(1,nTotParams);
+minSpikesPerClusterPERM=nan(1,nTotParams);
+
+c=1;
+for i=1:nMaxTempDist
+    for j=1:nminChannelInWave
+        for k=1:nminAVGAmp 
+            for l=1:nredundantAdjacentPeaks
+                for m=1:nminSpikesPerCluster
+                    maxTempDistPERM(c)=maxTempDist(i);
+                    minChannelInWavePERM(c)=minChannelInWave(j);
+                    minAVGAmpPERM(c)=minAVGAmp(k);
+                    redundantAdjacentPeaksPERM(c)=redundantAdjacentPeaks(l);
+                    minSpikesPerClusterPERM(c)=minSpikesPerCluster(m);
+                    c=c+1;
+                end
+            end
+        end
+    end
+end
+            
+            
+crossingType=3;
+% 
+% paramsOptim.waves=[];
+% paramsOptim.clusterPerTrial=[];
+% 
+% goodWaves.triggers=[];
+% goodWaves.clusterLimits=[];
+% goodWaves.clusterSpikes=[];
+% nGoodWaves=0;
+
+clustersAllParams=cell(1,nTotParams);
+
+for trig=trigs
+    trig
+    startTimes=triggers{5}(trig); %ms
+    [data,time]=Experiments.currentDataObj.getData([],startTimes,window_ms);
+    [FD,HT,HTabs,HTangle] = BPnHilbert(data,bandpass);
+    [crossings,hilbertAmps] = getHilbertCrossings(HTabs,HTangle);
+    binSpikes = getSpikeBinMatByChannel(ticPath,startTimes,startTimes+window_ms,Experiments.currentDataObj.samplingFrequency);
+%     disp(['crossing ' crossingsNames{crossingType} 'trig ' num2str(trig)])
+    for i=1:nTotParams
+        [clusterLimits,channels,times,spikesPerCluster] = findContinuousClusters(crossings{crossingType},hilbertAmps{crossingType},En,maxTempDistPERM(i),minChannelInWavePERM(i),minAVGAmpPERM(i),binSpikes,'redundantAdjacentPeaks',redundantAdjacentPeaksPERM(i),'plotTrialsClusters',false,'minSpikesPerCluster',minSpikesPerClusterPERM(i));
+        nGoodClusters=size(clusterLimits,1);
+        for j=1:nGoodClusters
+            cluster.Limits=clusterLimits(j,1:2);
+            cluster.channels=channels{j};
+            cluster.times=times{j};
+            cluster.spikesPerCluster=spikesPerCluster(j);
+            cluster.trig=trig;
+            clustersAllParams{i}=[clustersAllParams{i} cluster];
+        end
+    end
+end
