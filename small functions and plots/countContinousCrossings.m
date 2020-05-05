@@ -1,19 +1,16 @@
-function [nChInWave,channels,times] = countContinousCrossings(currentPosI,currentPosJ,currentCrossingTime,allCrossings,En,maxTempDist,channels,times)
+function [nChInWave,channels,times] = countContinousCrossings(allCrossings,En,maxTempDist,channels,times)
 %COUNTCONTINOUSCROSSINGS is a recursive function that counts how many 
 %channels have crossings that are connected (in space and time), i.e. how 
 %many channels participate in a particular wave. 
 %   Input:
-%       - currentPosI,currentPosJ: The channel position to which we are 
-%       looking for neighbors with crossings.
-%       - currentCrossingTime: the time (samples) of the channel's 
-%         crossings we are looking at
 %       - allCrossings: all channel's crossings times (one of the 4 
 %         matrices given by getHilbertCrossings)
 %       - En: channel layout 
 %       - maxTempDist: the maximal time window allowed for two neighbors to
 %       have crossings
 %       - channels,times are arrays to keep track of the wave crossings 
-%       found. Should be given as empty arrays
+%       found. AS INPUT, THE STARTING SEED SHOULD BE GIVEN (i.e. channels
+%       should contain the seed channel and times the seed's time).
 %   Output:
 %       - nChInWave: Number of channels that had a countinous crossings 
 %       from one another
@@ -24,8 +21,12 @@ function [nChInWave,channels,times] = countContinousCrossings(currentPosI,curren
 %      - Currently looking only at horizontal and vertical neighbours.
 %      Maybe diagonal should be added?
 
+[currentPosI,currentPosJ]=find(En==channels(end));
+currentCrossingTime=times(end);
+
 
 neighborsSum=0;
+
 % check all neighbors. If they have crossing in temporal window, add 1 and 
 % run function on them
 
@@ -39,8 +40,8 @@ for nextPosI=(currentPosI-1):(currentPosI+1)
                 for i=1:numel(closestCrossing) %There could be up to 2 closest crossing (one from each side). Need to address both becuase one might have appeared already in the cluster and the other not.
                     if abs(closestCrossing(i)-currentCrossingTime)<maxTempDist && all(~(channels==nextChannel & times==closestCrossing(i)))%next chanel has a crossing within time window, and it hasn't apeared yet in the cluster
                         channels=[channels nextChannel];
-                        times=[times closestCrossing];
-                        [nChInWaveNext,channels,times]=countContinousCrossings(nextPosI,nextPosJ,closestCrossing(i),allCrossings,En,maxTempDist,channels,times);
+                        times=[times closestCrossing(i)];
+                        [nChInWaveNext,channels,times]=countContinousCrossings(allCrossings,En,maxTempDist,channels,times);
                         neighborsSum=neighborsSum+1+nChInWaveNext;
                     end
                 end

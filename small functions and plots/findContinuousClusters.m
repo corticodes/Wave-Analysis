@@ -18,6 +18,8 @@ function [clusterLimits,channels,times,spikesPerCluster] = findContinuousCluster
 %       -   Varargins (given as 'Key',Value pairs):
 %           -   redundantAdjacentPeaks - merge two peaks  with this
 %           proximity (default is 100).
+%           -   minSpikesPerCluster - If given, function only returns 
+%           cluster with more spikes within cluster limits than this.
 %           -   plotTrialsClusters (logical) - plot the results of this
 %           trial crossing clustering. deafult is false.
 
@@ -102,15 +104,19 @@ for i=1:numel(PeakSamples)
     %matter
     [seedCh,chCross]=find(abs(crossings-PeakSamples(i))==min(min(abs(crossings-PeakSamples(i)))),1);
     seedSample=crossings(seedCh,chCross);
-    [seedPosI,seedPosJ]=find(En==seedCh); %position in layout
     %get the wave around the seed
-    [nChInWave,clusterChannels,clusterTimes] = countContinousCrossings(seedPosI,seedPosJ,seedSample,crossings,En,maxTempDist,[],[]);
+    [nChInWave,clusterChannels,clusterTimes] = countContinousCrossings(crossings,En,maxTempDist,seedCh,seedSample);
+    
     if nChInWave>=minChannelInWave
-        nGoodClusters=nGoodClusters+1;
-        clusterLimits(nGoodClusters,1:2)=[min(clusterTimes),max(clusterTimes)];
-        channels{nGoodClusters}=clusterChannels;
-        times{nGoodClusters}=clusterTimes;
-        spikesPerCluster(nGoodClusters)=sum(spikesPerSample(clusterLimits(nGoodClusters,1):clusterLimits(nGoodClusters,2)));
+        currentClusterLimits=[min(clusterTimes),max(clusterTimes)];
+        currentClusterSpikes=sum(spikesPerSample(currentClusterLimits(1):currentClusterLimits(2)));
+        if ~exist('minSpikesPerCluster','var') || (exist('minSpikesPerCluster','var') && currentClusterSpikes>=minSpikesPerCluster)
+            nGoodClusters=nGoodClusters+1;
+            clusterLimits(nGoodClusters,1:2)=currentClusterLimits;
+            channels{nGoodClusters}=clusterChannels;
+            times{nGoodClusters}=clusterTimes;
+            spikesPerCluster(nGoodClusters)=currentClusterSpikes;
+        end
     end
 end
 
