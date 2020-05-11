@@ -25,7 +25,7 @@ function [nChInWave,channels,times] = countContinousCrossings(allCrossings,En,ma
 currentCrossingTime=times(end);
 
 
-neighborsSum=0;
+neighborsSum=1; %There is always at least one - the seed
 
 % check all neighbors. If they have crossing in temporal window, add 1 and 
 % run function on them
@@ -42,7 +42,7 @@ for nextPosI=(currentPosI-1):(currentPosI+1)
                         channels=[channels nextChannel];
                         times=[times closestCrossing(i)];
                         [nChInWaveNext,channels,times]=countContinousCrossings(allCrossings,En,maxTempDist,channels,times);
-                        neighborsSum=neighborsSum+1+nChInWaveNext;
+                        neighborsSum=neighborsSum+nChInWaveNext;
                     end
                 end
              end
