@@ -138,6 +138,7 @@ trigs=1:1000;
 % minAVGAmp=[20 40];
 % redundantAdjacentPeaks=[50 100 150];
 % minSpikesPerCluster=[10 35 45];
+
 maxTempDist=20:20:60;
 minChannelInWave=60:30:120;
 minAVGAmp=10:10:40;
@@ -150,6 +151,8 @@ nminChannelInWave=numel(minChannelInWave);
 nminAVGAmp=numel(minAVGAmp);
 nredundantAdjacentPeaks=numel(redundantAdjacentPeaks);
 nminSpikesPerCluster=numel(minSpikesPerCluster);
+
+
 
 nTotParams=nMaxTempDist*nminChannelInWave*nminAVGAmp*nredundantAdjacentPeaks*nminSpikesPerCluster;
 
@@ -190,14 +193,17 @@ crossingType=3;
 
 clustersAllParams=cell(1,nTotParams);
 
+load('E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\saved mats\U4AllTrigCrossings.mat')
+load('E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\saved mats\U4AllTrigCrossingsAMPs.mat')
+load('E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\saved mats\U4AllTrigCrossingsBinSpikes.mat')
+
 for trig=trigs
     trig
     startTimes=triggers{5}(trig); %ms
-    [data,time]=Experiments.currentDataObj.getData([],startTimes,window_ms);
-    [FD,HT,HTabs,HTangle] = BPnHilbert(data,bandpass);
-    [crossings,hilbertAmps] = getHilbertCrossings(HTabs,HTangle);
-    binSpikes = getSpikeBinMatByChannel(ticPath,startTimes,startTimes+window_ms,Experiments.currentDataObj.samplingFrequency);
-%     disp(['crossing ' crossingsNames{crossingType} 'trig ' num2str(trig)])
+    crossings=allTrigCrossings{trig};
+    hilbertAmps=allTrigAmps{trig};
+    binSpikes = allTrigBinSpikes{trig};
+
     for i=1:nTotParams
         [clusterLimits,channels,times,spikesPerCluster] = findContinuousClusters(crossings{crossingType},hilbertAmps{crossingType},En,maxTempDistPERM(i),minChannelInWavePERM(i),minAVGAmpPERM(i),binSpikes,'redundantAdjacentPeaks',redundantAdjacentPeaksPERM(i),'plotTrialsClusters',false,'minSpikesPerCluster',minSpikesPerClusterPERM(i));
         nGoodClusters=size(clusterLimits,1);
@@ -210,4 +216,69 @@ for trig=trigs
             clustersAllParams{i}=[clustersAllParams{i} cluster];
         end
     end
+end
+paramsRanges={maxTempDist,minChannelInWave,minAVGAmp,redundantAdjacentPeaks,minSpikesPerCluster};
+nParamsRanges={nMaxTempDist,nminChannelInWave,nminAVGAmp,nredundantAdjacentPeaks,nminSpikesPerCluster};
+allParamsPermutations={maxTempDistPERM,minChannelInWavePERM,minAVGAmpPERM,redundantAdjacentPeaksPERM,minSpikesPerClusterPERM};            
+save('E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\saved mats\ClustersAllParamsWithParams','clustersAllParams','paramsRanges','nTotParams','nParamsRanges','allParamsPermutations','crossingType','triggers','En','-v7.3')
+
+
+%% find distances between density peaks
+%also start saving clusters and binSpikes
+allTrigCrossings=cell(1,4000);
+allTrigAmps=cell(1,4000);
+allTrigBinSpikes={1,4000};
+allTrigAllPeaks={1,4000};
+allTrigAllPeakSamples={1,4000};
+highPeakSamplesDiff=[];
+for trig=1:4000
+    trig
+    startTimes=triggers{5}(trig); %ms
+    [data,time]=Experiments.currentDataObj.getData([],startTimes,window_ms);
+    [FD,HT,HTabs,HTangle] = BPnHilbert(data,bandpass);
+    [crossings,hilbertAmps] = getHilbertCrossings(HTabs,HTangle);
+    binSpikes = getSpikeBinMatByChannel(ticPath,startTimes,startTimes+window_ms,Experiments.currentDataObj.samplingFrequency);
+    allTrigCrossings{trig}=crossings;
+    allTrigAmps{trig}=hilbertAmps;
+    allTrigBinSpikes{trig}=binSpikes;
+    sampleCrossings=getCrossingsBySamples(crossings{3},hilbertAmps{3});
+    sampleCrossings1dsmoothed=smooth(smooth(sum(sampleCrossings),200),100);
+    [allTrigAllPeaks{trig},allTrigAllPeakSamples{trig}] = findpeaks(sampleCrossings1dsmoothed);
+    highPeaksInd=find(allTrigAllPeaks{trig}>=20);
+    pks=allTrigAllPeaks{trig}(highPeaksInd);
+    PeakSamples=allTrigAllPeakSamples{trig}(highPeaksInd);
+    highPeakSamplesDiff=[highPeakSamplesDiff;diff(PeakSamples)];
+end
+hist(highPeakSamplesDiff,500)
+
+highPeakSamplesDiff100=highPeakSamplesDiff;
+allTrigCrossings100=allTrigCrossings;
+allTrigAmps100=allTrigAmps;
+allTrigBinSpikes100=allTrigBinSpikes;
+allTrigAllPeaks100=allTrigAllPeaks;
+allTrigAllPeakSamples100=allTrigAllPeakSamples;
+
+% % getCrossingsBySamples(crossings,hilbertAmps,'nSamples',size(binSpikes,2));
+% sampleCrossings=getCrossingsBySamples(crossings{3},hilbertAmps{3});
+% sampleCrossings1dsmoothed=smooth(smooth(sum(sampleCrossings),200),100);
+% plot(sampleCrossings1dsmoothed)
+% 
+% [Allpks,AllPeakSamples] = findpeaks(sampleCrossings1dsmoothed);
+% 
+% highPeaksInd=find(Allpks>=20);
+% pks=Allpks(highPeaksInd);
+% PeakSamples=AllPeakSamples(highPeaksInd);
+
+hist(diff(PeakSamples),100)
+
+
+%this was bad, redo
+highPeakDiff=[];
+for i=1:100
+    sampleCrossings=getCrossingsBySamples(allTrigCrossings{i}{3},allTrigCrossings{i}{3});
+    sampleCrossings1dsmoothed=smooth(smooth(sum(sampleCrossings),200),100);
+    [allTrigAllPeaks{i},allTrigAllPeakSamples{i}] = findpeaks(sampleCrossings1dsmoothed);
+    highPeaksInd=find(allTrigAllPeaks{i}>=20);
+    PeakSamples=allTrigAllPeakSamples{i}(highPeaksInd);
+    highPeakDiff=[highPeakDiff;diff(PeakSamples)];
 end
