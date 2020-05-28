@@ -1,4 +1,4 @@
-function [FD,HT,HTabs,HTangle] = BPnHilbert(data,bandpass)
+function [FD,HT,HTabs,HTangle] = BPnHilbert(data,bandpass,varargin)
 %BPNHILBERT bandpasses input data according to bandpass and calculates the
 %hilbert transform of the BPed data. 
 %If there is only one output arg BPnHilbert will only bandpass
@@ -8,10 +8,18 @@ function [FD,HT,HTabs,HTangle] = BPnHilbert(data,bandpass)
 %   where FD (chXtrialXsample) is the filtered data, HT is the complex hilbert analytic,
 %   HTabs is the complex magnitude of the analytic (the envelope) and HT
 %   angle is the hilbert phase.
+%   Varargin:
+%       -   cutwidths: cutwidths(1) to the right of bandpass(1), 
+%       cutwidths(2) to the left of bandpass(2). Default is [2 2]
+%       -   SamplingFrequency - self explanatory
 
+cutwidths=[2 2]; %
+SamplingFrequency=20000;
+for i=1:2:length(varargin)
+   eval([varargin{i} '=varargin{' num2str(i+1) '};']);
+end
 
-cutwidths=[2 2]; %cutwidths(1) to the right of bandpass(1), cutwidths(2) to the left of bandpass(2)
-F=filterData(20000);
+F=filterData(SamplingFrequency);
 F.padding=true;
 F.lowPassStopCutoff=bandpass(2)+cutwidths(2); %low-pass cutoff frequency
 F.lowPassPassCutoff=bandpass(2);
