@@ -253,6 +253,52 @@ ylim([0 600])
 %find groups of neurons and plot in physical per channel
 
 
+%% slow waves statistics
+nTrigs=100;
+lowPassCutoff=2;
+
+window_ms=5000;
+ignoreSample=100;
+startTimes=triggers{5}(1:nTrigs); %ms
+[data,time]=Experiments.currentDataObj.getData([],startTimes,window_ms);
+F=filterData(20000);
+F.padding=true;
+F.lowPassCutoff=lowPassCutoff;
+F=F.designLowPass;
+FD=F.getFilteredData(data);
+for i=1:nTrigs
+    HT(:,i,:)=hilbert(squeeze(FD(:,i,:))').';
+end
+croppedHT=HT(:,:,ignoreSample+1:end);
+croppedFD=FD(:,:,ignoreSample+1:end);
+nCroppedSamples=size(croppedHT,3);
+HTsequence=reshape(permute(croppedHT,[1,3,2]),numel(Experiments.currentDataObj.channelNumbers), (window_ms*Experiments.currentDataObj.samplingFrequency/1000-ignoreSample)*nTrigs);
+FDsequence=reshape(permute(croppedFD,[1,3,2]),numel(Experiments.currentDataObj.channelNumbers), (window_ms*Experiments.currentDataObj.samplingFrequency/1000-ignoreSample)*nTrigs);
+timeSequence=reshape((repmat(startTimes,1,nCroppedSamples)+(ignoreSample-1+(1:nCroppedSamples))/Experiments.currentDataObj.samplingFrequency*1000)',1,nTrigs*nCroppedSamples);
+HTabs=abs(HTsequence);
+HTangle=angle(HTsequence);
+
+ignoreTime_ms=ignoreSample/Experiments.currentDataObj.samplingFrequency*1000;
+[relevantTIC,nRelevant] = getRelevantSpikes(ticPath,startTimes+ignoreTime_ms,window_ms-ignoreTime_ms,numel(startTimes));
+spikePhase = getSpikePhase(relevantTIC,HTangle,timeSequence);
+[roundSpikePhase,neuronMostFrequentPhase,neuronMostFrequentPhaseCount,frequentPhaseProbabilityForNeuron] = calcNeuronFreqPhase(relevantTIC,spikePhase);
+nNeurons=numel(neuronMostFrequentPhase);
+
+hist(roundSpikePhase,25)
+
+
+%which phase is 100?
+subSequenceAngles=round(HTangle_sub(1,:)*180/pi);
+subSequenceAngles(subSequenceAngles<=0)=subSequenceAngles(subSequenceAngles<=0)+360;
+average_FD = accumarray(subSequenceAngles',FD_sub_sequence(1,:),[],@(x) mean(x,1));
+plot(subSequenceAngles,FD_sub_sequence(1,:),'.','color',[1 1 1]*0.5,'LineWidth',0.5)
+hold on
+plot(unique(subSequenceAngles),average_FD,'k','LineWidth',3)
+title(['Filtered Signal vs Hilbert Phase - ch1 triggers 1:2 ignoreSample' num2str(ignoreSample)])
+legend('Filtered Data','Average')
+xlabel('Hilbert Phase [Degree]')
+ylabel('Signal [uV]')
+
 %% calc spike rate vs amp
 [relevantTIC,nRelevant,tIc] = getRelevantSpikes(ticPath,startTimes,window_tot_ms,numel(trigsNums));
 spikeLFP = getSpikePhase(relevantTIC,FDsequence,timeSequence);
