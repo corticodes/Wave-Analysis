@@ -451,7 +451,7 @@ plotSingleHilbertCrossing(crossings{3},hilbertAmps{3},squeeze(FD(1,:)),'HalfwayU
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 maxTempDist=500;
-minChannelInWave=100;
+minChannelInWave=80;
 minHilbertAmp=5; 
 
 expandStartEndWave=0;
@@ -463,7 +463,7 @@ frameRate=800;
 crossingsNames={'Maxima','Minima','HalfwayUp','HalfwayDown'};
 F=filterData(20000);
 F.padding=true;
-F.lowPassCutoff=2;
+F.lowPassCutoff=lowPassCutoff;
 F=F.designLowPass;
 for crossingType=1:4
 %     crossingType=3;
@@ -472,7 +472,7 @@ for crossingType=1:4
     goodWaves.clusterLimits=[];
     goodWaves.clusterSpikes=[];
     nGoodWaves=0;
-    for trig=1:10
+    for trig=1:500
         startTimes=triggers{5}(trig); %ms
         [data,time]=Experiments.currentDataObj.getData([],startTimes,window_ms);
         FD=F.getFilteredData(data);
