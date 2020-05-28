@@ -1,3 +1,4 @@
+%#codegen
 function [nChInWave,channels,times] = countContinousCrossings(allCrossings,En,maxTempDist,channels,times)
 %COUNTCONTINOUSCROSSINGS is a recursive function that counts how many 
 %channels have crossings that are connected (in space and time), i.e. how 
@@ -30,23 +31,38 @@ neighborsSum=1; %There is always at least one - the seed
 % check all neighbors. If they have crossing in temporal window, add 1 and 
 % run function on them
 
+
+
 for nextPosI=(currentPosI-1):(currentPosI+1)
     for nextPosJ=(currentPosJ-1):(currentPosJ+1)
-        if (nextPosI==currentPosI && nextPosJ~=currentPosJ) || (nextPosI~=currentPosI && nextPosJ==currentPosJ) %Go only up,down,left,right
+        if (nextPosI==currentPosI && nextPosJ~=currentPosJ) || (nextPosI~=currentPosI && nextPosJ==currentPosJ) || (nextPosI==currentPosI && nextPosJ==currentPosJ) %Go only up,down,left,right, or stay in same channel
             if nextPosI>=1 && nextPosI<=size(En,1) && nextPosJ>=1 && nextPosJ<=size(En,2) && ~isnan(En(nextPosI,nextPosJ)) %make sure next channel is in layout and isn't a NaN
                 nextChannel=En(nextPosI,nextPosJ);
                 nextChannelCrossingsNoZeros=allCrossings(nextChannel,allCrossings(nextChannel,:)>0);
-                closestCrossing=nextChannelCrossingsNoZeros(abs(nextChannelCrossingsNoZeros-currentCrossingTime)==min(abs(nextChannelCrossingsNoZeros-currentCrossingTime)));
-                for i=1:numel(closestCrossing) %There could be up to 2 closest crossing (one from each side). Need to address both becuase one might have appeared already in the cluster and the other not.
-                    if abs(closestCrossing(i)-currentCrossingTime)<maxTempDist && all(~(channels==nextChannel & times==closestCrossing(i)))%next chanel has a crossing within time window, and it hasn't apeared yet in the cluster
+                closestCrossings=nextChannelCrossingsNoZeros(abs(nextChannelCrossingsNoZeros-currentCrossingTime)<maxTempDist);
+                for i=1:numel(closestCrossings) %There could be up to 2 closest crossing (one from each side). Need to address both becuase one might have appeared already in the cluster and the other not.
+                    if all(~(channels==nextChannel & times==closestCrossings(i)))%next chanel hasn't apeared yet in the cluster
                         channels=[channels nextChannel];
-                        times=[times closestCrossing(i)];
+                        times=[times closestCrossings(i)];
                         [nChInWaveNext,channels,times]=countContinousCrossings(allCrossings,En,maxTempDist,channels,times);
                         neighborsSum=neighborsSum+nChInWaveNext;
                     end
                 end
-             end
-         end
+            end
+%         elseif  %address possibility that next crossing is in the same channel
+%             nextChannel=channels(end); %same channel
+%             nextChannelCrossingsNoZerosNoCurrent=allCrossings(nextChannel,allCrossings(nextChannel,:)>0 & allCrossings(nextChannel,:)~=currentCrossingTime);
+%             %find the closest crossing, but not currentCrossingTime
+%             closestCrossings=nextChannelCrossingsNoZerosNoCurrent(abs(nextChannelCrossingsNoZerosNoCurrent-currentCrossingTime)==min(abs(nextChannelCrossingsNoZerosNoCurrent-currentCrossingTime)));
+%             for i=1:numel(closestCrossings) %There could be up to 2 closest crossing (one from each side). Need to address both becuase one might have appeared already in the cluster and the other not.
+%                 if abs(closestCrossings(i)-currentCrossingTime)<maxTempDist && all(~(channels==nextChannel & times==closestCrossings(i)))%next chanel has a crossing within time window, and it hasn't apeared yet in the cluster
+%                     channels=[channels nextChannel];
+%                     times=[times closestCrossings(i)];
+%                     [nChInWaveNext,channels,times]=countContinousCrossings(allCrossings,En,maxTempDist,channels,times);
+%                     neighborsSum=neighborsSum+nChInWaveNext;
+%                 end
+%             end
+        end
     end
 end
 
