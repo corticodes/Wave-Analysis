@@ -15,7 +15,7 @@ for i=1:length(Elecs)
         [y,x]=find(En==Elecs(i));
         spikesInWindow=find(spikesPerChannel{i}>startEndWave_ms(1) & spikesPerChannel{i}<startEndWave_ms(2));
         if ~isempty(spikesInWindow)
-            spikeInWindowSamples=round(max((spikesPerChannel{i}(spikesInWindow)-startEndWave_ms(1))*samplingFrequency/1000),1);
+            spikeInWindowSamples=round(max((spikesPerChannel{i}(spikesInWindow)-startEndWave_ms(1))*samplingFrequency/1000,1));
             spikes3dInd(y,x,spikeInWindowSamples)=1;
         end
 end
