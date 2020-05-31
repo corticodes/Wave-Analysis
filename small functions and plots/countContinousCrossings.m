@@ -40,7 +40,7 @@ for nextPosI=(currentPosI-1):(currentPosI+1)
                 nextChannel=En(nextPosI,nextPosJ);
                 nextChannelCrossingsNoZeros=allCrossings(nextChannel,allCrossings(nextChannel,:)>0);
                 closestCrossings=nextChannelCrossingsNoZeros(abs(nextChannelCrossingsNoZeros-currentCrossingTime)<maxTempDist);
-                for i=1:numel(closestCrossings) %There could be up to 2 closest crossing (one from each side). Need to address both becuase one might have appeared already in the cluster and the other not.
+                for i=1:numel(closestCrossings) %Find all closest crossings, which are closer than maxTempDist.
                     if all(~(channels==nextChannel & times==closestCrossings(i)))%next chanel hasn't apeared yet in the cluster
                         channels=[channels nextChannel];
                         times=[times closestCrossings(i)];
