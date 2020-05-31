@@ -1,5 +1,5 @@
 function [PLM,f] = plotCrossingsPhysical(selectedCrossings,startEndWave,En,hilbertAmps,varargin)
-%GETCROSSINGSINSPECIFICWINDOW uses IntensityPhysicalSpacePlot to plot the
+%plotCrossingsPhysical uses IntensityPhysicalSpacePlot to plot the
 %time to the first crossing in selectedCrossings for each channel. It looks
 %at the window defined by startEndWave. t=0 is defined by the time that the 
 %first channel crossing within the window has a crossing.
