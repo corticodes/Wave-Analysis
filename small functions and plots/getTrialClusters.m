@@ -7,11 +7,13 @@ function [clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedCh
 %       -   En: channel layout 
 %       -   maxTempDist: the maximal time window allowed for two neighbors 
 %       to have crossings
-%       -   minChannelInWave: minimal channels to be included in a cluster
+%       -   minHilbertAmp - Only look at crossings above this threshold.
+%       Default it 0 (no threshold)
 %       -   binSpikes - nChXnSamples logical matrix with ones marking spike 
 %           times. This is the output of getSpikeBinMatByChannel function.
 %           If empty, spikesPerCluster will have be all zeros
 %       -   Varargins (given as 'Key',Value pairs):
+%           -   minChannelInWave: minimal channels to be included in a cluster
 %           -   minSpikesPerCluster - If given, function only returns 
 %           cluster with more spikes within cluster limits than this.
 %           -   plotTrialsClusters (logical) - plot the results of this
@@ -34,6 +36,7 @@ function [clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedCh
 % TODO: Consider moving plotting option into plotSingleHilbertCrossing
 
 plotTrialsClusters=false;
+minHilbertAmp=0;
 
 for i=1:2:length(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
@@ -46,9 +49,20 @@ else
     nSamples=size(binSpikes,2);
 end
 
+%Get rid of crossings with amps lower than minHilbertAmp
+if minHilbertAmp>0
+    if ~exist('hilbertAmps','var')
+        error('In order to use minHilbertAmp threshold, hilbertAmps must be given as varargin. See Function Description')
+    else
+        lowAmpCrossingsInd=find(hilbertAmps<minHilbertAmp);
+        hilbertAmps(lowAmpCrossingsInd)=0;
+        crossings(lowAmpCrossingsInd)=0;
+    end
+end
+
+
 %convert crossings to binary
 sampleCrossings=getCrossingsBySamples(crossings,[],'nSamples',nSamples);
-
 
 if plotTrialsClusters
     if ~exist('hilbertAmps','var')
