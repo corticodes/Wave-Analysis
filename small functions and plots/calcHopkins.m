@@ -31,7 +31,10 @@ function [hopkinsAVG,hopkinsSTD] = calcHopkins(sampleCoordinates,n,varargin)
         %       hopkins was calculated. Default is 0.
 %
 %       Output
-%           pValue: The probability to get the hopkins value or higher 
+%           hopkinsSTD - the standart daviention of the n Hopkins values
+%           calculated
+
+%           Used to be pValue: The probability to get the hopkins value or higher 
 %           under the assumption of a beta distribution [1][2].
 %
 %       Refs:
@@ -119,7 +122,7 @@ for j=1:n
 end
 hopkinsAVG=mean(hopkins);
 
-if nargin==2
+if nargout==2
     hopkinsSTD=std(hopkins);    
 end
 
