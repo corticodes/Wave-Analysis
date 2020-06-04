@@ -101,17 +101,22 @@ for j=1:n
     sampOrgs=rand(m,2);
     sampOrgs(:,1)=sampOrgs(:,1)*(range(2,1)-range(1,1))+range(1,1);
     sampOrgs(:,2)=sampOrgs(:,2)*(range(2,2)-range(1,2))+range(1,2);
+    
+%     hold on
+%     f1=scatter(sampOrgs(:,1),sampOrgs(:,2),'b','filled');
 
     %choose m random samples FROM WITHIN RANGE    
     randSamples=allowedSamplesInd(randperm(numel(allowedSamplesInd),m));
-       
+    
+%     f2=scatter(sampleCoordinates(randSamples,1),sampleCoordinates(randSamples,2),'.b');
+    
     % find closest distances
     u=zeros(1,m);
     w=zeros(1,m);
     for i=1:m
         %from samplin origins to closest sample
         dists=sqrt((sampleCoordinates(:,1)-sampOrgs(i,1)).^2+(sampleCoordinates(:,2)-sampOrgs(i,2)).^2);
-        u(i)=min(dists);
+        [u(i),closestSampleInd]=min(dists);
         %from random sample to closest sample
         dists=sqrt((sampleCoordinates(:,1)-sampleCoordinates(randSamples(i),1)).^2+(sampleCoordinates(:,2)-sampleCoordinates(randSamples(i),2)).^2);
         w(i)=min([dists(1:(randSamples(i)-1));dists((randSamples(i)+1):nSamples)]);
