@@ -22,6 +22,11 @@ function [clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedCh
 %           -   hilbertAmps - nChXnCrossings hilbert amplitudes at crossings the
 %           times of the crossings (one of the 4 hilbertAmps matrices given by 
 %           "getHilbertCrossings")
+%           -   plotStyles - cell array of styles to use for each cluster.
+%           Only relevant if plotTrialsClusters=1. If so, cluster i will be
+%           plotted using the style plotStyles{((i-1) mod numel(plotStyles))+1}.
+%           So if you want triplets of clusters to be bluee,red,green dots
+%           repeatedly then use {'.b','.r','.g'}. Default is {'.b'}. 
 %
 %       Output:
 %       -   clusterLimits (nGoodClustersX2) - position (samples) of the
@@ -37,6 +42,7 @@ function [clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedCh
 
 plotTrialsClusters=false;
 minHilbertAmp=0;
+plotStyles={'b.'};
 
 for i=1:2:length(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
@@ -113,10 +119,11 @@ while ~isempty(seedCh)
     [seedCh,seedSample]=find(sampleCrossings,1);
 end
 
+nStyles=numel(plotStyles);
 if plotTrialsClusters && nGoodClusters>0
     for i=1:size(clusterLimits,1)
         plot(clusterLimits(i,:),[0 0],'LineWidth',2,'Color','k')
-        plot(times{i},channels{i},'b.')
+        plot(times{i},channels{i},plotStyles{mod(i-1,nStyles)+1})
     end
 end
 end
