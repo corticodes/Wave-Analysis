@@ -33,8 +33,10 @@ for i=1:nSpikes
     if rem(i,1000)==0, [num2str(i ) ' in getSpikePhase, out of ' num2str(nSpikes)],end
     channel=TIC(2,i);
     spikeTime=TIC(1,i);
-    firstAfterInd=find(timeSequence>spikeTime,1);    
-    if abs(timeSequence(firstAfterInd-1)-spikeTime)<abs(timeSequence(firstAfterInd)-spikeTime)
+%     spikePhase(i)=HTangle(channel,find(abs(timeSequence-spikeTime)==min(abs(timeSequence-spikeTime)),1)); %this is slow
+    
+    firstAfterInd=find(timeSequence>=spikeTime,1);    
+    if abs(timeSequence(firstAfterInd-1)-spikeTime)<=abs(timeSequence(firstAfterInd)-spikeTime)
         closestInd=firstAfterInd-1;
     else
         closestInd=firstAfterInd;
