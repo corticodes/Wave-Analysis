@@ -20,7 +20,7 @@ for i=1:length(Elecs)
             spikes3dInd(y,x,spikeInWindowSamples)=1;
         end
 end
-if ~isempy(spikes3dInd)
+if ~isempty(spikes3dInd)
     [y,x,samples]=ind2sub([size(spikes3dInd,1),size(spikes3dInd,2),size(spikes3dInd,3)],find(spikes3dInd));
     spikeCoordinates=[y,x,samples];
 else
