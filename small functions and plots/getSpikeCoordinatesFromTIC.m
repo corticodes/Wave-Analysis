@@ -11,6 +11,7 @@ Elecs=Elecs(~isnan(Elecs));
 x=[];
 y=[];
 
+spikes3dInd=[];
 for i=1:length(Elecs)
         [y,x]=find(En==Elecs(i));
         spikesInWindow=find(spikesPerChannel{i}>startEndWave_ms(1) & spikesPerChannel{i}<startEndWave_ms(2));
@@ -19,8 +20,12 @@ for i=1:length(Elecs)
             spikes3dInd(y,x,spikeInWindowSamples)=1;
         end
 end
+if ~isempy(spikes3dInd)
+    [y,x,samples]=ind2sub([size(spikes3dInd,1),size(spikes3dInd,2),size(spikes3dInd,3)],find(spikes3dInd));
+    spikeCoordinates=[y,x,samples];
+else
+    spikeCoordinates=[];
+end
 
-[y,x,samples]=ind2sub([size(spikes3dInd,1),size(spikes3dInd,2),size(spikes3dInd,3)],find(spikes3dInd));
-spikeCoordinates=[y,x,samples];
 end
 
