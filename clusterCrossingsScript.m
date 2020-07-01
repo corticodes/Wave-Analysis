@@ -8,9 +8,10 @@ band=[12 34];
 % expandStartEndWave=300;
 
 %clustering params
+
 maxTempDist=40;
 minChannelInWave=4;
-minHilbertAmp=13; %calculated by mean background amp+5 std
+minHilbertAmp=20; %calculated by mean background amp+5 std
 % minAVGAmp=20;
 % redundantAdjacentPeaks=150;
 
@@ -20,10 +21,13 @@ Experiments=getRecording('E:\Yuval\Analysis\spikeSorting\cleanCheck.xlsx','recNa
 [Experiments,VST]=Experiments.getVStimParams('E:\Yuval\Analysis\spikeSorting\sample data\U4\visualStimulation\Images0001.mat');
 triggers=Experiments.currentDataObj.getTrigger;
 
+
 load('layout_100_12x12.mat','En')
 
 %cluster by seed
 [currentPosI,currentPosJ]=find(En==46);
+
+
 startTimes=triggers{5}(1); %ms
 [data,time]=Experiments.currentDataObj.getData([],startTimes,window_ms);
 [FD,HT,HTabs,HTangle] = BPnHilbert(data,band);
@@ -148,7 +152,7 @@ for trig=trigs
 %     highHilbertCrossings(lowAmpCrossingsInd)=0;
     for i=1:numel(maxTempDistRANGE)
         clusterAllMaxTempDistRANGE{i}=[];
-        [clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedChannels] = getTrialClusters(crossings{crossingType},En,maxTempDistRANGE(i),4,binSpikes,'plotTrialsClusters',1,'hilbertAmps',hilbertAmps{crossingType});
+        [clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedChannels] = getTrialClusters(crossings{crossingType},En,maxTempDistRANGE(i),4,binSpikes,'plotTrialsClusters',1,'hilbertAmps',hilbertAmps{crossingType},'plotStyle',{'b.','r.','g.'});
         title(['Trial ' num2str(trig) ' Crossings - Max Temp Dist ' num2str(maxTempDistRANGE(i))])
         saveas(gcf,['\\sil2\Literature\Projects\corplex\progress reports\meetings\next\Configure maxTempDist\' 'trig ' num2str(trig) ' Clusters - maxTempDis ' num2str(maxTempDistRANGE(i)) '.jpg'])
         savefig(['\\sil2\Literature\Projects\corplex\progress reports\meetings\next\Configure maxTempDist\' 'trig ' num2str(trig) ' Clusters - maxTempDis ' num2str(maxTempDistRANGE(i)) '.fig'])
@@ -203,17 +207,20 @@ for trig=1:100
     [crossings,hilbertAmps] = getHilbertCrossings(HTabs,HTangle);
     triggerHilbertAmps=[triggerHilbertAmps hilbertAmps{3}(:)'];
 end
-hist(triggerHilbertAmps,100)
-mean(triggerHilbertAmps)
-std(triggerHilbertAmps)
+
+load('\\sil2\Literature\Projects\corplex\progress reports\meetings\200525\configMinHilbertAmp\backgroundHilbertAmps.mat')
+hist(triggerHilbertAmps(triggerHilbertAmps>0),1000)
+mean(triggerHilbertAmps(triggerHilbertAmps>0))
+std(triggerHilbertAmps(triggerHilbertAmps>0))
+
 mean(triggerHilbertAmps(triggerHilbertAmps>5))
 std(triggerHilbertAmps(triggerHilbertAmps>5))
 
 
-hist(backgroundHilbertAmps,100)
+hist(backgroundHilbertAmps(backgroundHilbertAmps>0),100)
 title('Hilbert Amplitudes 1.5s Before Trials 1-100')
-mean(backgroundHilbertAmps)
-std(backgroundHilbertAmps)
+mean(backgroundHilbertAmps(backgroundHilbertAmps>0))
+std(backgroundHilbertAmps(backgroundHilbertAmps>0))
 
 binSpikes = getSpikeBinMatByChannel(ticPath,startTimes-window_ms,startTimes,Experiments.currentDataObj.samplingFrequency);
 plotSingleHilbertCrossing(crossings{3},hilbertAmps{3},squeeze(FD(1,1,:)),'HalfwayUp Crossings',1,'Spikes',binSpikes);
@@ -252,7 +259,8 @@ end
 
 maxTempDist=40;
 minChannelInWave=4;
-minHilbertAmp=13; %calculated by mean background amp+5 std
+% minHilbertAmp=13; %calculated by mean background amp+5 std
+minHilbertAmp=20; %calculated by mean background amp+5 std
 
 
 load('E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\saved mats\U4AllTrigCrossings.mat')
@@ -263,6 +271,17 @@ load('E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\saved mats\U4AllTri
 numberOfSpikesPerPattern=[];
 % hilbertAmplitudeDistribution=[]; %this is unneeded, information contained
 % in 
+
+%check if distribution of channels in patterns makes sense
+trig=2;
+startTimes=triggers{5}(trig); %ms
+crossings=allTrigCrossings{trig}{crossingType};
+hilbertAmps=allTrigAmps{trig}{crossingType};
+binSpikes = allTrigBinSpikes{trig};
+[clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedChannels] = getTrialClusters(crossings,En,maxTempDist,minChannelInWave,binSpikes,'plotTrialsClusters',1,'hilbertAmps',hilbertAmps,'plotStyles',{'.b','.r'},'minHilbertAmp',13);
+nChannelsPerPatter=cellfun(@(x) numel(x),channels,'UniformOutput',1);
+figure
+hist(nChannelsPerPatter,500)
 
 tic
 for trig=1:4000
@@ -337,6 +356,7 @@ hist(patternLengthsInSamples/20,50)
 title('Pattern Lengths Distribution')
 xlabel('Pattern Length (ms)')
 
+
 %% compare filters
 band=[5 34];
 cutwidths=[2 2];
@@ -373,51 +393,149 @@ HTangle=angle(HT);
 
 %% Slow Waves
 
+ticPath='E:\Yuval\Analysis\spikeSorting\sample data\U4\U4_071014_Images3001_layout_100_12x12_gridSorter FROM MARK.mat';
+Experiments=getRecording('E:\Yuval\Analysis\spikeSorting\cleanCheck.xlsx','recNames=U4_071014_Images3');
+[Experiments,VST]=Experiments.getVStimParams('E:\Yuval\Analysis\spikeSorting\sample data\U4\visualStimulation\Images0001.mat');
+triggers=Experiments.currentDataObj.getTrigger;
+
+load('layout_100_12x12.mat','En')
+trig=10;
 window_ms=3000; %ms
-lowPassCutoff=5; %Hz
-% band=[2.0001 35];
+lowPassCutoff=6; %Hz
+
+band=[0 lowPassCutoff];
+
+
+
+%check best LP cutoff
+[data,time]=Experiments.currentDataObj.getData([],triggers{5}(trig),window_ms);
+freqs=2:7;
+F=filterData(20000);
+F.padding=true;
+
+plot(time,squeeze(data(1,1,:)))
+hold on
+legends={'Raw Data'};
+for i=1:numel(freqs)
+    F.lowPassCutoff=freqs(i);
+    F=F.designLowPass;
+    FD=F.getFilteredData(data);
+    plot(time,squeeze(FD(1,1,:)))
+    legends=[legends,[num2str(freqs(i)) 'Hz LP']];
+end
+legend(legends)
+xlabel('time [ms]')
+
+
+% Best is ~6Hz
 
 
 %%%%%%%find the most relevant phase%%%%%%%%%%%%%
 
-nTrigs=10;
-ignoreSample=100;
+nTrigs=2000;
+ignoreSample=2000;
+lowPassCutoff=6;
+
+band=[0 lowPassCutoff];
 
 
+% WholeHTsequence=[];
+% WholeFDsequence=[];
+% WholetimeSequence=[];
+nIterations=100;
+allPhases=[];
+for j=25:nIterations
+    j
+    trigsStart=(j-1)*nTrigs/nIterations;
+    startTimes=triggers{5}(trigsStart+(1:(nTrigs/nIterations))); %ms
+    [data,time]=Experiments.currentDataObj.getData([],startTimes,window_ms);
 
-startTimes=triggers{5}(1:nTrigs); %ms
-[data,time]=Experiments.currentDataObj.getData([],startTimes,window_ms);
+    F=filterData(20000);
+    F.padding=true;
+    F.lowPassCutoff=lowPassCutoff;
+    F=F.designLowPass;
 
-F=filterData(20000);
-F.padding=true;
-F.lowPassCutoff=lowPassCutoff;
-F=F.designLowPass;
+    FD=F.getFilteredData(data);
 
-FD=F.getFilteredData(data);
-clear HT
+    clear HT
+    for i=1:(nTrigs/nIterations)
+        HT(:,i,:)=hilbert(squeeze(FD(:,i,:))').';
+    end
+    croppedHT=HT(:,:,ignoreSample+1:end);
+    croppedFD=FD(:,:,ignoreSample+1:end);
+    nCroppedSamples=size(croppedHT,3);
+    HTsequence=reshape(permute(croppedHT,[1,3,2]),numel(Experiments.currentDataObj.channelNumbers), (window_ms*Experiments.currentDataObj.samplingFrequency/1000-ignoreSample)*nTrigs/nIterations);
+    FDsequence=reshape(permute(croppedFD,[1,3,2]),numel(Experiments.currentDataObj.channelNumbers), (window_ms*Experiments.currentDataObj.samplingFrequency/1000-ignoreSample)*nTrigs/nIterations);
+    timeSequence=reshape((repmat(startTimes,1,nCroppedSamples)+(ignoreSample-1+(1:nCroppedSamples))/Experiments.currentDataObj.samplingFrequency*1000)',1,nTrigs/nIterations*nCroppedSamples);
+%     WholeHTsequence=[WholeHTsequence HTsequence];
+%     WholeFDsequence=[WholeFDsequence FDsequence];
+%     WholetimeSequence=[WholetimeSequence timeSequence];
+    HTabs=abs(HTsequence);
+        HTangle=angle(HTsequence);
 
-for i=1:nTrigs
-    HT(:,i,:)=hilbert(squeeze(FD(:,i,:))').';
+    ignoreTime_ms=ignoreSample/Experiments.currentDataObj.samplingFrequency*1000;
+    [relevantTIC,nRelevant] = getRelevantSpikes(ticPath,startTimes+ignoreTime_ms,window_ms-ignoreTime_ms,1);
+    spikePhase = getSpikePhase(relevantTIC,HTangle,timeSequence);
+%     [roundSpikePhase,neuronMostFrequentPhase,neuronMostFrequentPhaseCount,frequentPhaseProbabilityForNeuron] = calcNeuronFreqPhase(relevantTIC,spikePhase);
+%     nNeurons=numel(neuronMostFrequentPhase);
+    allPhases=[allPhases spikePhase];
 end
-croppedHT=HT(:,:,ignoreSample+1:end);
-croppedFD=FD(:,:,ignoreSample+1:end);
-nCroppedSamples=size(croppedHT,3);
-HTsequence=reshape(permute(croppedHT,[1,3,2]),numel(Experiments.currentDataObj.channelNumbers), (window_ms*Experiments.currentDataObj.samplingFrequency/1000-ignoreSample)*nTrigs);
-FDsequence=reshape(permute(croppedFD,[1,3,2]),numel(Experiments.currentDataObj.channelNumbers), (window_ms*Experiments.currentDataObj.samplingFrequency/1000-ignoreSample)*nTrigs);
-timeSequence=reshape((repmat(startTimes,1,nCroppedSamples)+(ignoreSample-1+(1:nCroppedSamples))/Experiments.currentDataObj.samplingFrequency*1000)',1,nTrigs*nCroppedSamples);
 
-HTabs=abs(HTsequence);
-HTangle=angle(HTsequence);
+%convert phases to positive degrees
+allPhasesDegrees=allPhases*180/pi;
+allPhasesDegrees(allPhasesDegrees<0)=allPhasesDegrees(allPhasesDegrees<0)+360;
+allPhasesTEMPDegrees=allPhasesTEMP*180/pi;
+allPhasesTEMPDegrees(allPhasesTEMPDegrees<0)=allPhasesTEMPDegrees(allPhasesTEMPDegrees<0)+360;
+
+histogram(allPhasesDegrees,'Normalization','probability','BinEdges',0:1:360)
+title(['Spike Phases from 2000 Trials (' num2str(numel(allPhases)) ' Spikes)'])
+xlabel('Phase [Degree]')
+ylabel('Probability')
+
+figure
+histogram(allPhasesTEMPDegrees,'Normalization','probability','BinEdges',0:1:360)
+title(['Spike Phases from 500 Trials (' num2str(numel(allPhasesTEMPDegrees)) ' Spikes)'])
+xlabel('Phase [Degree]')
+ylabel('Probability')
+
+% save('\\sil2\Literature\Projects\corplex\progress reports\meetings\next\slow waves\2000TrialsSequencePhases','allRoundPhases')
+save('\\sil2\Literature\Projects\corplex\progress reports\meetings\next\slow waves\2000TrialsSequencePhasesNotRound','allPhases','allPhasesTEMP','allPhasesTEMPDegrees','allPhasesTEMPDegrees')
 
 % singleTrigSamples=1:(window_ms*Experiments.currentDataObj.samplingFrequency/1000-ignoreSample);
 % % plotHilbert(FDsequence(singleChannel,singleTrigSamples),HTabs(singleChannel,singleTrigSamples),HTangle(singleChannel,singleTrigSamples),timeSequence(singleTrigSamples),1,singleChannel,106)
 % plotHilbert(FDsequence(singleChannel,singleTrigSamples),HTabs(singleChannel,singleTrigSamples),HTangle(singleChannel,singleTrigSamples),[],1,singleChannel)
 
-ignoreTime_ms=ignoreSample/Experiments.currentDataObj.samplingFrequency*1000;
-[relevantTIC,nRelevant] = getRelevantSpikes(ticPath,startTimes+ignoreTime_ms,window_ms-ignoreTime_ms,numel(startTimes));
-spikePhase = getSpikePhase(relevantTIC,HTangle,timeSequence);
-[roundSpikePhase,neuronMostFrequentPhase,neuronMostFrequentPhaseCount,frequentPhaseProbabilityForNeuron] = calcNeuronFreqPhase(relevantTIC,spikePhase);
-nNeurons=numel(neuronMostFrequentPhase);
+% save('\\sil2\Literature\Projects\corplex\progress reports\meetings\next\slow waves\2000TrialsSequence','nTrigs','nIterations','ignoreSample',...
+%     'lowPassCutoff','band','WholeHTsequence','WholeFDsequence','WholetimeSequence','HTabs','HTangle','-v7.3')
+
+
+
+save('\\sil2\Literature\Projects\corplex\progress reports\meetings\next\slow waves\2000TrialsSequence1','nTrigs','nIterations','ignoreSample',...
+    'lowPassCutoff','band','WholeHTsequence','WholeFDsequence','WholetimeSequence','HTabs','HTangle',...
+    'relevantTIC','nRelevant','spikePhase','roundSpikePhase','nNeurons','-v7.3')
+
+
+hist(roundSpikePhase,100)
+
+% plot FD vs angle
+[FD_sub_sequence,HT_sub_sequence,time_sub_Sequence] = getDataSequence(Experiments.currentDataObj,startTimes(1:5),window_ms,ignoreSample,band);
+HTabs_sub=abs(HT_sub_sequence);
+HTangle_sub=angle(HT_sub_sequence);
+
+% plotHilbert(FD_sub_sequence(1,:),HTabs_sub(1,:),HTangle_sub(1,:),time_sub_Sequence,1:2,singleChannel)
+% figure
+subSequenceAngles=round(HTangle_sub(1,:)*180/pi);
+subSequenceAngles(subSequenceAngles<=0)=subSequenceAngles(subSequenceAngles<=0)+360;
+average_FD = accumarray(subSequenceAngles',FD_sub_sequence(1,:),[],@(x) mean(x,1));
+plot(subSequenceAngles,FD_sub_sequence(1,:),'.','color',[1 1 1]*0.5,'LineWidth',0.5)
+hold on
+plot(unique(subSequenceAngles),average_FD,'k','LineWidth',3)
+title(['Filtered Signal vs Hilbert Phase - ch1 triggers 1:2 ignoreSample' num2str(ignoreSample)])
+legend('Filtered Data','Average')
+xlabel('Hilbert Phase [Degree]')
+ylabel('Signal [uV]')
+
+
 
 
 startTimes=triggers{5}(1); %ms
@@ -465,14 +583,14 @@ F=filterData(20000);
 F.padding=true;
 F.lowPassCutoff=lowPassCutoff;
 F=F.designLowPass;
-for crossingType=1:4
+for crossingType=2:4
 %     crossingType=3;
     filesPath=['\\sil2\Literature\Projects\corplex\progress reports\meetings\next\slow wave\slow wave automation\' crossingsNames{crossingType} '\'];
     goodWaves.triggers=[];
     goodWaves.clusterLimits=[];
     goodWaves.clusterSpikes=[];
     nGoodWaves=0;
-    for trig=1:500
+    for trig=1:490
         startTimes=triggers{5}(trig); %ms
         [data,time]=Experiments.currentDataObj.getData([],startTimes,window_ms);
         FD=F.getFilteredData(data);
@@ -533,7 +651,6 @@ for crossingType=1:4
 end
 
 
-%%
 %% Wide Band
 
 window_ms=1500; %ms
