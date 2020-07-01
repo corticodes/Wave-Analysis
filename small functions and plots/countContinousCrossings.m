@@ -31,8 +31,6 @@ neighborsSum=1; %There is always at least one - the seed
 % check all neighbors. If they have crossing in temporal window, add 1 and 
 % run function on them
 
-
-
 for nextPosI=(currentPosI-1):(currentPosI+1)
     for nextPosJ=(currentPosJ-1):(currentPosJ+1)
         if (nextPosI==currentPosI && nextPosJ~=currentPosJ) || (nextPosI~=currentPosI && nextPosJ==currentPosJ) || (nextPosI==currentPosI && nextPosJ==currentPosJ) %Go only up,down,left,right, or stay in same channel
