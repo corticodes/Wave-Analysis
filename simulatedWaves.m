@@ -563,12 +563,16 @@ exportVideo(spikeProbability,['E:\Yuval\Analysis\DataAnalysis\waves and spike so
 nSpikes=40; %hopkins cdf will be beta(nSpikes/10,nSpikes/10)
 hopkinsIterations=1000;
 simulationIterations=1000;
+noiseIterations=100;
 
-hopkinses=zeros(1,simulationIterations);
-for i=1:simulationIterations
+hopkinses=zeros(noiseIterations,simulationIterations);
+for j=1:noiseIterations
+    j
+    for i=1:simulationIterations
 
-    [hopkinses(i),pvalue]=calcHopkins(rand(nSpikes,2),hopkinsIterations,'subspaceLimisMethod','madRange','nMedianDeviations',2,'centerIsAverage',1);
-%     [hopkins,pvalue]=calcHopkins(rand(nSpikes,2),hopkinsIterations,'subspaceLimisMethod','madRange','plotRange',1,'nMedianDeviations',2,'centerIsAverage',1);
+        hopkinses(j,i)=calcHopkins(rand(nSpikes,2),hopkinsIterations,'subspaceLimisMethod','madRange','nMedianDeviations',2,'centerIsAverage',1);
+    %     [hopkins,pvalue]=calcHopkins(rand(nSpikes,2),hopkinsIterations,'subspaceLimisMethod','madRange','plotRange',1,'nMedianDeviations',2,'centerIsAverage',1);
+    end
 end
 
 % h=histogram(hopkinses,50,'Normalization','cdf');
@@ -609,25 +613,148 @@ legend('Hopkins CDF',['Norm Dist CDF' char(10) '(mu=' num2str(hopkinsMean) ', si
 % % plot(hopkinValues,cumDist)
 % significantHopkins=hopkinValues(find(cumDist>0.95,1));
 
+
+% see how many iterations are needed to get stable significant hopkins
+
+nSpikes=40; %hopkins cdf will be beta(nSpikes/10,nSpikes/10)
+hopkinsIterations=1000;
+% hopkinsIterations=10;
+simulationIterations=[1000,10000,100000];
+noiseIterations=100;
+% noiseIterations=3;
+sigHop=zeros(numel(simulationIterations),noiseIterations);
+allHopkinses={};
+
+for k=1:numel(simulationIterations)
+    k
+    hopkinses=zeros(noiseIterations,simulationIterations(k));
+    for j=1:noiseIterations
+        if k==3
+            j
+        end
+        for i=1:simulationIterations(k)
+            hopkinses(j,i)=calcHopkins(rand(nSpikes,2),hopkinsIterations,'subspaceLimisMethod','madRange','nMedianDeviations',2,'centerIsAverage',1);
+        %     [hopkins,pvalue]=calcHopkins(rand(nSpikes,2),hopkinsIterations,'subspaceLimisMethod','madRange','plotRange',1,'nMedianDeviations',2,'centerIsAverage',1);
+        end
+        [cumulativeHist,edges] = histcounts(hopkinses(j,:),500,'Normalization','cdf');
+        bins=edges(1:end-1)+(edges(2)-edges(1))/2;
+        sigHop(k,j)=bins(min(find(cumulativeHist>0.95,1),numel(bins)));
+    end
+    allHopkinses{k}=hopkinses;
+end
+%remember to redo allHopkinses{1}!!!
+save('\\sil2\Literature\Projects\corplex\progress reports\meetings\next\hopkins statistics\allSigHopkinses','allHopkinses','sigHop')
+
+hist(sigHop)
+
 % find significant Hopkins Statistic for different number of spikes 25:
 hopkinsIterations=1000;
-simulationIterations=1000;
-nSpikes=20:60;
-nSpikes=159;
+simulationIterations=100000;
+nSpikes=20:2:40;
+% nSpikes=159;
 sigHop=zeros(1,numel(nSpikes));
-for i=1:numel(sigHop)
+for i=1:numel(nSpikes)
     i
     n=nSpikes(i);
     hopkinses=zeros(1,simulationIterations);
     for j=1:simulationIterations
-        [hopkinses(j),pvalue]=calcHopkins(rand(n,2),hopkinsIterations,'subspaceLimisMethod','madRange','nMedianDeviations',2,'centerIsAverage',1);
+        hopkinses(j)=calcHopkins(rand(n,2),hopkinsIterations,'subspaceLimisMethod','madRange','nMedianDeviations',2,'centerIsAverage',1);
     end
-    [cumulativeHist,edges] = histcounts(hopkinses,500,'Normalization','cdf');
-    [hopkinsHist,edges] = histcounts(hopkinses,500);
-    [hopkinsHistProbability,edges] = histcounts(hopkinses,500,'Normalization','probability');
+    [cumulativeHist,edges] = histcounts(hopkinses,simulationIterations,'Normalization','cdf');
+%     [hopkinsHist,edges] = histcounts(hopkinses,500);
+%     [hopkinsHistProbability,edges] = histcounts(hopkinses,500,'Normalization','probability');
     bins=edges(1:end-1)+(edges(2)-edges(1))/2;
 %     hopkinsMean=hopkinsHistProbability*bins';
 %     hopkinsSTD=sqrt(hopkinsHistProbability*((bins-hopkinsMean).^2)');
     sigHop(i)=bins(min(find(cumulativeHist>0.95,1),numel(bins)));
 end
+save('\\sil2\Literature\Projects\corplex\progress reports\meetings\next\hopkins statistics\p-value variations\significant Hopkins Per Number of Spikes','sigHop','hopkinsIterations','simulationIterations','nSpikes')
+% redo partial calculations
 
+nSpikes=40; %hopkins cdf will be beta(nSpikes/10,nSpikes/10)
+hopkinsIterations=1000;
+% hopkinsIterations=10;
+simulationIterations=[1000,10000,100000];
+noiseIterations=100;
+% noiseIterations=41;
+% noiseIterations=3;
+sigHop=zeros(numel(simulationIterations),noiseIterations);
+allHopkinses={};
+
+for k=2:numel(simulationIterations)
+    
+    hopkinses=zeros(noiseIterations,simulationIterations(k));
+    for j=1:noiseIterations
+        if k==1
+            j
+        
+            for i=1:simulationIterations(k)
+                hopkinses(j,i)=calcHopkins(rand(nSpikes,2),hopkinsIterations,'subspaceLimisMethod','madRange','nMedianDeviations',2,'centerIsAverage',1);
+            %     [hopkins,pvalue]=calcHopkins(rand(nSpikes,2),hopkinsIterations,'subspaceLimisMethod','madRange','plotRange',1,'nMedianDeviations',2,'centerIsAverage',1);
+            end
+        end
+        [cumulativeHist,edges] = histcounts(allHopkinses{k}(j,:),500,'Normalization','cdf');
+        bins=edges(1:end-1)+(edges(2)-edges(1))/2;
+        sigHop(k,j)=bins(min(find(cumulativeHist>0.95,1),numel(bins)));
+    end
+%     allHopkinses{k}=hopkinses;
+end
+%remember to redo allHopkinses{1}!!!
+save('\\sil2\Literature\Projects\corplex\progress reports\meetings\next\hopkins statistics\allSigHopkinses','allHopkinses')
+
+
+% If calculated on a specific random sample - and only once - is it
+% distributed Beta?
+
+nSpikes=4;
+randomSample=rand(nSpikes,2);
+hopkinsIterations=1;
+
+distributionSamples=10000;
+hopkinses=zeros(2,distributionSamples);
+
+            %   
+for i=1:distributionSamples
+    hopkinses(1,i)=calcHopkins(randomSample,hopkinsIterations,'subspaceLimisMethod','madRange','nMedianDeviations',2,'centerIsAverage',1);
+    hopkinses(2,i)=calcHopkins(randomSample,hopkinsIterations,'subspaceLimisMethod','dataRange');
+
+end
+
+[cumulativeHist,edges] = histcounts(hopkinses(1,:),5000,'Normalization','cdf');
+bins=edges(1:end-1)+(edges(2)-edges(1))/2;
+figure
+plot(bins,cumulativeHist)
+xlim([0 1])
+hold on
+% fit=20;
+plot(0:0.01:1,betainc(0:0.01:1,nSpikes/10,nSpikes/10),'g')
+% plot(0:0.01:1,betainc(0:0.01:1,1,1),'k')
+plot(0:0.01:1,betainc(0:0.01:1,nSpikes,nSpikes),'r')
+% plot(0:0.01:1,betainc(0:0.01:1,fit,fit),'cyan')
+% plot(0:0.01:1,betainc(0:0.01:1,nSpikes/10,nSpikes),'-k')
+% plot(0:0.01:1,betainc(0:0.01:1,nSpikes,nSpikes/10),'*k')
+% legend('Hopkins CDF',['incomplete beta(x,' num2str(nSpikes/10) ',' num2str(nSpikes/10) ')'],['incomplete beta(x,' num2str(nSpikes) ',' num2str(nSpikes) ')'],['incomplete beta(x,' num2str(nSpikes/10) ',' num2str(nSpikes) ')'],['incomplete beta(x,' num2str(nSpikes/10) ',' num2str(nSpikes) ')'])
+% legend('Hopkins CDF',['incomplete beta(x,' num2str(nSpikes/10) ',' num2str(nSpikes/10) ')'],['incomplete beta(x,' num2str(nSpikes) ',' num2str(nSpikes) ')'],['incomplete beta(x,' num2str(fit) ',' num2str(fit) ')'],['incomplete beta(x,' num2str(nSpikes/10) ',' num2str(nSpikes) ')'],['incomplete beta(x,' num2str(nSpikes/10) ',' num2str(nSpikes) ')'])
+legend('Hopkins CDF',['incomplete beta(x,' num2str(nSpikes/10) ',' num2str(nSpikes/10) ')'],['incomplete beta(x,' num2str(nSpikes) ',' num2str(nSpikes) ')'])
+savefig(gcf,'\\sil2\Literature\Projects\corplex\progress reports\meetings\next\hopkins statistics\single repeat distribution\4 samples distibution - MED range')
+saveas(gcf,'\\sil2\Literature\Projects\corplex\progress reports\meetings\next\hopkins statistics\single repeat distribution\4 samples distibution - MED range.jpg')
+close(gcf)
+
+[cumulativeHist,edges] = histcounts(hopkinses(2,:),5000,'Normalization','cdf');
+bins=edges(1:end-1)+(edges(2)-edges(1))/2;
+figure
+plot(bins,cumulativeHist)
+xlim([0 1])
+hold on
+% fit=20;
+plot(0:0.01:1,betainc(0:0.01:1,nSpikes/10,nSpikes/10),'g')
+plot(0:0.01:1,betainc(0:0.01:1,nSpikes,nSpikes),'r')
+% plot(0:0.01:1,betainc(0:0.01:1,fit,fit),'cyan')
+% plot(0:0.01:1,betainc(0:0.01:1,nSpikes/10,nSpikes),'-k')
+% plot(0:0.01:1,betainc(0:0.01:1,nSpikes,nSpikes/10),'*k')
+% legend('Hopkins CDF',['incomplete beta(x,' num2str(nSpikes/10) ',' num2str(nSpikes/10) ')'],['incomplete beta(x,' num2str(nSpikes) ',' num2str(nSpikes) ')'],['incomplete beta(x,' num2str(nSpikes/10) ',' num2str(nSpikes) ')'],['incomplete beta(x,' num2str(nSpikes/10) ',' num2str(nSpikes) ')'])
+% legend('Hopkins CDF',['incomplete beta(x,' num2str(nSpikes/10) ',' num2str(nSpikes/10) ')'],['incomplete beta(x,' num2str(nSpikes) ',' num2str(nSpikes) ')'],['incomplete beta(x,' num2str(fit) ',' num2str(fit) ')'],['incomplete beta(x,' num2str(nSpikes/10) ',' num2str(nSpikes) ')'],['incomplete beta(x,' num2str(nSpikes/10) ',' num2str(nSpikes) ')'])
+legend('Hopkins CDF',['incomplete beta(x,' num2str(nSpikes/10) ',' num2str(nSpikes/10) ')'],['incomplete beta(x,' num2str(nSpikes) ',' num2str(nSpikes) ')'])
+savefig(gcf,'\\sil2\Literature\Projects\corplex\progress reports\meetings\next\hopkins statistics\single repeat distribution\4 samples distibution - Data range')
+saveas(gcf,'\\sil2\Literature\Projects\corplex\progress reports\meetings\next\hopkins statistics\single repeat distribution\4 samples distibution - Data range.jpg')
+close(gcf)
