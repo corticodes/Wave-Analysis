@@ -55,7 +55,7 @@ plotAllHilbertCrossings(crossings,hilbertAmps,squeeze(FD(singleChannel,1,:)),sin
 plotSingleHilbertCrossing(crossings{1},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Maxima (upward crossings)',singleChannel,'Spikes',binSpikes)
 plotSingleHilbertCrossing(crossings{1},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Maxima (upward crossings)',singleChannel,'Spikes',binSpikes)
 plotSingleHilbertCrossing(crossings{2},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Minima (downward crossings)',singleChannel)
-plotSingleHilbertCrossing(crossings{3},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Inhibitions',singleChannel)
+plotSingleHilbertCrossing(crossings{3},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Halfway Up',singleChannel)
 plotSingleHilbertCrossing(crossings{3},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Inhibitions',singleChannel,'Spikes',binSpikes)
 plotSingleHilbertCrossing(crossings{4},hilbertAmps{1},squeeze(FD(singleChannel,1,:)),'Excitations',singleChannel)
 
@@ -261,8 +261,8 @@ close(f)
 % xlabel('PCA1'),ylabel('PCA2'),zlabel('PCA3')
 
 
-[hopkins,pvalue]=calcHopkins(score(:,1:2),100000);
-[hopkins,pvalue]=calcHopkins(score(:,1:2),100000,'subspaceLimisMethod','madRange','centerIsAverage',1,'plotRange',1,'nMedianDeviations',2)
+[hopkins,std]=calcHopkins(score(:,1:2),100000);
+[hopkins,std]=calcHopkins(score(:,1:2),10000,'subspaceLimisMethod','madRange','centerIsAverage',1,'plotRange',1,'nMedianDeviations',2)
 
 % meanHopkins=mean(hopkins)
 steHopkins=std(hopkins)/sqrt(100000)
