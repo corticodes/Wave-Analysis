@@ -27,6 +27,7 @@ function [clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedCh
 %           plotted using the style plotStyles{((i-1) mod numel(plotStyles))+1}.
 %           So if you want triplets of clusters to be bluee,red,green dots
 %           repeatedly then use {'.b','.r','.g'}. Default is {'.b'}. 
+%           -   plotSpikes - logical - self explanatory
 %
 %       Output:
 %       -   clusterLimits (nGoodClustersX2) - position (samples) of the
@@ -43,6 +44,7 @@ function [clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedCh
 plotTrialsClusters=false;
 minHilbertAmp=0;
 plotStyles={'b.'};
+plotSpikes=1;
 
 for i=1:2:length(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
@@ -74,7 +76,11 @@ if plotTrialsClusters
     if ~exist('hilbertAmps','var')
         error('hilbertAmps must be given as varagin in order to plot crossings');
     end
-    plotSingleHilbertCrossing(crossings,hilbertAmps,0,'',1,'Spikes',binSpikes,'plotLegend',false);
+    if plotSpikes
+        plotSingleHilbertCrossing(crossings,hilbertAmps,0,'',1,'Spikes',binSpikes,'plotLegend',false);
+    else
+        plotSingleHilbertCrossing(crossings,hilbertAmps,0,'',1,'plotLegend',false);
+    end
 end
 
 
