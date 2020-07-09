@@ -24,7 +24,7 @@ binarySpikes=normedDist>=rand(size(normedDist,1),size(normedDist,2),size(normedD
 
 [y,x,t]=ind2sub([size(binarySpikes,1),size(binarySpikes,2),size(binarySpikes,3)],find(binarySpikes));
 
-if nargout=1
+if nargout==1
    x=[x,y,t]; 
 end
 end
