@@ -53,21 +53,26 @@ for i=1:nChannels
 %     crossTimes((crossingsCount+1):(crossingsCount+nChCrossings))=singleCrossings(i,1:nChCrossings);
 %     crossAmps((crossingsCount+1):(crossingsCount+nChCrossings))=singleHilbertAmps(i,1:nChCrossings);
 %     crossPos((crossingsCount+1):(crossingsCount+nChCrossings),1:2)=repmat([channelPosX,channelPosY],nChCrossings,1);
-    crossTimes(length(crossTimes)+1)=singleCrossings(i,crossInd)-startEndWave(1);
-    crossAmps(length(crossAmps)+1)=singleHilbertAmps(i,crossInd);
-    crossPos(size(crossPos,1)+1,1:2)=[channelPosX,channelPosY];
+    if ~isempty(crossInd)
+        crossTimes(length(crossTimes)+1)=singleCrossings(i,crossInd)-startEndWave(1);
+        crossAmps(length(crossAmps)+1)=singleHilbertAmps(i,crossInd);
+        crossPos(size(crossPos,1)+1,1:2)=[channelPosX,channelPosY];
+    end
 %     crossingsCount=crossingsCount+nChCrossings;
 end
-%normalize crossAmps
-crossAmps=crossAmps./max(crossAmps(:));
 
+%normalize crossAmps
+% crossAmps=crossAmps./min(crossAmps(:));
+crossingsLength=max(crossTimes)-min(crossTimes)+1; %this is different from nSamples when startEndWave include more samples than just the crossings (e.g. a whole oscillation period that contains the crossing clusters)
 %calculate center of mass for each frame
+
 waveCenterPath=zeros(nSamples,2);
 for i=1:nSamples
 %    timeDiffs=exp(-abs(i-crossTimes));
-   timeDiffs=abs(i-crossTimes)/nSamples; %normalize to have same scale as crossAmps
-%    tempWeight=1./timeDiffs;
-  tempWeight=exp(-timeDiffs);
+   timeDiffs=abs(i-crossTimes); 
+%    timeDiffsNormed=timeDiffs/max(crossTimes(1));%normalize to have same scale as crossAmps
+%    tempWeight=1./(timeDiffs+1); %add 1 so it won't be singular at crossing times
+  tempWeight=exp(-timeDiffs.^2/(2*(crossingsLength/2)^2)); %gaussian with a crossingsLength width
    waveCenterPath(i,1)=sum(crossPos(:,1)'.*crossAmps.*tempWeight)/sum(crossAmps.*tempWeight);
    waveCenterPath(i,2)=sum(crossPos(:,2)'.*crossAmps.*tempWeight)/sum(crossAmps.*tempWeight);
 end
