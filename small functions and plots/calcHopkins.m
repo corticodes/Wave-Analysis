@@ -2,6 +2,8 @@ function [hopkinsAVG,hopkinsSTD] = calcHopkins(sampleCoordinates,n,varargin)
 %CALCHopkins calculates the Hopkins statistic for the samples given by
 %sampleCoordinates (nSamplesX2). It does this n times and returns the
 %average. It also returns the p-value (see explantion in output parameters)
+%Current accepted usage:
+%hopkins=calcHopkins(sampleCoordinates,n,'subspaceLimisMethod','madRange','nMedianDeviations',2,'centerIsAverage',1);
 %   Varargins (given as 'key','value' pairs)
 %
 %       'subspaceLimisMethod': Set the limits of the sub-space in which to calc
