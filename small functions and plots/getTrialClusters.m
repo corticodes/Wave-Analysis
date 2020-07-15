@@ -53,8 +53,10 @@ end
 
 if isempty(binSpikes)
     nSamples=max(crossings(:));
+    noSpikes=1;
 else
     nSamples=size(binSpikes,2);
+    noSpikes=0;
 end
 
 %Get rid of crossings with amps lower than minHilbertAmp
@@ -110,13 +112,19 @@ while ~isempty(seedCh)
 %     %%%%%%%%%%%
     if nChInWave>=minChannelInWave
         currentClusterLimits=[min(clusterTimes),max(clusterTimes)];
-        currentClusterSpikes=sum(spikesPerSample(currentClusterLimits(1):currentClusterLimits(2)));
-        if ~exist('minSpikesPerCluster','var') || (exist('minSpikesPerCluster','var') && currentClusterSpikes>=minSpikesPerCluster)
+        if ~noSpikes
+            currentClusterSpikes=sum(spikesPerSample(currentClusterLimits(1):currentClusterLimits(2)));
+        end
+        if ~exist('minSpikesPerCluster','var') || (exist('minSpikesPerCluster','var') && ~noSpikes && currentClusterSpikes>=minSpikesPerCluster)
             nGoodClusters=nGoodClusters+1;
             clusterLimits(nGoodClusters,1:2)=currentClusterLimits;
             channels{nGoodClusters}=clusterChannels;
             times{nGoodClusters}=clusterTimes;
-            spikesPerCluster(nGoodClusters)=currentClusterSpikes;
+            if noSpikes
+                spikesPerCluster(nGoodClusters)=0;
+            else
+                spikesPerCluster(nGoodClusters)=currentClusterSpikes;
+            end
         end
     end
     %erase current cluster
