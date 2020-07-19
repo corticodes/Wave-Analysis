@@ -33,7 +33,7 @@ if flipEn
     En=flipud(En);
 end
 
-nSamples=startEndWave(2)-startEndWave(1)+1; %include edges samples in wave
+nSamples=startEndcWave(2)-startEndWave(1)+1; %include edges samples in wave
 nChannels=size(singleCrossings,1);
 
 % %create arrays for all crossing's Amp, Position and times
