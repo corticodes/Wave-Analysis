@@ -23,9 +23,63 @@ HTangle=angle(HT);
 startEndWave=[1 size(waveData,3)]; %twoGausses
 plotCrossingsPhysical(crossings{1},startEndWave,flipud(En),hilbertAmps{1},'Units','frames')
 
+% spikesCoordinates=simulateSpikes(waveData,0.005);
+spikesCoordinates=simulateSpikes(waveData,0.01);
+plotWaveSpikes(spikesCoordinates,size(En));
+
 waveCenterPath = drawWavePath(crossings{1},hilbertAmps{1},startEndWave,En);
 
-exportVideo(waveData,'D:\Google Drive\Masters\???\Analysis\plots and movies\check drawWavePath\Two Gauss with Wave Path3',30,pixelsPerChannel,'particlePath',waveCenterPath);
+exportVideo(waveData,'\\sil2\Literature\Projects\corplex\progress reports\meetings\next\simulations\correlation coefficient\Two Gauss prob 0.01 with Wave Path and Spikes',30,pixelsPerChannel,'particlePath',waveCenterPath,'spikeCoordinates',spikesCoordinates);
+
+%visualize spike and waveCenterPath in 3d
+nSamples=size(waveCenterPath,1);
+t=1:nSamples;
+clear plottingInd
+plottingInd(1:nSamples)=1;
+plottingInd((nSamples+1):(nSamples+size(spikesCoordinates,1)))=2;
+h=plotWaveSpikes([waveCenterPath,t';spikesCoordinates],size(En),plottingInd);
+
+%check spatial correlation
+rvc=rvcoeff(spikesCoordinates(:,1:2),waveCenterPath(spikesCoordinates(:,3),:))
+
+%calculate spike projection on curve - spatial distance in each frame
+% spikeCurveCoordinates=zeros(size(spikesCoordinates));
+times=spikesCoordinates(:,3);
+dists=sqrt((spikesCoordinates(:,1)-waveCenterPath(times,1)).^2+(spikesCoordinates(:,2)-waveCenterPath(times,2)).^2);
+scatter(times,dists)
+
+%calculate spike projection on curve - shortest distance of each spike from
+%curve
+nSpikes=size(spikesCoordinates,1);
+nSamples=size(waveCenterPath,1);
+all_dists=sqrt((spikesCoordinates(:,1)-waveCenterPath(:,1)').^2+(spikesCoordinates(:,2)-waveCenterPath(:,2)').^2+(spikesCoordinates(:,3)*layoutSize/nSamples-linspace(1,layoutSize,nSamples)).^2);
+[dists,inds]=min(all_dists,[],2);
+% calculate curve length
+curveLocalLengths=sqrt((waveCenterPath(2:(end),1)-waveCenterPath(1:(end-1),1)).^2+(waveCenterPath(2:(end),2)-waveCenterPath(1:(end-1),2)).^2+(layoutSize/nSamples)^2); %layoutSize/nSamples frame is the normalized temporal distance between each point on the curve 
+% curveSpeeds=sqrt((waveCenterPath(2:(end),1)-waveCenterPath(1:(end-1),1)).^2+(waveCenterPath(2:(end),2)-waveCenterPath(1:(end-1),2)).^2);
+cureveLength=[0 cumsum(curveLocalLengths)'];
+scatter(cureveLength(inds),dists)
+h=plotWaveSpikes([waveCenterPath,t';spikesCoordinates],size(En),plottingInd);
+
+calcHopkins([cureveLength(inds)',dists],1000,'subspaceLimisMethod','madRange','nMedianDeviations',2,'centerIsAverage',1,'plotRange',1)
+calcHopkins([cureveLength(inds)',dists],1000,'subspaceLimisMethod','madRange','nMedianDeviations',2,'centerIsAverage',1,'plotRange',0)
+
+%check correlation
+scatter(spikesCoordinates(:,1),waveCenterPath(times,1))
+corrcoef(spikesCoordinates(:,1),waveCenterPath(times,1))
+
+scatter(spikesCoordinates(:,2),waveCenterPath(times,2))
+corrcoef(spikesCoordinates(:,2),waveCenterPath(times,2))
+
+X=spikesCoordinates(:,1:2);
+Y=waveCenterPath(times,1:2);
+[A,B,r] = canoncorr(X,Y);
+
+% nSpikes=size(spikesCoordinates,1);
+% for i=1:nSpikes
+%     
+% end
+
 
 % see how data looks on this axis
 nFrames=size(waveData,3);
@@ -64,10 +118,10 @@ imshow(visualizePath,'InitialMagnification','fit')
 window_ms=1500; %ms
 band=[12 34];
 
-ticPath='D:\Everything\Exp Data\U4\U4_071014_Images3001_layout_100_12x12_gridSorter FROM MARK.mat';
+ticPath='E:\Yuval\Analysis\spikeSorting\sample data\U4\U4_071014_Images3001_layout_100_12x12_gridSorter FROM MARK.mat';
 
-Experiments=getRecording('D:\Everything\Exp Data\U4\MEARecordings.xlsx','recNames=U4Bin');
-[Experiments,VST]=Experiments.getVStimParams('D:\Everything\Exp Data\U4\visualStimulation\Images0001.mat');
+Experiments=getRecording('E:\Yuval\Analysis\spikeSorting\cleanCheck.xlsx','recNames=U4_071014_Images3');
+[Experiments,VST]=Experiments.getVStimParams('E:\Yuval\Analysis\spikeSorting\sample data\U4\visualStimulation\Images0001.mat');
 
 load('layout_100_12x12.mat','En')
 triggers=Experiments.currentDataObj.getTrigger;
@@ -94,7 +148,7 @@ savefig(['D:\Google Drive\Masters\???\Analysis\plots and movies\check drawWavePa
 close gcf
 
 waveCenterPath = drawWavePath(crossings{3},hilbertAmps{3},startEndWave,flipud(En));
-exportVideo(convertChannelsToMovie(squeeze(FD(:,1,startEndWave(1):startEndWave(2))),En),['D:\Google Drive\Masters\???\Analysis\plots and movies\check drawWavePath\from data\Trial ' num2str(trig) ' Samples' num2str(startEndWave(1)) '-' num2str(startEndWave(2)) ' Movie.avi'],200,pixelsPerChannel,'particlePath',waveCenterPath);
+exportVideo(convertChannelsToMovie(squeeze(FD(:,1,startEndWave(1):startEndWave(2))),En),['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\fix coordinate systems\Trial ' num2str(trig) ' Samples' num2str(startEndWave(1)) '-' num2str(startEndWave(2)) ' MARKED Movie.avi'],200,pixelsPerChannel,'particlePath',waveCenterPath);
 
 % startEndWave=[9612 10710]; %for trig1
 % startEndWave=[8967 9808]; %for trig10
