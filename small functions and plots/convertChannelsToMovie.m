@@ -1,6 +1,8 @@
 function movieData = convertChannelsToMovie(chData,En,varargin)
 %convertChannelsToMovie converts a ChxSamples matrix to 
-%HeightXWidthXnFrames movie matrix according to En channel map
+%HeightXWidthXnFrames movie matrix according to En channel map.
+%Notice that En is flipped upside down. If for example En=[1 2;3 4]
+%then data from channel 1 will appear at the bottm ledt corner.
 % varargins:
 %   BGVal (1x1 double)
 %       Value of pixels with no channels assigned to them (Usually
