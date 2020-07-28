@@ -38,7 +38,8 @@ gaussSigma=[2 4];
 gaussTXT='Gaussian wave';
 layoutSize=51*12;
 gaussSigma=51;
-waveFrames=300;
+% waveFrames=300;
+waveFrames=150;
 
 
 % % single gauss
@@ -109,6 +110,33 @@ for i=1:size(waveData,3)
    maxPos(i,:)=[x,y,i];
 end
 exportVideo(waveData,[videoDir 'with max'],30,pixelsPerChannel,'particlePath',[maxPos(:,1) maxPos(:,2)]);
+
+%Gaussian Wave
+waveData=simulateGaussianWave(layoutSize,gaussSigma*3,waveFrames);
+pixelsPerChannel=[1 1];
+
+
+exportVideo(waveData,'E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\Gereal testings exports etc\largeGaussWave.avi',60,pixelsPerChannel);
+
+%downSample
+waveData=waveData(51:51:612,51:51:612,:);
+pixelsPerChannel=[51 51];
+layoutSize=12;
+En=reshape(1:(layoutSize^2),layoutSize,layoutSize);
+
+exportVideo(waveData,'E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\Gereal testings exports etc\largeGaussWaveDownsample.avi',60,pixelsPerChannel);
+
+
+
+HT=hilbert(squeeze(convertMovieToChannels(waveData,En))').';
+HTabs=abs(HT);
+HTangle=angle(HT);
+
+[crossings,hilbertAmps] = getHilbertCrossings(HTabs,HTangle);
+
+startEndWave=[1 size(waveData,3)]; %twoGausses
+
+plotCrossingsPhysical(crossings{1},startEndWave,flipud(En),hilbertAmps{1},'Units','frames')
 
 
 % two elipsoids
@@ -649,11 +677,11 @@ hist(sigHop)
 
 % find significant Hopkins Statistic for different number of spikes 25:
 hopkinsIterations=1000;
-simulationIterations=100000;
+simulationIterations=1000000;
 nSpikes=20:2:40;
-% nSpikes=159;
+
 sigHop=zeros(1,numel(nSpikes));
-for i=1:numel(nSpikes)
+for i=8:numel(nSpikes)
     i
     n=nSpikes(i);
     hopkinses=zeros(1,simulationIterations);
@@ -661,14 +689,13 @@ for i=1:numel(nSpikes)
         hopkinses(j)=calcHopkins(rand(n,2),hopkinsIterations,'subspaceLimisMethod','madRange','nMedianDeviations',2,'centerIsAverage',1);
     end
     [cumulativeHist,edges] = histcounts(hopkinses,simulationIterations,'Normalization','cdf');
-%     [hopkinsHist,edges] = histcounts(hopkinses,500);
-%     [hopkinsHistProbability,edges] = histcounts(hopkinses,500,'Normalization','probability');
     bins=edges(1:end-1)+(edges(2)-edges(1))/2;
-%     hopkinsMean=hopkinsHistProbability*bins';
-%     hopkinsSTD=sqrt(hopkinsHistProbability*((bins-hopkinsMean).^2)');
     sigHop(i)=bins(min(find(cumulativeHist>0.95,1),numel(bins)));
+    save('\\sil2\Literature\Projects\corplex\progress reports\meetings\next\significant hopkinses\tempHop.mat','sigHop','hopkinsIterations','simulationIterations','nSpikes','i')
+
 end
-save('\\sil2\Literature\Projects\corplex\progress reports\meetings\next\hopkins statistics\p-value variations\significant Hopkins Per Number of Spikes','sigHop','hopkinsIterations','simulationIterations','nSpikes')
+save('\\sil2\Literature\Projects\corplex\progress reports\meetings\next\significant hopkinses\SigHopPerNspikes.mat','sigHop','hopkinsIterations','simulationIterations','nSpikes')
+
 % redo partial calculations
 
 nSpikes=40; %hopkins cdf will be beta(nSpikes/10,nSpikes/10)
