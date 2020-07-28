@@ -741,60 +741,6 @@ F=F.designLowPass;
     save([filesPath 'goodWaves'],'goodWaves')
 % end
 
-
-
-
-%% Gabazine
-
-window_ms=1500; %ms
-band=[12 34];
-% lowPassCutoff=6; %Hz
-% band=[0 lowPassCutoff];
-
-frameRate=200;
-
-maxTempDist=40;
-minChannelInWave=4;
-minHilbertAmp=20;
-ticPath='\\sil2\Data\Turtle\AF28_290216\MCRackData\RectGrid0001_spikeSort\spikeSorting.mat';
-Experiments=getRecording('E:\Yuval\Analysis\spikeSorting\cleanCheck.xlsx','recNames=Gabazine1');
-% [Experiments,VST]=Experiments.getVStimParams('\\sil2\Data\Turtle\AF28_290216\analysis\Trig_RectGrid0001.mat');
-triggers=load('\\sil2\Data\Turtle\AF28_290216\analysis\Trig_RectGrid0001.mat','triggers');
-triggers=triggers.triggers;
-load('layout_100_12x12.mat','En')
-trig=1;
-startTimes=triggers{3}(trig); %ms
-[data,time]=Experiments.currentDataObj.getData([],startTimes,window_ms);
-[FD,HT,HTabs,HTangle] = BPnHilbert(data,band);
-[crossings,hilbertAmps] = getHilbertCrossings(HTabs,HTangle);
-binSpikes = getSpikeBinMatByChannel(ticPath,startTimes,startTimes+window_ms,Experiments.currentDataObj.samplingFrequency);
-plotSingleHilbertCrossing(crossings{3},hilbertAmps{3},squeeze(FD(1,:)),'HalfwayUp Crossings',1,'Spikes',binSpikes);
-
-for i=1:100
-   startTimes=triggers{3}(i);
-   nSpikesInTrial1(i)=nnz(t>=startTimes&t<=startTimes+window_ms);
-   nSpikesInTrial2(i)=nnz(getSpikeBinMatByChannel(ticPath,startTimes,startTimes+window_ms,Experiments.currentDataObj.samplingFrequency));
-end
-
-% [clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedChannels] = getTrialClusters(crossings{3},En,maxTempDist,minChannelInWave,binSpikes,'plotTrialsClusters',1,'hilbertAmps',hilbertAmps{3},'plotSpikes',0);
-[clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedChannels] = getTrialClusters(crossings{3},En,maxTempDist,80,binSpikes,'plotTrialsClusters',1,'hilbertAmps',hilbertAmps{3},'plotSpikes',0);
-
-filesPath='\\sil2\Literature\Projects\corplex\progress reports\meetings\next\Gabazine\Check trial data\';
- for j=1:size(clusterLimits,1)
-     j
-    %export movies and spike clusters
-    startEndWave=[clusterLimits(j,1) clusterLimits(j,2)];
-    startEndWave_ms=startEndWave/Experiments.currentDataObj.samplingFrequency*1000+startTimes;
-%     plotCrossingsPhysical(crossings{3},startEndWave,En,hilbertAmps{3},'Units','Samples')
-%     saveas(gcf,[filesPath 'trig ' num2str(trig) ' Cluster ' num2str(j) ' Phase Latency.jpg'])
-%     savefig([filesPath 'trig ' num2str(trig) ' Cluster ' num2str(j) ' Phase Latency.fig'])
-%     close gcf
-    waveCenterPath = drawWavePath(crossings{3},hilbertAmps{3},startEndWave,En);
-    videoDir=[filesPath 'trig' num2str(trig) ' Cluster ' num2str(j) ' Video with wave center'];
-%     exportVideo(convertChannelsToMovie(squeeze(FD(:,1,startEndWave(1):startEndWave(2))),En),[videoDir '.avi'],frameRate,pixelsPerChannel,'spikeCoordinates',spikeCoordinates,'spikeFrameLength',spikeFrameLength,'particlePath',waveCenterPath);
-    exportVideo(convertChannelsToMovie(squeeze(FD(:,1,startEndWave(1):startEndWave(2))),En),[videoDir '.avi'],frameRate,pixelsPerChannel,'particlePath',waveCenterPath);
- end
-
  
 %% old code that is now irrelevent
 
