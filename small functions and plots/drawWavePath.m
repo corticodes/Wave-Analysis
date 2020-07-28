@@ -17,13 +17,19 @@ function waveCenterPath = drawWavePath(singleCrossings,singleHilbertAmps,startEn
 %       Channel layout
 %   Varargs (given as 'Name','Value' pairs):
 %       flipEn: logical. Whether to flip En or not when when getting 
-%               channel's position. Defult is 0;
+%               channel's position. Defult is 1 since 
+%               convertChannelsToMovie flips En when converting recorded 
+%               data (to match the En flipping of IntensityPhysicalSpacePlot).
+%               If you're drawing for simulated data then 
+%               convertChannelsToMovie is not used and therefor there
+%               should be no flipping.
 %   
 %OUTPUT:
 %   waveCenterPath (nSamplesX3) 
 %       coordinates (x,y) of the center of the wave.
 
-flipEn=0;
+flipEn=1;
+splitPLM=1;
 
 for i=1:2:numel(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
@@ -33,7 +39,7 @@ if flipEn
     En=flipud(En);
 end
 
-nSamples=startEndcWave(2)-startEndWave(1)+1; %include edges samples in wave
+nSamples=startEndWave(2)-startEndWave(1)+1; %include edges samples in wave
 nChannels=size(singleCrossings,1);
 
 % %create arrays for all crossing's Amp, Position and times
@@ -72,7 +78,7 @@ for i=1:nSamples
    timeDiffs=abs(i-crossTimes); 
 %    timeDiffsNormed=timeDiffs/max(crossTimes(1));%normalize to have same scale as crossAmps
 %    tempWeight=1./(timeDiffs+1); %add 1 so it won't be singular at crossing times
-  tempWeight=exp(-timeDiffs.^2/(2*(crossingsLength/2)^2)); %gaussian with a crossingsLength width
+  tempWeight=exp(-timeDiffs.^2/(2*(crossingsLength/4)^2)); %gaussian with a crossingsLength width
    waveCenterPath(i,1)=sum(crossPos(:,1)'.*crossAmps.*tempWeight)/sum(crossAmps.*tempWeight);
    waveCenterPath(i,2)=sum(crossPos(:,2)'.*crossAmps.*tempWeight)/sum(crossAmps.*tempWeight);
 end
