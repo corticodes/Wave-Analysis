@@ -335,6 +335,62 @@ hold on
 [~,maxBICInd]=max(BIC);
 plot(cmeans{maxBICInd},zeros(1,length(cmeans{maxBICInd})),'rx')
 
+%% Optimize PCA normalizations
+window_ms=1500; %ms
+band=[12 34];
+maxTempDist=40;
+minChannelInWave=80;
+minHilbertAmp=32;
+minSpikesPerCluster=0;
+ticPath='E:\Yuval\Analysis\spikeSorting\sample data\U4\U4_071014_Images3001_layout_100_12x12_gridSorter FROM MARK.mat';
+% ticPath='E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\U4_071014\U4_071014_Images3001_layout_100_12x12_JRC2gridSorter.mat';
+Experiments=getRecording('E:\Yuval\Analysis\spikeSorting\cleanCheck.xlsx','recNames=U4_071014_Images3');
+[Experiments,VST]=Experiments.getVStimParams('E:\Yuval\Analysis\spikeSorting\sample data\U4\visualStimulation\Images0001.mat');
+triggers=Experiments.currentDataObj.getTrigger;
+load('layout_100_12x12.mat','En')
+trig=1;
+startTimes=triggers{5}(trig); %ms
+[data,time]=Experiments.currentDataObj.getData([],startTimes,window_ms);
+[FD,HT,HTabs,HTangle] = BPnHilbert(data,band);
+[crossings,hilbertAmps] = getHilbertCrossings(HTabs,HTangle);
+binSpikes = getSpikeBinMatByChannel(ticPath,startTimes,startTimes+window_ms,Experiments.currentDataObj.samplingFrequency);
+[clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedChannels] = getTrialClusters(crossings{3},En,maxTempDist,minChannelInWave,binSpikes,'plotTrialsClusters',1,'hilbertAmps',hilbertAmps{3},'minHilbertAmp',minHilbertAmp,'minSpikesPerCluster',minSpikesPerCluster);
+i=4;
+startEndWave=clusterLimits(i,:);
+startEndWave_ms=startEndWave/Experiments.currentDataObj.samplingFrequency*1000+startTimes;
+spikeCoordinates=getSpikeCoordinatesFromTIC(ticPath,startEndWave_ms,En,Experiments.currentDataObj.samplingFrequency);
+% plotCrossingsPhysical(crossings{3},startEndWave,En,hilbertAmps{3})
+plotWaveSpikes([spikeCoordinates(:,2) spikeCoordinates(:,1) spikeCoordinates(:,3)],size(En));
+exportPath='E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\Gereal testings exports etc\';
+wavelength=startEndWave(2)-startEndWave(1);
+exportVideo(convertChannelsToMovie(squeeze(FD(:,1,(startEndWave(1)-round(wavelength/4)):(startEndWave(2)+round(wavelength/4)))),En),[exportPath 'Movie1.avi'],100,[51,51],'spikeCoordinates',spikeCoordinates,'spikeFrameLength',50);
+
+renormCoordinates1=spikeCoordinates;
+renormCoordinates1(:,1:2)=(spikeCoordinates(:,1:2)-mean(spikeCoordinates(:,1:2)))/size(En,1); %this line should be revised for when En is not symmetric
+renormCoordinates1(:,3)=(spikeCoordinates(:,3)-mean(spikeCoordinates(:,3)))/(max(spikeCoordinates(:,3))-min(spikeCoordinates(:,3)));
+%remember that here coordinates are y,x,t
+spikeCoordinatesPCA=renormCoordinates1;
+[coeff,score,latent] = pca(spikeCoordinatesPCA);
+%Show new axis
+f=figure;
+scatter3(spikeCoordinatesPCA(:,1),spikeCoordinatesPCA(:,2),spikeCoordinatesPCA(:,3));
+xlabel('Vertical Coordinate')
+ylabel('Horizontal Coordinate')
+zlabel('Temporal Coordinate')
+hold on
+plot3([-coeff(1,1) coeff(1,1)],[-coeff(2,1) coeff(2,1)],[-coeff(3,1) coeff(3,1)])
+plot3([-coeff(1,2) coeff(1,2)],[-coeff(2,2) coeff(2,2)],[-coeff(3,2) coeff(3,2)])
+plot3([-coeff(1,3) coeff(1,3)],[-coeff(2,3) coeff(2,3)],[-coeff(3,3) coeff(3,3)])
+figure
+scatter3(score(:,1),score(:,2),score(:,3));
+xlabel('PCA1')
+ylabel('PCA2')
+zlabel('PCA3')
+
+hopkins=calcHopkins(score(:,1:2),10000,'subspaceLimisMethod','madRange','centerIsAverage',1,'plotRange',1,'nMedianDeviations',2)
+
+
+
 %% Spike Particle
 
 % startEndWave=[17355 17969];
