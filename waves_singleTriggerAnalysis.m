@@ -30,7 +30,7 @@ plotTitle(fs,WT(:,singleChannel),['Welch PSDE of Ch' num2str(singleChannel)],'fs
 %Past BPs: [5 15],[10 35]
 FD = BPnHilbert(data,bandpass);
 % plotBP(data,FD,bandpass,trig,singleChannel)
-plotBP(data,FD,settingsMap)
+plotBP(squeeze(data(singleChannel,1,:)),FD,settingsMap)
 
 
 %% Get Hilbert Transform
