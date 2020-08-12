@@ -96,7 +96,7 @@ allSeedChannels=[];
 allSeedSamples=[];
 [seedCh,seedSample]=find(sampleCrossings,1); %find the first non zero crossings. find searches rows first so all columns left to what it finds will be zeros
 while ~isempty(seedCh)
-    allSeedChannels=[allSeedChannels seedCh];
+    allSeedChannels=[allSeedChannels seedCh]; %DEBUG THIS: last bug should be deleted if cluster is not included (e.g. if nChInWave>=minChannelInWave)
     allSeedSamples=[allSeedSamples seedSample];
     %get the wave around the seed
     [nChInWave,clusterChannels,clusterTimes] = countContinousCrossings(crossings,En,maxTempDist,seedCh,seedSample);
