@@ -1,38 +1,45 @@
-function [spikesDensity3d] = calc3dSpikeDensity(ticPath,startTimes,window_ms,En,samplingFrequency,varargin)
-%CALC2DSPIKEDENSITY calculates the smoothed spike density for each channel
-%and returns it as 3d matrix: (x,y,t) according to channel layout in En
+function spikingRate = calc3dSpikeDensity(ticPath,startTime,window_ms,En,samplingFrequency,varargin)
+%CALC2DSPIKEDENSITY calculates the spiking rate (spike/s) for each channel
+%starting from startTime to startTime+window_ms and returns it as 3d 
+%matrix: (frameHeightXFrameWidthXFrames) according to channel layout in En
 %   Input:
 %       -   ticPath: The path to t,ic containg saved mat
-%       -   startTimes: 1X2 array with the start and end of the wave in
-%       ms
+%       -   startTime: 1X2 array with the start and end of the wave in ms
 %       -   En: Electrode layout
 %       -   Varargs (given as 'Name','Value' pairs):
 %       	-   slidingWindowSize (1X1): size of the moving window in units
-%       	of seconds (i.e. each sample will hold avg spikes per
-%       	slidingWindowSize seconds). Default is 1
+%       	of samples. Default is 1000 (50ms)
+%           -   outputFormat (string): 
+%               - "movieFormat": frameHeightXFrameWidthXFrames. Default.
+%               - "dataFormat": Output is nChXnSamples (like the output of 
+%                   recordingObject.getData). 
 %
 %   Output:
-%       - spikesDensity3d: First two dimension are the same as En. Third
+%       - spikingRate: First two dimension are the same as En. Third
 %       dimention is time in units of samples (with the length of the
-%       wave). 
+%       wave). If outputFormat is set to dataFormat, dimensions are
+%       nChXnSamples
+%
+%   TODO: - Add varargin so that slidingWindowSize will be in different units
+%         - MAKE SURE DIMENSIONS ARE frameHeightXFrameWidthXFrames (or,
+%         fix description).
 
-% BuildBurstMatrix(ic,round(t/smoothFactor),round(triggers{5}(trig))/smoothFactor,1500/smoothFactor)
-
-slidingWindowSize=1; %seconds
+slidingWindowSize=1000; %samples
+outputFormat='movieFormat';
 
 for i=1:2:numel(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
 end
 
-%convert window to samples
-slidingWindowSamples=max(round(slidingWindowSize*samplingFrequency),1);
-avgFilt=ones(1,slidingWindowSamples);
+normalization=slidingWindowSize/samplingFrequency;
+avgFilt=ones(1,slidingWindowSize/normalization);
 
-binSpikes = getSpikeBinMatByChannel(ticPath,startTimes,startTimes+window_ms,samplingFrequency);
-spikeRate=conv2(binSpikes,avgFilt,'same');
+binSpikes = getSpikeBinMatByChannel(ticPath,startTime,startTime+window_ms,samplingFrequency);
+spikingRate=conv2(binSpikes,avgFilt,'same');
 
-spikesDensity3d=convertChannelsToMovie(spikeRate,En);
-
+if strcmp(outputFormat,'movieFormat')
+    spikingRate=convertChannelsToMovie(spikingRate,En);
+end
      
 end
 
