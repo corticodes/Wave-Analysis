@@ -62,12 +62,12 @@ for i=1:3
     savefig([basePath bandPath{i} 'startTimes ' num2str(startTimes) ' Crossings no Spikes.fig'])
     close gcf
 
-    [clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedChannels] = getTrialClusters(crossings{1},En,maxTempDist(i),minChannelInWave,[],'plotTrialsClusters',1,'hilbertAmps',hilbertAmps{1},'plotSpikes',0,'plotStyles',{'b.','r.'});
+    [clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedChannels] = getTrialClusters(crossings{1},En,maxTempDist(i),minChannelInWave,[],'plotTrialsClusters',1,'hilbertAmps',hilbertAmps{1},'plotSpikes',0,'plotStyles',{'b.','g.'});
     saveas(gcf,[basePath bandPath{i} 'startTimes ' num2str(startTimes) ' Clusters.jpg'])
     savefig([basePath bandPath{i} 'startTimes ' num2str(startTimes) ' Clusters.fig'])
     close gcf
     
-    [clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedChannels] = getTrialClusters(crossings{1},En,maxTempDist(i),minChannelInWave,binSpikes,'plotTrialsClusters',1,'hilbertAmps',hilbertAmps{1},'plotSpikes',1,'plotStyles',{'b.','r.'});
+    [clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedChannels] = getTrialClusters(crossings{1},En,maxTempDist(i),minChannelInWave,binSpikes,'plotTrialsClusters',1,'hilbertAmps',hilbertAmps{1},'plotSpikes',1,'plotStyles',{'b.','g.'});
     saveas(gcf,[basePath bandPath{i} 'startTimes ' num2str(startTimes) ' Clusters w spikes.jpg'])
     savefig([basePath bandPath{i} 'startTimes ' num2str(startTimes) ' Clusters w spikes.fig'])
     close gcf
@@ -178,7 +178,7 @@ filesPath='\\sil2\Literature\Projects\corplex\progress reports\meetings\next\M24
 % % plotSingleHilbertCrossing(crossings{3},hilbertAmps{3},squeeze(FD(1,:)),'HalfwayUp Crossings',1,'Spikes',binSpikes);
 % plotSingleHilbertCrossing(crossings{3},hilbertAmps{3},squeeze(FD(1,:)),'HalfwayUp Crossings',1);
 % maxTempDist=400;
-% [clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedChannels] = getTrialClusters(crossings{3},En,maxTempDist,50,[],'plotTrialsClusters',1,'hilbertAmps',hilbertAmps{3},'plotSpikes',0,'plotStyles',{'b.','r.'});
+% [clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedChannels] = getTrialClusters(crossings{3},En,maxTempDist,50,[],'plotTrialsClusters',1,'hilbertAmps',hilbertAmps{3},'plotSpikes',0,'plotStyles',{'b.','g.'});
 % 
 %  filesPath='\\sil2\Literature\Projects\corplex\progress reports\meetings\next\Gabazine\M24\Hem2Gabazine_5um_0004\0-5\';
 %  for j=1:size(clusterLimits,1)
@@ -235,7 +235,8 @@ Experiments=getRecording('E:\Yuval\Analysis\spikeSorting\cleanCheck.xlsx','recNa
 timeSeriesViewer(Experiments.currentDataObj)
 
 % startTimes=21200;
-startTimes=4100;
+% startTimes=4100;
+startTimes=57200;
 window_ms=3000; %ms
 
 data=Experiments.currentDataObj.getData([],startTimes,window_ms);
@@ -245,7 +246,8 @@ singleChannel=50;
 plotTitle(fs,WT(:,singleChannel),['Welch PSDE of Ch' num2str(singleChannel)],'fs [Hz]','PSD')
 
 
- band=[0 1];
+ band=[10 50];
+ band=[0 5];
  FD = BPnHilbert(data,band);
  plotBP(squeeze(data(singleChannel,1,:)),squeeze(FD(singleChannel,1,:)),['M24 Channel ' num2str(singleChannel) ' Data vs filtered'],band)
 
@@ -255,90 +257,188 @@ ticPath='\\sil2\Data\Turtle\M24_271113\Hem2Gabazine_200um_0001_spikeSort\spikeSo
 load('layout_100_12x12.mat','En')
 layoutSize=size(En,1); % to be revised when En is not symmetric
 
-bands={[0 3],[0 10],[13 20]};
+bands={[0 3],[0 5],[10 50]};
 cutwidths={[2 2] [1 2] [2 2]};
-basePath='\\sil2\Literature\Projects\corplex\progress reports\meetings\next\M24\M24_Gaba200uM\startTimes 4100_window_ms 3000\';
-bandPath={'0-3 band\','0-10 band\','13-20 band\'};
-maxTempDist=[400 200 80];
+basePath='\\sil2\Literature\Projects\corplex\progress reports\meetings\next\M24\M24_Gaba200uM\startTimes 57200_window_ms 3000\';
+bandPath={'0-3 band\','0-5 band ','10-50 band '};
+crossing={'maxima\','minima\'};
+maxTempDist=[400 600 100];
 minChannelInWave=61;
-minHilbertAmp=20;
+minHilbertAmp=300;
 
 binSpikes = getSpikeBinMatByChannel(ticPath,startTimes,startTimes+window_ms,Experiments.currentDataObj.samplingFrequency);
-for i=1:3
+spikingRateDataFormat=calc3dSpikeDensity(ticPath,startTimes,window_ms,En,Experiments.currentDataObj.samplingFrequency,'outputFormat','dataFormat','slidingWindowSize',50);
+spikingRateDataFormatSmoothed=smoothdata(spikingRateDataFormat','gaussian')';
+
+for i=2:3
     i
-   [FD,HT,HTabs,HTangle] = BPnHilbert(data,bands{i},'cutwidths',cutwidths{i});
-    [crossings,hilbertAmps] = getHilbertCrossings(HTabs,HTangle);
-    plotSingleHilbertCrossing(crossings{1},hilbertAmps{1},squeeze(FD(1,:)),'Maaxima',1,'Spikes',binSpikes);
-    saveas(gcf,[basePath bandPath{i} 'startTimes ' num2str(startTimes) ' Crossings with Spikes.jpg'])
-    savefig([basePath bandPath{i} 'startTimes ' num2str(startTimes) ' Crossings with Spikes.fig'])
-    close gcf
-    plotSingleHilbertCrossing(crossings{1},hilbertAmps{1},squeeze(FD(1,:)),'Maaxima',1);
-    saveas(gcf,[basePath bandPath{i} 'startTimes ' num2str(startTimes) ' Crossings no Spikes.jpg'])
-    savefig([basePath bandPath{i} 'startTimes ' num2str(startTimes) ' Crossings no Spikes.fig'])
-    close gcf
-
-    [clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedChannels] = getTrialClusters(crossings{1},En,maxTempDist(i),minChannelInWave,[],'plotTrialsClusters',1,'hilbertAmps',hilbertAmps{1},'plotSpikes',0,'plotStyles',{'b.','r.'});
-    saveas(gcf,[basePath bandPath{i} 'startTimes ' num2str(startTimes) ' Clusters.jpg'])
-    savefig([basePath bandPath{i} 'startTimes ' num2str(startTimes) ' Clusters.fig'])
-    close gcf
-    
-    [clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedChannels] = getTrialClusters(crossings{1},En,maxTempDist(i),minChannelInWave,binSpikes,'plotTrialsClusters',1,'hilbertAmps',hilbertAmps{1},'plotSpikes',1,'plotStyles',{'b.','r.'});
-    saveas(gcf,[basePath bandPath{i} 'startTimes ' num2str(startTimes) ' Clusters w spikes.jpg'])
-    savefig([basePath bandPath{i} 'startTimes ' num2str(startTimes) ' Clusters w spikes.fig'])
-    close gcf
-    
-    pixelsPerChannel=[51 51];
-
-     for j=1:size(clusterLimits,1)
-         disp(['cluster ' num2str(j) 'out of ' num2str(size(clusterLimits,1))])
-        %export movies and spike clusters
-        startEndWave=[clusterLimits(j,1) clusterLimits(j,2)];
-        startEndWave_ms=startEndWave/Experiments.currentDataObj.samplingFrequency*1000+startTimes;
-        plotCrossingsPhysical(crossings{1},startEndWave,En,hilbertAmps{1},'Units','Samples')
-        saveas(gcf,[basePath bandPath{i} '\clusters\Cluster ' num2str(j) ' Phase Latency.jpg'])
-        savefig([basePath bandPath{i} '\clusters\Cluster ' num2str(j) ' Phase Latency.fig'])
+    for k=1:2
+       [FD,HT,HTabs,HTangle] = BPnHilbert(data,bands{i},'cutwidths',cutwidths{i});
+        [crossings,hilbertAmps] = getHilbertCrossings(HTabs,HTangle);
+        plotSingleHilbertCrossing(crossings{k},hilbertAmps{k},squeeze(FD(1,:)),crossing{k}(1:6),1,'Spikes',binSpikes);
+        saveas(gcf,[basePath bandPath{i} crossing{k} 'startTimes ' num2str(startTimes) ' Crossings with Spikes.jpg'])
+        savefig([basePath bandPath{i} crossing{k} 'startTimes ' num2str(startTimes) ' Crossings with Spikes.fig'])
         close gcf
-        clear waveCenterPath
-        waveCenterPath = drawWavePath(crossings{1},hilbertAmps{1},startEndWave,En);
-        videoDir=[basePath bandPath{i} '\clusters\Cluster' num2str(j) ' Video with wave center'];
-        frameRate=round((startEndWave(2)-startEndWave(1))/5);
-        exportVideo(convertChannelsToMovie(squeeze(FD(:,1,startEndWave(1):startEndWave(2))),En),[videoDir '.avi'],frameRate,pixelsPerChannel,'particlePath',waveCenterPath);
+        plotSingleHilbertCrossing(crossings{k},hilbertAmps{k},squeeze(FD(1,:)),crossing{k}(1:6),1);
+        saveas(gcf,[basePath bandPath{i} crossing{k} 'startTimes ' num2str(startTimes) ' Crossings no Spikes.jpg'])
+        savefig([basePath bandPath{i} crossing{k} 'startTimes ' num2str(startTimes) ' Crossings no Spikes.fig'])
+        close gcf
 
-        spikeCoordinates=getSpikeCoordinatesFromTIC(ticPath,startEndWave_ms,flipud(En),Experiments.currentDataObj.samplingFrequency); %flip ud to match video flip
-        if ~isempty(spikeCoordinates)
-                spikesCoordinates=spikeCoordinates(:,[2,1,3]);
+        [clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedChannels] = getTrialClusters(crossings{k},En,maxTempDist(i),minChannelInWave,[],'plotTrialsClusters',1,'hilbertAmps',hilbertAmps{k},'plotSpikes',0,'plotStyles',{'b.','g.'});
+        saveas(gcf,[basePath bandPath{i} crossing{k} 'startTimes ' num2str(startTimes) ' Clusters.jpg'])
+        savefig([basePath bandPath{i} crossing{k} 'startTimes ' num2str(startTimes) ' Clusters.fig'])
+        close gcf
 
-                nSpikes=size(spikesCoordinates,1);
-                nSamples=size(waveCenterPath,1);
-                all_dists=sqrt((spikesCoordinates(:,1)-waveCenterPath(:,1)').^2+(spikesCoordinates(:,2)-waveCenterPath(:,2)').^2+(spikesCoordinates(:,3)*layoutSize/nSamples-linspace(1,layoutSize,nSamples)).^2);
-                [dists,inds]=min(all_dists,[],2);
-                curveLocalLengths=sqrt((waveCenterPath(2:(end),1)-waveCenterPath(1:(end-1),1)).^2+(waveCenterPath(2:(end),2)-waveCenterPath(1:(end-1),2)).^2+(layoutSize/nSamples)^2); %layoutSize/nSamples frame is the normalized temporal distance between each point on the curve 
-                % curveSpeeds=sqrt((waveCenterPath(2:(end),1)-waveCenterPath(1:(end-1),1)).^2+(waveCenterPath(2:(end),2)-waveCenterPath(1:(end-1),2)).^2);
-                cureveLength=[0 cumsum(curveLocalLengths)'];
-                scatter(cureveLength(inds),dists)
-                saveas(gcf,[basePath bandPath{i} '\clusters\Cluster ' num2str(j) ' Spike Projetion.jpg'])
-                savefig([basePath bandPath{i} '\clusters\Cluster ' num2str(j) ' Spike Projection.fig'])
-                close gcf
+        [clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedChannels] = getTrialClusters(crossings{k},En,maxTempDist(i),minChannelInWave,binSpikes,'plotTrialsClusters',1,'hilbertAmps',hilbertAmps{k},'plotSpikes',1,'plotStyles',{'b.','g.'});
+        saveas(gcf,[basePath bandPath{i} crossing{k} 'startTimes ' num2str(startTimes) ' Clusters w spikes.jpg'])
+        savefig([basePath bandPath{i} crossing{k} 'startTimes ' num2str(startTimes) ' Clusters w spikes.fig'])
+        close gcf
 
-                nSamples=size(waveCenterPath,1);
-                t=1:nSamples;
-                clear plottingInd
-                plottingInd(1:nSamples)=1;
-                plottingInd((nSamples+1):(nSamples+size(spikesCoordinates,1)))=2;
-                h=plotWaveSpikes([waveCenterPath,t';spikesCoordinates],size(En),plottingInd);
-                saveas(gcf,[basePath bandPath{i} '\clusters\Cluster ' num2str(j) ' spikes 3d.jpg'])
-                savefig([basePath bandPath{i} '\clusters\Cluster ' num2str(j) ' spike 3d.fig'])
-                close gcf
-                videoDir=[basePath bandPath{i} '\clusters\Cluster ' num2str(j) ' Video with wave center and spikes'];
-                spikeFrameLength=round(frameRate/4); %every spike will apear 5th of a second 
-                exportVideo(convertChannelsToMovie(squeeze(FD(:,1,startEndWave(1):startEndWave(2))),En),[videoDir '5.avi'],frameRate,pixelsPerChannel,'particlePath',waveCenterPath,'spikeCoordinates',spikeCoordinates,'spikeFrameLength',spikeFrameLength);
-        end
+        pixelsPerChannel=[51 51];
+
+         for j=1:size(clusterLimits,1)
+             disp(['cluster ' num2str(j) 'out of ' num2str(size(clusterLimits,1))])
+            %export movies and spike clusters
+            startEndWave=[clusterLimits(j,1) clusterLimits(j,2)];
+            startEndWave_ms=startEndWave/Experiments.currentDataObj.samplingFrequency*1000+startTimes;
+            plotCrossingsPhysical(crossings{k},startEndWave,En,hilbertAmps{k},'Units','Samples')
+            saveas(gcf,[basePath bandPath{i} crossing{k} '\clusters\Cluster ' num2str(j) ' Phase Latency.jpg'])
+            savefig([basePath bandPath{i} crossing{k} '\clusters\Cluster ' num2str(j) ' Phase Latency.fig'])
+            close gcf
+            clear waveCenterPath
+            waveCenterPath = drawWavePath(crossings{k},hilbertAmps{k},startEndWave,En);
+            videoDir=[basePath bandPath{i} crossing{k} '\clusters\Cluster' num2str(j) ' Video with wave center'];
+            frameRate=round((startEndWave(2)-startEndWave(1))/5);
+            exportVideo(convertChannelsToMovie(squeeze(FD(:,1,startEndWave(1):startEndWave(2))),En),[videoDir '.avi'],frameRate,pixelsPerChannel,'particlePath',waveCenterPath);
+
+            spikeCoordinates=getSpikeCoordinatesFromTIC(ticPath,startEndWave_ms,flipud(En),Experiments.currentDataObj.samplingFrequency); %flip ud to match video flip
+            if ~isempty(spikeCoordinates)
+                    spikesCoordinates=spikeCoordinates(:,[2,1,3]);
+
+                    nSpikes=size(spikesCoordinates,1);
+                    nSamples=size(waveCenterPath,1);
+                    all_dists=sqrt((spikesCoordinates(:,1)-waveCenterPath(:,1)').^2+(spikesCoordinates(:,2)-waveCenterPath(:,2)').^2+(spikesCoordinates(:,3)*layoutSize/nSamples-linspace(1,layoutSize,nSamples)).^2);
+                    [dists,inds]=min(all_dists,[],2);
+                    curveLocalLengths=sqrt((waveCenterPath(2:(end),1)-waveCenterPath(1:(end-1),1)).^2+(waveCenterPath(2:(end),2)-waveCenterPath(1:(end-1),2)).^2+(layoutSize/nSamples)^2); %layoutSize/nSamples frame is the normalized temporal distance between each point on the curve 
+                    % curveSpeeds=sqrt((waveCenterPath(2:(end),1)-waveCenterPath(1:(end-1),1)).^2+(waveCenterPath(2:(end),2)-waveCenterPath(1:(end-1),2)).^2);
+                    cureveLength=[0 cumsum(curveLocalLengths)'];
+                    scatter(cureveLength(inds),dists)
+                    saveas(gcf,[basePath bandPath{i} crossing{k} '\clusters\Cluster ' num2str(j) ' Spike Projetion.jpg'])
+                    savefig([basePath bandPath{i} crossing{k} '\clusters\Cluster ' num2str(j) ' Spike Projection.fig'])
+                    close gcf
+
+                    nSamples=size(waveCenterPath,1);
+                    t=1:nSamples;
+                    clear plottingInd
+                    plottingInd(1:nSamples)=1;
+                    plottingInd((nSamples+1):(nSamples+size(spikesCoordinates,1)))=2;
+                    h=plotWaveSpikes([waveCenterPath,t';spikesCoordinates],size(En),plottingInd);
+                    saveas(gcf,[basePath bandPath{i} crossing{k} '\clusters\Cluster ' num2str(j) ' spikes 3d.jpg'])
+                    savefig([basePath bandPath{i} crossing{k} '\clusters\Cluster ' num2str(j) ' spike 3d.fig'])
+                    close gcf
+                    videoDir=[basePath bandPath{i} crossing{k} '\clusters\Cluster ' num2str(j) ' Video with wave center and spikes'];
+                    spikeFrameLength=round(frameRate/4); %every spike will apear 5th of a second 
+                    exportVideo(convertChannelsToMovie(squeeze(FD(:,1,startEndWave(1):startEndWave(2))),En),[videoDir '5.avi'],frameRate,pixelsPerChannel,'particlePath',waveCenterPath,'spikeCoordinates',spikeCoordinates,'spikeFrameLength',spikeFrameLength);
+    %                 exportVideo(convertChannelsToMovie(spikingRateDataFormat(:,startEndWave(1):startEndWave(2)),En),[basePath bandPath{i} crossing{k} '\clusters\Cluster ' num2str(j) ' spikes density.avi'],frameRate,pixelsPerChannel);
+%                     exportVideo(convertChannelsToMovie(spikingRateDataFormatSmoothed(:,startEndWave(1):startEndWave(2)),En),[basePath bandPath{i} crossing{k} '\clusters\Cluster ' num2str(j) ' spikes density smoothed1.avi'],frameRate,pixelsPerChannel);
+
+            end
+         end
     end
 end
 
 
  
+ %%%%%%% try 2 downsample movies %%%%%%
  
+ frameRate=60; %Hz
+movieDuration=5; %sec
+totSample=frameRate*movieDuration;
+movieExportLength=10000;
+
+for i=2:3
+    i
+    for k=1:2
+       [FD,HT,HTabs,HTangle] = BPnHilbert(data,bands{i},'cutwidths',cutwidths{i});
+        [crossings,hilbertAmps] = getHilbertCrossings(HTabs,HTangle);
+        plotSingleHilbertCrossing(crossings{k},hilbertAmps{k},squeeze(FD(1,:)),'Minima',1,'Spikes',binSpikes);
+        saveas(gcf,[basePath bandPath{i} crossing{k} 'startTimes ' num2str(startTimes) ' Crossings with Spikes.jpg'])
+        savefig([basePath bandPath{i} crossing{k} 'startTimes ' num2str(startTimes) ' Crossings with Spikes.fig'])
+        close gcf
+        plotSingleHilbertCrossing(crossings{k},hilbertAmps{k},squeeze(FD(1,:)),'Minima',1);
+        saveas(gcf,[basePath bandPath{i} crossing{k} 'startTimes ' num2str(startTimes) ' Crossings no Spikes.jpg'])
+        savefig([basePath bandPath{i} crossing{k} 'startTimes ' num2str(startTimes) ' Crossings no Spikes.fig'])
+        close gcf
+
+        [clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedChannels] = getTrialClusters(crossings{k},En,maxTempDist(i),minChannelInWave,[],'plotTrialsClusters',1,'hilbertAmps',hilbertAmps{k},'plotSpikes',0,'plotStyles',{'b.','k.'});
+        saveas(gcf,[basePath bandPath{i} crossing{k} 'startTimes ' num2str(startTimes) ' Clusters.jpg'])
+        savefig([basePath bandPath{i} crossing{k} 'startTimes ' num2str(startTimes) ' Clusters.fig'])
+        close gcf
+
+        [clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedChannels] = getTrialClusters(crossings{k},En,maxTempDist(i),minChannelInWave,binSpikes,'plotTrialsClusters',1,'hilbertAmps',hilbertAmps{k},'plotSpikes',1,'plotStyles',{'b.','k.'});
+        saveas(gcf,[basePath bandPath{i} crossing{k} 'startTimes ' num2str(startTimes) ' Clusters w spikes.jpg'])
+        savefig([basePath bandPath{i} crossing{k} 'startTimes ' num2str(startTimes) ' Clusters w spikes.fig'])
+        close gcf
+
+        pixelsPerChannel=[51 51];
+
+         for j=1:size(clusterLimits,1)
+             disp(['cluster ' num2str(j) 'out of ' num2str(size(clusterLimits,1))])
+            %export movies and spike clusters
+            startEndWave=[clusterLimits(j,1) clusterLimits(j,2)];
+            startEndWave_ms=startEndWave/Experiments.currentDataObj.samplingFrequency*1000+startTimes;
+            plotCrossingsPhysical(crossings{k},startEndWave,En,hilbertAmps{k},'Units','Samples')
+            saveas(gcf,[basePath bandPath{i} crossing{k} '\clusters\Cluster ' num2str(j) ' Phase Latency.jpg'])
+            savefig([basePath bandPath{i} crossing{k} '\clusters\Cluster ' num2str(j) ' Phase Latency.fig'])
+            close gcf
+            clear waveCenterPath
+            waveCenterPath = drawWavePath(crossings{k},hilbertAmps{k},startEndWave,En);
+            videoDir=[basePath bandPath{i} crossing{k} '\clusters\Cluster' num2str(j) ' Video with wave center'];
+            
+%             movieExportInterval=max(round((startEndWave(2)-startEndWave(1))/totSample),1);
+            movieExportInterval=max(round(movieExportLength/totSample),1);
+%             samples2export=startEndWave(1):movieExportInterval:startEndWave(2); %downsample
+            samples2export=startEndWave(1):movieExportInterval:(startEndWave(1)+movieExportLength); %downsample
+            exportVideo(convertChannelsToMovie(squeeze(FD(:,1,samples2export)),En),[videoDir '.avi'],frameRate,pixelsPerChannel,'particlePath',waveCenterPath);
+
+%             spikeCoordinates=getSpikeCoordinatesFromTIC(ticPath,startEndWave_ms,flipud(En),Experiments.currentDataObj.samplingFrequency); %flip ud to match video flip
+            spikeCoordinates=getSpikeCoordinatesFromTIC(ticPath,[startEndWave_ms(1) (startEndWave_ms(1)+movieExportLength/Experiments.currentDataObj.samplingFrequency)],flipud(En),Experiments.currentDataObj.samplingFrequency); %flip ud to match video flip
+            if ~isempty(spikeCoordinates)
+                    spikesCoordinates=spikeCoordinates(:,[2,1,3]);
+
+                    nSpikes=size(spikesCoordinates,1);
+                    nSamples=size(waveCenterPath,1);
+                    all_dists=sqrt((spikesCoordinates(:,1)-waveCenterPath(:,1)').^2+(spikesCoordinates(:,2)-waveCenterPath(:,2)').^2+(spikesCoordinates(:,3)*layoutSize/nSamples-linspace(1,layoutSize,nSamples)).^2);
+                    [dists,inds]=min(all_dists,[],2);
+                    curveLocalLengths=sqrt((waveCenterPath(2:(end),1)-waveCenterPath(1:(end-1),1)).^2+(waveCenterPath(2:(end),2)-waveCenterPath(1:(end-1),2)).^2+(layoutSize/nSamples)^2); %layoutSize/nSamples frame is the normalized temporal distance between each point on the curve 
+                    % curveSpeeds=sqrt((waveCenterPath(2:(end),1)-waveCenterPath(1:(end-1),1)).^2+(waveCenterPath(2:(end),2)-waveCenterPath(1:(end-1),2)).^2);
+                    cureveLength=[0 cumsum(curveLocalLengths)'];
+                    scatter(cureveLength(inds),dists)
+                    saveas(gcf,[basePath bandPath{i} crossing{k} '\clusters\Cluster ' num2str(j) ' Spike Projetion.jpg'])
+                    savefig([basePath bandPath{i} crossing{k} '\clusters\Cluster ' num2str(j) ' Spike Projection.fig'])
+                    close gcf
+
+                    nSamples=size(waveCenterPath,1);
+                    t=1:nSamples;
+                    clear plottingInd
+                    plottingInd(1:nSamples)=1;
+                    plottingInd((nSamples+1):(nSamples+size(spikesCoordinates,1)))=2;
+                    h=plotWaveSpikes([waveCenterPath,t';spikesCoordinates],size(En),plottingInd);
+                    saveas(gcf,[basePath bandPath{i} crossing{k} '\clusters\Cluster ' num2str(j) ' spikes 3d.jpg'])
+                    savefig([basePath bandPath{i} crossing{k} '\clusters\Cluster ' num2str(j) ' spike 3d.fig'])
+                    close gcf
+                    videoDir=[basePath bandPath{i} crossing{k} '\clusters\Cluster ' num2str(j) ' Video with wave center and spikes'];
+                    spikeFrameLength=round(frameRate/4); %every spike will apear 5th of a second 
+                    exportVideo(convertChannelsToMovie(squeeze(FD(:,1,startEndWave(1):startEndWave(2))),En),[videoDir '5.avi'],frameRate,pixelsPerChannel,'particlePath',waveCenterPath,'spikeCoordinates',spikeCoordinates,'spikeFrameLength',spikeFrameLength);
+    %                 exportVideo(convertChannelsToMovie(spikingRateDataFormat(:,startEndWave(1):startEndWave(2)),En),[basePath bandPath{i} crossing{k} '\clusters\Cluster ' num2str(j) ' spikes density.avi'],frameRate,pixelsPerChannel);
+                    exportVideo(convertChannelsToMovie(spikingRateDataFormatSmoothed(:,startEndWave(1):startEndWave(2)),En),[basePath bandPath{i} crossing{k} '\clusters\Cluster ' num2str(j) ' spikes density smoothed.avi'],frameRate,pixelsPerChannel);
+
+            end
+         end
+    end
+end
+
+%%%%% end of try2 downsample movies
  
  
  
@@ -357,7 +457,7 @@ minHilbertAmp=20;
 load('layout_100_12x12.mat','En')
 layoutSize=size(En,1); % to be revised when En is not symmetric
 % 
-% [clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedChannels] = getTrialClusters(crossings{3},En,maxTempDist,50,[],'plotTrialsClusters',1,'hilbertAmps',hilbertAmps{3},'plotSpikes',0,'plotStyles',{'b.','r.'});
+% [clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedChannels] = getTrialClusters(crossings{3},En,maxTempDist,50,[],'plotTrialsClusters',1,'hilbertAmps',hilbertAmps{3},'plotSpikes',0,'plotStyles',{'b.','g.'});
 % filesPath='\\sil2\Literature\Projects\corplex\progress reports\meetings\next\spectral\M24_Gaba200uM_startTime21200_windowms3000\clusters\';
 %     
 % for j=1:size(clusterLimits,1)
@@ -410,7 +510,7 @@ save(ticPath,'t','ic')
 binSpikes = getSpikeBinMatByChannel(ticPath,startTimes,startTimes+window_ms,dataObj.samplingFrequency);
 plotSingleHilbertCrossing(crossings{1},hilbertAmps{1},squeeze(FD(1,:)),'Maxima Crossings',1,'Spikes',binSpikes);
 
-[clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedChannels] = getTrialClusters(crossings{1},En,maxTempDist,50,binSpikes,'plotTrialsClusters',1,'hilbertAmps',hilbertAmps{1},'plotSpikes',1,'plotStyles',{'b.','r.'});
+[clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedChannels] = getTrialClusters(crossings{1},En,maxTempDist,50,binSpikes,'plotTrialsClusters',1,'hilbertAmps',hilbertAmps{1},'plotSpikes',1,'plotStyles',{'b.','g.'});
 % mkdir(['\\sil2\Literature\Projects\corplex\progress reports\meetings\next\M24\M24_Gaba200uM_startTime21200_windowms3000\peak detection\clusters\prominence ' num2str(prominence) '\'])
 filesPath=['\\sil2\Literature\Projects\corplex\progress reports\meetings\next\M24\M24_Gaba200uM_startTime21200_windowms3000\peak detection\clusters\prominence ' num2str(prominence) '\'];
 saveas(gcf,[filesPath 'clusters with spikes (prominence ' num2str(prominence) ').jpg'])
@@ -488,85 +588,53 @@ ticPath='\\sil2\Data\Turtle\M24_271113\Hem2Gabazine_5um_0004_spikeSort\spikeSort
 load('layout_100_12x12.mat','En')
 layoutSize=size(En,1); % to be revised when En is not symmetric
 
-bands={[0 2],[2 13],[13 20]};
-cutwidths={[2 2] [1 2] [2 2]};
-basePath='\\sil2\Literature\Projects\corplex\progress reports\meetings\next\M24\M24_Gaba05uM_04\startTimes 899987 window_ms 3000\';
-bandPath={'0-2 band\','2-13 band\','13-20 band\'};
-maxTempDist=[400 200 80];
-minChannelInWave=61;
-minHilbertAmp=20;
+spikingRate = calc3dSpikeDensity(ticPath,startTimes,window_ms,En,Experiments.currentDataObj.samplingFrequency);
+spikingRateDataFormat=calc3dSpikeDensity(ticPath,startTimes,window_ms,En,Experiments.currentDataObj.samplingFrequency,'outputFormat','dataFormat');
 
-binSpikes = getSpikeBinMatByChannel(ticPath,startTimes,startTimes+window_ms,Experiments.currentDataObj.samplingFrequency);
-for i=1:3
-    i
-   [FD,HT,HTabs,HTangle] = BPnHilbert(data,bands{i},'cutwidths',cutwidths{i});
-    [crossings,hilbertAmps] = getHilbertCrossings(HTabs,HTangle);
-    plotSingleHilbertCrossing(crossings{1},hilbertAmps{1},squeeze(FD(1,:)),'Maaxima',1,'Spikes',binSpikes);
-    saveas(gcf,[basePath bandPath{i} 'startTimes ' num2str(startTimes) ' Crossings with Spikes.jpg'])
-    savefig([basePath bandPath{i} 'startTimes ' num2str(startTimes) ' Crossings with Spikes.fig'])
-    close gcf
-    plotSingleHilbertCrossing(crossings{1},hilbertAmps{1},squeeze(FD(1,:)),'Maaxima',1);
-    saveas(gcf,[basePath bandPath{i} 'startTimes ' num2str(startTimes) ' Crossings no Spikes.jpg'])
-    savefig([basePath bandPath{i} 'startTimes ' num2str(startTimes) ' Crossings no Spikes.fig'])
-    close gcf
+pixelsPerChannel=[51 51];
+frameRate=round((window_ms*Experiments.currentDataObj.samplingFrequency/1000)/5);
+exportVideo(spikingRate,'\\sil2\Literature\Projects\corplex\progress reports\meetings\next\M24\M24_Gaba05uM_04\startTimes 899987 window_ms 3000\spike density\spike density.avi',frameRate,pixelsPerChannel);
 
-    [clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedChannels] = getTrialClusters(crossings{1},En,maxTempDist(i),minChannelInWave,[],'plotTrialsClusters',1,'hilbertAmps',hilbertAmps{1},'plotSpikes',0,'plotStyles',{'b.','r.'});
-    saveas(gcf,[basePath bandPath{i} 'startTimes ' num2str(startTimes) ' Clusters.jpg'])
-    savefig([basePath bandPath{i} 'startTimes ' num2str(startTimes) ' Clusters.fig'])
-    close gcf
-    
-    [clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedChannels] = getTrialClusters(crossings{1},En,maxTempDist(i),minChannelInWave,binSpikes,'plotTrialsClusters',1,'hilbertAmps',hilbertAmps{1},'plotSpikes',1,'plotStyles',{'b.','r.'});
-    saveas(gcf,[basePath bandPath{i} 'startTimes ' num2str(startTimes) ' Clusters w spikes.jpg'])
-    savefig([basePath bandPath{i} 'startTimes ' num2str(startTimes) ' Clusters w spikes.fig'])
-    close gcf
-    
-    pixelsPerChannel=[51 51];
+% channelData = convertMovieToChannels(spikingRate,En);
 
-     for j=1:size(clusterLimits,1)
-         disp(['cluster ' num2str(j) 'out of ' num2str(size(clusterLimits,1))])
-        %export movies and spike clusters
-        startEndWave=[clusterLimits(j,1) clusterLimits(j,2)];
-        startEndWave_ms=startEndWave/Experiments.currentDataObj.samplingFrequency*1000+startTimes;
-        plotCrossingsPhysical(crossings{1},startEndWave,En,hilbertAmps{1},'Units','Samples')
-        saveas(gcf,[basePath bandPath{i} '\clusters\Cluster ' num2str(j) ' Phase Latency.jpg'])
-        savefig([basePath bandPath{i} '\clusters\Cluster ' num2str(j) ' Phase Latency.fig'])
-        close gcf
-        clear waveCenterPath
-        waveCenterPath = drawWavePath(crossings{1},hilbertAmps{1},startEndWave,En);
-        videoDir=[basePath bandPath{i} '\clusters\Cluster' num2str(j) ' Video with wave center'];
-        frameRate=round((startEndWave(2)-startEndWave(1))/5);
-        exportVideo(convertChannelsToMovie(squeeze(FD(:,1,startEndWave(1):startEndWave(2))),En),[videoDir '.avi'],frameRate,pixelsPerChannel,'particlePath',waveCenterPath);
+% for i=1:size(channelData,1)
+%     smoothed(i,:)=smooth(channelData(i,:)')';
+% end
 
-        spikeCoordinates=getSpikeCoordinatesFromTIC(ticPath,startEndWave_ms,flipud(En),Experiments.currentDataObj.samplingFrequency); %flip ud to match video flip
-        if ~isempty(spikeCoordinates)
-                spikesCoordinates=spikeCoordinates(:,[2,1,3]);
-
-                nSpikes=size(spikesCoordinates,1);
-                nSamples=size(waveCenterPath,1);
-                all_dists=sqrt((spikesCoordinates(:,1)-waveCenterPath(:,1)').^2+(spikesCoordinates(:,2)-waveCenterPath(:,2)').^2+(spikesCoordinates(:,3)*layoutSize/nSamples-linspace(1,layoutSize,nSamples)).^2);
-                [dists,inds]=min(all_dists,[],2);
-                curveLocalLengths=sqrt((waveCenterPath(2:(end),1)-waveCenterPath(1:(end-1),1)).^2+(waveCenterPath(2:(end),2)-waveCenterPath(1:(end-1),2)).^2+(layoutSize/nSamples)^2); %layoutSize/nSamples frame is the normalized temporal distance between each point on the curve 
-                % curveSpeeds=sqrt((waveCenterPath(2:(end),1)-waveCenterPath(1:(end-1),1)).^2+(waveCenterPath(2:(end),2)-waveCenterPath(1:(end-1),2)).^2);
-                cureveLength=[0 cumsum(curveLocalLengths)'];
-                scatter(cureveLength(inds),dists)
-                saveas(gcf,[basePath bandPath{i} '\clusters\Cluster ' num2str(j) ' Spike Projetion.jpg'])
-                savefig([basePath bandPath{i} '\clusters\Cluster ' num2str(j) ' Spike Projection.fig'])
-                close gcf
-
-                nSamples=size(waveCenterPath,1);
-                t=1:nSamples;
-                clear plottingInd
-                plottingInd(1:nSamples)=1;
-                plottingInd((nSamples+1):(nSamples+size(spikesCoordinates,1)))=2;
-                h=plotWaveSpikes([waveCenterPath,t';spikesCoordinates],size(En),plottingInd);
-                saveas(gcf,[basePath bandPath{i} '\clusters\Cluster ' num2str(j) ' spikes 3d.jpg'])
-                savefig([basePath bandPath{i} '\clusters\Cluster ' num2str(j) ' spike 3d.fig'])
-                close gcf
-                videoDir=[basePath bandPath{i} '\clusters\Cluster ' num2str(j) ' Video with wave center and spikes'];
-                spikeFrameLength=round(frameRate/4); %every spike will apear 5th of a second 
-                exportVideo(convertChannelsToMovie(squeeze(FD(:,1,startEndWave(1):startEndWave(2))),En),[videoDir '5.avi'],frameRate,pixelsPerChannel,'particlePath',waveCenterPath,'spikeCoordinates',spikeCoordinates,'spikeFrameLength',spikeFrameLength);
-        end
-    end
+% smoothed=smoothdata(channelData','gaussian')';
+figure
+hold on
+for i=10:10:size(channelData,1)
+%     plot(spikingRateDataFormat(i,2600:14000))
+    plot(spikingRateFD(i,2600:14000))
+%   plot(spikingRateFD(i,:)+10*i)
 end
 
-[spikesDensity3d] = calc3dSpikeDensity(ticPath,startTimes,window_ms,En,Experiments.currentDataObj.samplingFrequency)
+startEndWave=[2600 14000];
+pixelsPerChannel=[51 51];
+frameRate=round(((startEndWave(2)-startEndWave(1))*Experiments.currentDataObj.samplingFrequency/1000)/10);
+exportVideo(convertChannelsToMovie(squeeze(spikingRateFD(:,1,startEndWave(1):startEndWave(2))),En),'\\sil2\Literature\Projects\corplex\progress reports\meetings\next\M24\M24_Gaba05uM_04\startTimes 899987 window_ms 3000\spike density\spike density1.avi',frameRate,pixelsPerChannel);
+
+
+
+[WT,fs]=pwelch(spikingRateDataFormat(:,:)',[],[],[],20e3);
+% singleChannel=80;
+singleChannel=50;
+plotTitle(fs,WT(:,singleChannel),['Welch PSDE of Ch' num2str(singleChannel)],'fs [Hz]','PSD')
+
+band=[0 3];
+spikingRateDataFormatOneTrials=zeros(size(spikingRateDataFormat,1),1,size(spikingRateDataFormat,2));
+spikingRateDataFormatOneTrials(:,1,:)=spikingRateDataFormat;
+spikingRateFD = BPnHilbert(spikingRateDataFormatOneTrials,band);
+plotBP(squeeze(spikingRateDataFormatOneTrials(singleChannel,1,:)),squeeze(spikingRateFD(singleChannel,1,:)),['M24 Channel ' num2str(singleChannel) ' Data vs filtered'],band)
+
+
+[spikingRateFD,spikingRateHT,spikingRateHTabs,spikingRateHTangle] = BPnHilbert(spikingRateDataFormatOneTrials,band);
+[spikingRatecrossings,spikingRatehilbertAmps] = getHilbertCrossings(spikingRateHTabs,spikingRateHTangle);
+plotSingleHilbertCrossing(spikingRatecrossings{1},spikingRatehilbertAmps{1},squeeze(spikingRateFD(1,:)),'Maxima Crossings',1);
+
+
+[clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedChannels] = getTrialClusters(spikingRatecrossings{1},En,1000,20,[],'hilbertAmps',spikingRatehilbertAmps{1},'plotTrialsClusters',1,'plotSpikes',0,'plotStyles',{'b.','g.'});
+% saveas(gcf,[basePath bandPath{i} 'startTimes ' num2str(startTimes) ' Clusters.jpg'])
+% savefig([basePath bandPath{i} 'startTimes ' num2str(startTimes) ' Clusters.fig'])
+% close gcf
