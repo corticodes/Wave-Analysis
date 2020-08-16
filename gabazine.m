@@ -270,6 +270,9 @@ binSpikes = getSpikeBinMatByChannel(ticPath,startTimes,startTimes+window_ms,Expe
 spikingRateDataFormat=calc3dSpikeDensity(ticPath,startTimes,window_ms,En,Experiments.currentDataObj.samplingFrequency,'outputFormat','dataFormat','slidingWindowSize',50);
 spikingRateDataFormatSmoothed=smoothdata(spikingRateDataFormat','gaussian')';
 
+plotSingleHilbertCrossing(crossings{k},hilbertAmps{k},squeeze(FD(1,:)),crossing{k}(1:6),1,'CrossingsVerticalOffset',-200,'moreChannelsData',squeeze(spikingRateDataFormat(chInds,:)),'moreChannelsNumbers',(chInds)','Spikes',tenthOfSpikes);
+plotSingleHilbertCrossing(crossings{k},hilbertAmps{k},squeeze(FD(1,:)),crossing{k}(1:6),1,'CrossingsVerticalOffset',-200,'moreChannelsData',squeeze(spikingRateDataFormatSmoothed(chInds,:)),'moreChannelsNumbers',(chInds)','Spikes',tenthOfSpikes);
+
 for i=2:3
     i
     for k=1:2
