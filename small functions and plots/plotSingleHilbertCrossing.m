@@ -26,14 +26,17 @@ function [f] = plotSingleHilbertCrossing(singleCrossings,crossingsAmps,FD,crossi
 %           below channel i+1). If this is given, plotLegend is set to
 %           false. Whoever's reading this is welcome to fix the legend it
 %           creates - I didn't have time.
-%      moreChannelsNumbers (nCX1) configures the vertical position of
-%      every channel in moreChannelsData (allows to plot less channels then
-%      total channel numbers, or to order it in different way).
+%       moreChannelsNumbers (nCX1) configures the vertical position of
+%           every channel in moreChannelsData (allows to plot less channels then
+%           total channel numbers, or to order it in different way).
+%       normalizeChannels (1x1 logical) Normelaize each channel by twice
+%           its mean. default is true.
 
 plotLegend=true;
 CrossingsVerticalOffset=0;
 plotAdditionalChannels=0;
-
+normalizeChannels=1;
+ 
 f=figure;
 for i=1:2:length(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
@@ -109,7 +112,9 @@ if plotAdditionalChannels
     end
     moreDataSamples=size(moreChannelsData,2);
     %first normalize
-    moreChannelsData=moreChannelsData./(2*repmat(mean(moreChannelsData,2),1,moreDataSamples));
+    if normalizeChannels
+        moreChannelsData=moreChannelsData./(repmat(std(moreChannelsData,0,2),1,moreDataSamples));
+    end
     %add relevant height
     moreChannelsData=moreChannelsData+repmat(moreChannelsNumbers,1,moreDataSamples);
 %     hLegend = findobj(gcf, 'Type', 'Legend');
