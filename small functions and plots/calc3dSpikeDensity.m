@@ -32,7 +32,7 @@ for i=1:2:numel(varargin)
 end
 
 normalization=slidingWindowSize/samplingFrequency;
-avgFilt=ones(1,slidingWindowSize/normalization);
+avgFilt=ones(1,slidingWindowSize)/normalization;
 
 binSpikes = getSpikeBinMatByChannel(ticPath,startTime,startTime+window_ms,samplingFrequency);
 spikingRate=conv2(binSpikes,avgFilt,'same');
