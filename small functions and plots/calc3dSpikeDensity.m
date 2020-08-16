@@ -34,7 +34,7 @@ end
 normalization=slidingWindowSize/samplingFrequency;
 avgFilt=ones(1,slidingWindowSize)/normalization;
 
-binSpikes = getSpikeBinMatByChannel(ticPath,startTime,startTime+window_ms,samplingFrequency);
+binSpikes = getSpikeBinMatByChannel(ticPath,startTime,startTime+window_ms,samplingFrequency,max(En(:)));
 spikingRate=conv2(binSpikes,avgFilt,'same');
 
 if strcmp(outputFormat,'movieFormat')
