@@ -12,7 +12,7 @@ function binSpikes = getSpikeBinMatByChannel(ticPath,start_times_ms,end_times_ms
 
 load(ticPath,'t','ic');
 
-if isempty(nCh)
+if ~exist('nCh','var')
     nCh=ic(1,end);
 end
 nTrials=numel(start_times_ms);
