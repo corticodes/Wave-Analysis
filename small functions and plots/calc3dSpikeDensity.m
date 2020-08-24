@@ -8,7 +8,7 @@ function spikingRate = calc3dSpikeDensity(ticPath,startTime,window_ms,En,samplin
 %       -   En: Electrode layout
 %       -   Varargs (given as 'Name','Value' pairs):
 %       	-   slidingWindowSize (1X1): size of the moving window in units
-%       	of samples. Default is 1000 (50ms)
+%       	of samples. Default is 10000 (0.5s)
 %           -   outputFormat (string): 
 %               - "movieFormat": frameHeightXFrameWidthXFrames. Default.
 %               - "dataFormat": Output is nChXnSamples (like the output of 
@@ -24,7 +24,7 @@ function spikingRate = calc3dSpikeDensity(ticPath,startTime,window_ms,En,samplin
 %         - MAKE SURE DIMENSIONS ARE frameHeightXFrameWidthXFrames (or,
 %         fix description).
 
-slidingWindowSize=1000; %samples
+slidingWindowSize=10000; %samples
 outputFormat='movieFormat';
 
 for i=1:2:numel(varargin)
