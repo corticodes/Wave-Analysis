@@ -18,6 +18,8 @@ function [PLM,f] = plotCrossingsPhysical(selectedCrossings,startEndWave,En,hilbe
 %       Units of crossing times and startEndWave. Default is ms.
 %   Title (string)
 %       Figure title
+%   plotElectrodeNumbers (logical)
+%      Default is false
 %OUTPUT:
 %   PLM (1XnCh)
 %       Phase Latency Map - the times all channel reached the crossings
@@ -28,6 +30,7 @@ function [PLM,f] = plotCrossingsPhysical(selectedCrossings,startEndWave,En,hilbe
 
 f=figure;
 Units='ms';
+plotElectrodeNumbers=false;
 
 for i=1:2:length(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
@@ -57,7 +60,7 @@ pT=(pT-firstCrossing);
 
 %plot the times of crossing in physical space
 % [hCbar]=IntensityPhysicalSpacePlot(chNum,pT,En,'plotElectrodeNumbers',0);
-[hCbar]=IntensityPhysicalSpacePlot(chNum,pT,En,'plotElectrodeNumbers',0,'markerSize',hAmp*60/max(hAmp),'plotSizeBar',0);
+[hCbar]=IntensityPhysicalSpacePlot(chNum,pT,En,'plotElectrodeNumbers',plotElectrodeNumbers,'markerSize',hAmp*60/max(hAmp),'plotSizeBar',0);
 % [hCbar]=IntensityPhysicalSpacePlot(chNum,pT,En,'plotElectrodeNumbers',0,'saturations',hAmp);
 
 ylabel(hCbar,['Time From First Crossing [' Units ']']);
