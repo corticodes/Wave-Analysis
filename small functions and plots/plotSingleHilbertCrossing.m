@@ -38,6 +38,8 @@ plotAdditionalChannels=0;
 normalizeChannels=1;
  
 f=figure;
+hold on
+
 for i=1:2:length(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
 end
@@ -53,6 +55,18 @@ end
 chNum=1:size(singleCrossings,1);
 
 sz=25;
+
+
+if exist('Spikes','var')
+    for i=chNum
+       spikeInd=find(Spikes(i,:));
+       plot(spikeInd, i*ones(1,length(spikeInd)),'or');
+    end
+end
+
+
+
+
 h(1)=scatter(singleCrossings(chNum(1),singleCrossings(chNum(1),:)~=0),chNum(1)*ones(1,numel(singleCrossings(chNum(1),singleCrossings(chNum(1),:)~=0)))+CrossingsVerticalOffset,sz,squeeze(crossingsAmps(1,singleCrossings(chNum(1),:)~=0))');
 hold on
 for i=chNum(2:end)
@@ -69,11 +83,7 @@ h(3)=plot(nan,nan,'--k');
 h(4)=plot(nan,nan,'or');
 end
 
-if exist('Spikes','var')
-    for i=chNum
-       spikeInd=find(Spikes(i,:));
-       plot(spikeInd, i*ones(1,length(spikeInd)),'or');
-    end
+if exist('Spikes','var')    
     if plotLegend
         legend([h(1) h(2) h(3) h(4)],{crossingType,'Filtered Data',['Current Channel (' num2str(channelShown) ')'],'Spikes'})
     end
