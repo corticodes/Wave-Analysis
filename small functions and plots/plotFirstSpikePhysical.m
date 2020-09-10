@@ -15,12 +15,18 @@ function [f,firstSpikes] = plotFirstSpikePhysical(ticPath,startTime,window_ms,sa
 %   Possible Varargs (given as 'key',value pairs):
 %       plotElectrodeNumbers (logical)
 %           Default is falsef=figure;
+%   OUTPUT:
+%       f - figure handle
+%       firstSpikes - array of time to first spikes. NaNs for channels
+%       without spikes within window
 
 plotElectrodeNumbers=false;
 
 for i=1:2:length(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
 end
+
+f=figure;
 
 binSpikes = getSpikeBinMatByChannel(ticPath,startTime,startTime+window_ms,samplingFrequency,max(En(:)));
 
