@@ -18,6 +18,7 @@ function [f] = plotSingleHilbertCrossing(singleCrossings,crossingsAmps,FD,crossi
 %      plotLegend (logical)
 %           True to plot legend (default), False for no legend.
 %           moreChannelsData overrides this to be false.
+%      plotColorbar: default is true
 %      CrossingsVerticalOffset (1x1)
 %           Move Crossings scatter up or down. Default is 0.
 %      moreChannelsData (nChXnSamples)
@@ -32,6 +33,8 @@ function [f] = plotSingleHilbertCrossing(singleCrossings,crossingsAmps,FD,crossi
 %       normalizeChannels (1x1 logical) Normelaize each channel by twice
 %           its mean. default is true.
 
+
+plotColorbar=true;
 plotLegend=true;
 CrossingsVerticalOffset=0;
 plotAdditionalChannels=0;
@@ -111,8 +114,10 @@ if exist('clusterLimits','var')
     end
 end
 
-hcb=colorbar;
-title(hcb,'Hilbert Amplitude [uV]');
+if plotColorbar
+    hcb=colorbar;
+    title(hcb,'Hilbert Amplitude [uV]');
+end
 xlabel('Samples')
 ylabel(['Filtered Data (Channel' num2str(channelShown) ') [uV]'])
 
