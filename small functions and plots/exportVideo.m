@@ -10,7 +10,7 @@ function [] = exportVideo(data,videoDir,frameRate,pixelsPerChannel,varargin)
     %       Video will contain red circles in the right times and channels, 
     %       marking spikes that accured in that channel. Columns are (y,x,sample) 
     %   spikeFrameLength:
-    %       Spikes will last spikeFrameLength frames (default is 10)
+    %       Spikes will last spikeFrameLength frames (default is round(frameRate/2) (0.5s)
     %   pixelsPerSpike (1X1):
     %       Radius of the spike circle. Default is pixelsPerChannel(1)/4.
     %   particlePath (nSamplesX2):
@@ -21,7 +21,7 @@ function [] = exportVideo(data,videoDir,frameRate,pixelsPerChannel,varargin)
     % TODO: Revisit particle path drawing, make sure it works with recent
     % changes
 
-spikeFrameLength=10;
+spikeFrameLength=round(frameRate/2);
 particleSize=10;
 pixelsPerSpike=pixelsPerChannel(1)/4;
 
