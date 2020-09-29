@@ -23,13 +23,20 @@ function waveCenterPath = drawWavePath(singleCrossings,singleHilbertAmps,startEn
 %               If you're drawing for simulated data then 
 %               convertChannelsToMovie is not used and therefor there
 %               should be no flipping.
+%       temporalWeightWidth: How wide is the temporal gaussian Sigma.
+%           The guassian sigma will be temporalWeightWidth times the
+%           average distance between crossings (calculated from crossings
+%           within startEndWindow). Default is 5. If the crossings are 
+%           highley organized spatialy this is good. Otherwise widen the 
+%           width (e.g. change temporalWeightWidth to ~100)
 %   
 %OUTPUT:
-%   waveCenterPath (nSamplesX3) 
+%   waveCenterPath (nSamplesX2) 
 %       coordinates (x,y) of the center of the wave.
 
 flipEn=1;
 splitPLM=1;
+temporalWeightWidth=10;
 
 for i=1:2:numel(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
@@ -69,7 +76,10 @@ end
 
 %normalize crossAmps
 % crossAmps=crossAmps./min(crossAmps(:));
-crossingsLength=max(crossTimes)-min(crossTimes)+1; %this is different from nSamples when startEndWave include more samples than just the crossings (e.g. a whole oscillation period that contains the crossing clusters)
+% crossingsLength=max(crossTimes)-min(crossTimes)+1; %this is different from nSamples when startEndWave include more samples than just the crossings (e.g. a whole oscillation period that contains the crossing clusters)
+
+temporalGaussWeightSigmas=temporalWeightWidth*mean(diff(sort(crossTimes)));
+
 %calculate center of mass for each frame
 
 waveCenterPath=zeros(nSamples,2);
@@ -78,7 +88,7 @@ for i=1:nSamples
    timeDiffs=abs(i-crossTimes); 
 %    timeDiffsNormed=timeDiffs/max(crossTimes(1));%normalize to have same scale as crossAmps
 %    tempWeight=1./(timeDiffs+1); %add 1 so it won't be singular at crossing times
-  tempWeight=exp(-timeDiffs.^2/(2*(crossingsLength/4)^2)); %gaussian with a crossingsLength width
+  tempWeight=exp(-timeDiffs.^2/(2*(temporalGaussWeightSigmas)^2)); %gaussian with a crossingsLength width
    waveCenterPath(i,1)=sum(crossPos(:,1)'.*crossAmps.*tempWeight)/sum(crossAmps.*tempWeight);
    waveCenterPath(i,2)=sum(crossPos(:,2)'.*crossAmps.*tempWeight)/sum(crossAmps.*tempWeight);
 end
