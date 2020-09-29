@@ -74,23 +74,29 @@ for i=1:nChannels
 %     crossingsCount=crossingsCount+nChCrossings;
 end
 
+% order cross times to elongate start and end (to deal with boundaries
+% weight)
+[crossTimesSorted,order]=sort(crossTimes);
+crossAmpsSorted=crossAmps(order);
+crossPosSorted=crossPos(order,1:2);
+
 %normalize crossAmps
 % crossAmps=crossAmps./min(crossAmps(:));
 % crossingsLength=max(crossTimes)-min(crossTimes)+1; %this is different from nSamples when startEndWave include more samples than just the crossings (e.g. a whole oscillation period that contains the crossing clusters)
 
-temporalGaussWeightSigmas=temporalWeightWidth*mean(diff(sort(crossTimes)));
+temporalGaussWeightSigmas=temporalWeightWidth*mean(diff(crossTimesSorted));
 
 %calculate center of mass for each frame
 
 waveCenterPath=zeros(nSamples,2);
 for i=1:nSamples
-%    timeDiffs=exp(-abs(i-crossTimes));
-   timeDiffs=abs(i-crossTimes); 
-%    timeDiffsNormed=timeDiffs/max(crossTimes(1));%normalize to have same scale as crossAmps
+%    timeDiffs=exp(-abs(i-crossTimesSorted));
+   timeDiffs=abs(i-crossTimesSorted); 
+%    timeDiffsNormed=timeDiffs/max(crossTimesSorted(1));%normalize to have same scale as crossAmps
 %    tempWeight=1./(timeDiffs+1); %add 1 so it won't be singular at crossing times
   tempWeight=exp(-timeDiffs.^2/(2*(temporalGaussWeightSigmas)^2)); %gaussian with a crossingsLength width
-   waveCenterPath(i,1)=sum(crossPos(:,1)'.*crossAmps.*tempWeight)/sum(crossAmps.*tempWeight);
-   waveCenterPath(i,2)=sum(crossPos(:,2)'.*crossAmps.*tempWeight)/sum(crossAmps.*tempWeight);
+   waveCenterPath(i,1)=sum(crossPosSorted(:,1)'.*crossAmpsSorted.*tempWeight)/sum(crossAmpsSorted.*tempWeight);
+   waveCenterPath(i,2)=sum(crossPosSorted(:,2)'.*crossAmpsSorted.*tempWeight)/sum(crossAmpsSorted.*tempWeight);
 end
 
 
