@@ -4,8 +4,8 @@ function [crossings,hilbertAmps] = getHilbertCrossings(HTabs,HTangle)
 %   Input: HTabs and HTanlge are the magnitude and angle of the Hilbert
 %   Transform analytic.
 %   Output:
-%   crossings={upCrossings,downCrosings,inhibitions,excitations}
-%   (maxima,minima,excitations,inhibitions)
+%   crossings={upCrossings,downCrosings,inhibitions,excitations} 
+%   (maxima,minima,excitations,inhibitions) in units of samples
 %   hilbertAmps={Hups,Hdowns,Hinhibition,Hexcitation}
 % Todo: make sure that all crossings has same size (paddArray?)
 

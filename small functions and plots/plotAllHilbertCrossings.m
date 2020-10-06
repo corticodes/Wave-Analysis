@@ -56,7 +56,7 @@ color2Mat=hsv2rgb(color2Mat);
 color3Mat=hsv2rgb(color3Mat);
 color4Mat=hsv2rgb(color4Mat);
 
-f=figure;
+h=figure;
 sz=25;
 scatter(upAll(chNum(1),:),chNum(1)*ones(1,numel(upAll(chNum(1),:))),sz,color1Mat(1:arrayWidths,:),'filled');
 hold on
@@ -95,5 +95,8 @@ if exist('Title','var')
 end
 xlabel('Samples')
 ylabel('Filtered Data [uV]')
+if nargout==1
+   f=h; 
+end
 end
 

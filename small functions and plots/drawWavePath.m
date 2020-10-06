@@ -10,7 +10,11 @@ function waveCenterPath = drawWavePath(singleCrossings,singleHilbertAmps,startEn
 %   singleHilbertAmps
 %       Hilbert amplitude of the crossings. One of the four arrays that are 
 %       recived in 'hilbertAmps' by the getHilbertCrossings function
+<<<<<<< HEAD
 %   startEndWave    (1x2) 
+=======
+%   startEndWave (1x2) 
+>>>>>>> master
 %       Array with the indices which define the start and end of the 
 %       window (reletive to beging of trial. i.e. 1 is the start of trial start).
 %   En

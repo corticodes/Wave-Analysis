@@ -9,6 +9,8 @@ function [x,y,t] = simulateSpikes(spikeDist,maxProb)
 %       x - 1XnSpikes horizontal position of nSpikes simulated spikes
 %       y - 1XnSpikes vertical position of nSpikes simulated spikes
 %       t - 1XnSpikes times (samples) of nSpikes simulated spikes
+%   if only one output variable is given it will be the combined array
+%   [x,y,t]
 
 
 range=[min(spikeDist(:)),max(spikeDist(:))];
@@ -22,5 +24,8 @@ binarySpikes=normedDist>=rand(size(normedDist,1),size(normedDist,2),size(normedD
 
 [y,x,t]=ind2sub([size(binarySpikes,1),size(binarySpikes,2),size(binarySpikes,3)],find(binarySpikes));
 
+if nargout==1
+   x=[x,y,t]; 
+end
 end
 
