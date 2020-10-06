@@ -26,9 +26,10 @@ function waveCenterPath = drawWavePath(singleCrossings,singleHilbertAmps,startEn
 %       temporalWeightWidth: How wide is the temporal gaussian Sigma.
 %           The guassian sigma will be temporalWeightWidth times the
 %           average distance between crossings (calculated from crossings
-%           within startEndWindow). Default is 5. If the crossings are 
+%           within startEndWindow). Default is 10. If the crossings are 
 %           highley organized spatialy this is good. Otherwise widen the 
 %           width (e.g. change temporalWeightWidth to ~100)
+%       repEdgesTimes - default 10
 %   
 %OUTPUT:
 %   waveCenterPath (nSamplesX2) 
@@ -37,6 +38,7 @@ function waveCenterPath = drawWavePath(singleCrossings,singleHilbertAmps,startEn
 flipEn=1;
 splitPLM=1;
 temporalWeightWidth=10;
+repEdgesTimes=10;
 
 for i=1:2:numel(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
@@ -74,11 +76,15 @@ for i=1:nChannels
 %     crossingsCount=crossingsCount+nChCrossings;
 end
 
-% order cross times to elongate start and end (to deal with boundaries
+% order cross times and elongate start and end (to deal with boundaries
 % weight)
 [crossTimesSorted,order]=sort(crossTimes);
 crossAmpsSorted=crossAmps(order);
 crossPosSorted=crossPos(order,1:2);
+
+crossTimesSorted=[repmat(crossTimesSorted(1),1,repEdgesTimes) crossTimesSorted repmat(crossTimesSorted(end),1,repEdgesTimes)];
+crossAmpsSorted=[repmat(crossAmpsSorted(1),1,repEdgesTimes) crossAmpsSorted repmat(crossAmpsSorted(end),1,repEdgesTimes)];
+crossPosSorted=[repmat(crossPosSorted(1,1:2),repEdgesTimes,1);crossPosSorted;repmat(crossPosSorted(end,1:2),repEdgesTimes,1)];
 
 %normalize crossAmps
 % crossAmps=crossAmps./min(crossAmps(:));
