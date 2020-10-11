@@ -4,7 +4,7 @@ function [] = exportVideo(data,videoDir,frameRate,pixelsPerChannel,varargin)
 %   videoDir is string with the directory and name of the file to be exported.
 %   pixelsPerChannel [2x1] is how much pixels will each channel get in each frame
 %   (after smoothing) in the x,y direction (not sure that in that order,
-%   check)
+%   check). pixelsPerChannel must be odd numbers!
 %   Varargs (given as 'Name','Value' pairs):
     %   spikeCoordinates (nSpikesX3): 
     %       Video will contain red circles in the right times and channels, 
