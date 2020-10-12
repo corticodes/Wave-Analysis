@@ -24,21 +24,23 @@ function waveCenterPath = drawWavePath(singleCrossings,singleHilbertAmps,startEn
 %               convertChannelsToMovie is not used and therefor there
 %               should be no flipping.
 %       temporalWeightWidth: How wide is the temporal gaussian Sigma.
-%           The guassian sigma will be temporalWeightWidth times the
+%           The maximal guassian sigma will be temporalWeightWidth times the
 %           average distance between crossings (calculated from crossings
-%           within startEndWindow). Default is 10. If the crossings are 
-%           highley organized spatialy this is good. Otherwise widen the 
-%           width (e.g. change temporalWeightWidth to ~100)
-%       repEdgesTimes - default 10
+%           within startEndWindow). This weight is for calculating the COM
+%           samples in the middle. Gaussian temporal weight decreases as 
+%           you get closer to the edges. Default is 10 (Highley organized 
+%           spatialy this is good, otherwise widen the width, e.g. change 
+%           temporalWeightWidth to ~100)
+%       normCoordinates - logical. Spatial coordinates will be normalized 
+%           to the range [0,1] using maximal crossing position
 %   
 %OUTPUT:
 %   waveCenterPath (nSamplesX2) 
 %       coordinates (x,y) of the center of the wave.
 
 flipEn=1;
-splitPLM=1;
 temporalWeightWidth=10;
-repEdgesTimes=10;
+normCoordinates=1;
 
 for i=1:2:numel(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
@@ -52,59 +54,39 @@ nSamples=startEndWave(2)-startEndWave(1)+1; %include edges samples in wave
 nChannels=size(singleCrossings,1);
 
 % %create arrays for all crossing's Amp, Position and times
-% nTotCrossings=nnz(singleCrossings);
-% crossAmps=zeros(nTotCrossings,1);
-% crossPos=zeros(nTotCrossings,2); %(x,y)
-% crossTimes=zeros(nTotCrossings,1);
+
 crossAmps=[];
 crossPos=[]; %(x,y)
 crossTimes=[];
 
-% crossingsCount=0;
 for i=1:nChannels
     [channelPosY,channelPosX]=find(En==i);
     crossInd=find(singleCrossings(i,:)>=startEndWave(1) & singleCrossings(i,:)<=startEndWave(2),1);
-%     nChCrossings=nnz(singleCrossings(i,:));
-%     crossTimes((crossingsCount+1):(crossingsCount+nChCrossings))=singleCrossings(i,1:nChCrossings);
-%     crossAmps((crossingsCount+1):(crossingsCount+nChCrossings))=singleHilbertAmps(i,1:nChCrossings);
-%     crossPos((crossingsCount+1):(crossingsCount+nChCrossings),1:2)=repmat([channelPosX,channelPosY],nChCrossings,1);
     if ~isempty(crossInd)
         crossTimes(length(crossTimes)+1)=singleCrossings(i,crossInd)-startEndWave(1);
         crossAmps(length(crossAmps)+1)=singleHilbertAmps(i,crossInd);
         crossPos(size(crossPos,1)+1,1:2)=[channelPosX,channelPosY];
     end
-%     crossingsCount=crossingsCount+nChCrossings;
 end
 
-% order cross times and elongate start and end (to deal with boundaries
-% weight)
-[crossTimesSorted,order]=sort(crossTimes);
-crossAmpsSorted=crossAmps(order);
-crossPosSorted=crossPos(order,1:2);
-
-crossTimesSorted=[repmat(crossTimesSorted(1),1,repEdgesTimes) crossTimesSorted repmat(crossTimesSorted(end),1,repEdgesTimes)];
-crossAmpsSorted=[repmat(crossAmpsSorted(1),1,repEdgesTimes) crossAmpsSorted repmat(crossAmpsSorted(end),1,repEdgesTimes)];
-crossPosSorted=[repmat(crossPosSorted(1,1:2),repEdgesTimes,1);crossPosSorted;repmat(crossPosSorted(end,1:2),repEdgesTimes,1)];
-
-%normalize crossAmps
-% crossAmps=crossAmps./min(crossAmps(:));
-% crossingsLength=max(crossTimes)-min(crossTimes)+1; %this is different from nSamples when startEndWave include more samples than just the crossings (e.g. a whole oscillation period that contains the crossing clusters)
-
-temporalGaussWeightSigmas=temporalWeightWidth*mean(diff(crossTimesSorted));
+%create shorter temporal weighting width for boundary adjecent samples
+meanCrossDiff=mean(diff(sort(crossTimes)));
+temporalGaussWeightSigmas=[linspace(floor(temporalWeightWidth/5)*meanCrossDiff,temporalWeightWidth*meanCrossDiff,floor(nSamples/2)) linspace(temporalWeightWidth*meanCrossDiff,floor(temporalWeightWidth/5)*meanCrossDiff,ceil(nSamples/2))];
 
 %calculate center of mass for each frame
 
 waveCenterPath=zeros(nSamples,2);
 for i=1:nSamples
-%    timeDiffs=exp(-abs(i-crossTimesSorted));
-   timeDiffs=abs(i-crossTimesSorted); 
-%    timeDiffsNormed=timeDiffs/max(crossTimesSorted(1));%normalize to have same scale as crossAmps
-%    tempWeight=1./(timeDiffs+1); %add 1 so it won't be singular at crossing times
-  tempWeight=exp(-timeDiffs.^2/(2*(temporalGaussWeightSigmas)^2)); %gaussian with a crossingsLength width
-   waveCenterPath(i,1)=sum(crossPosSorted(:,1)'.*crossAmpsSorted.*tempWeight)/sum(crossAmpsSorted.*tempWeight);
-   waveCenterPath(i,2)=sum(crossPosSorted(:,2)'.*crossAmpsSorted.*tempWeight)/sum(crossAmpsSorted.*tempWeight);
+   timeDiffs=abs(i-crossTimes); 
+   tempWeight=exp(-timeDiffs.^2/(2*(temporalGaussWeightSigmas(i))^2));
+   waveCenterPath(i,1)=sum(crossPos(:,1)'.*crossAmps.*tempWeight)/sum(crossAmps.*tempWeight);
+   waveCenterPath(i,2)=sum(crossPos(:,2)'.*crossAmps.*tempWeight)/sum(crossAmps.*tempWeight);
 end
 
+%if normCoordinates, normalize coordinates reletive to chPos max
+if normCoordinates
+    waveCenterPath=waveCenterPath/max(crossPos(:));
+end
 
 
 end
