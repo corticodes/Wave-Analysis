@@ -56,7 +56,7 @@ end
 
 if strcmp(projectionMethod,'closestPoint')
 %find for each dataPoint its closest point on the curve
-    all_dists=sqrt((dataCoordinates(:,1)-waveCenterPath(:,1)').^2+(dataCoordinates(:,2)-waveCenterPath(:,2)').^2+(dataCoordinates(:,3)*maxTimeValue/nSamples-linspace(0,maxTimeValue,nSamples)).^2);
+    all_dists=sqrt((dataCoordinates(:,1)-waveCenterPath(:,1)').^2+(dataCoordinates(:,2)-waveCenterPath(:,2)').^2+(dataCoordinates(:,3)-linspace(0,maxTimeValue,nSamples)).^2);
     [dists,inds]=min(all_dists,[],2);
     projections=cureveLength(inds);
     projected=1:nDataPoints;
