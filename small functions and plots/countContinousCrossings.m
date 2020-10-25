@@ -1,4 +1,3 @@
-%#codegen
 function [nChInWave,channels,times] = countContinousCrossings(allCrossings,En,maxTempDist,channels,times)
 %COUNTCONTINOUSCROSSINGS is a recursive function that counts how many 
 %channels have crossings that are connected (in space and time), i.e. how 
