@@ -27,7 +27,7 @@ function [clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedCh
 %           plotted using the style plotStyles{((i-1) mod numel(plotStyles))+1}.
 %           So if you want triplets of clusters to be bluee,red,green dots
 %           repeatedly then use {'.b','.r','.g'}. Default is {'.b'}. 
-%           -   plotSpikes - logical - self explanatory
+%           -   plotSpikes - logical - Default is true.
 %
 %       Output:
 %       -   clusterLimits (nGoodClustersX2) - position (samples) of the
