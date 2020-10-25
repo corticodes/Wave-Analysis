@@ -362,3 +362,63 @@ xlabel('Neuron')
 ylabel('Phase [Degree]')
 ylim([0 360])
 xlim([0 nNeurons+7])
+
+%% Blast from the Past! %for thesis presentation - Continued in \\sil2\literature\Projects\corplex\progress reports\figs for PR 201021\scriptForPlots.m
+
+Experiments=getRecording('E:\Yuval\Analysis\spikeSorting\cleanCheck.xlsx','recNames=U4_071014_Images3');
+triggers=Experiments.currentDataObj.getTrigger;
+
+trigsNums=1:100;
+startTimes=triggers{5}(trigsNums); %ms
+ignoreSample=4000; %ignore first 200ms
+window_tot_ms=1500; %ms
+nCh=120; %number of channels - in code this will channels arrays will be 1:nCh
+bandpass=[0 2];
+% singleChannel=113;
+nAngles=360;
+timeBin=10; %ms. for every angle timestamp count spikes in timestamp-timeBin/2:timestamp+timeBin/2
+% timeBin1=10;
+% timeBin2=50;
+ticPath='E:\Yuval\Analysis\spikeSorting\sample data\U4\U4_071014_Images3001_layout_100_12x12_gridSorter FROM MARK.mat';
+
+
+nTrigs=numel(trigsNums);
+ 
+
+[FDsequence,HTsequence,timeSequence,data,FD,HT] = getDataSequence(Experiments.currentDataObj,startTimes,window_tot_ms,ignoreSample,bandpass);
+HTabs=abs(HTsequence);
+HTangle=angle(HTsequence);
+
+
+ignoreTime_ms=ignoreSample/Experiments.currentDataObj.samplingFrequency*1000;
+[relevantTIC,nRelevant] = getRelevantSpikes(ticPath,startTimes+ignoreTime_ms,window_tot_ms-ignoreTime_ms,numel(startTimes));
+spikePhase = getSpikePhase(relevantTIC,HTangle,timeSequence);
+% [roundSpikePhase,neuronMostFrequentPhase,neuronMostFrequentPhaseCount,frequentPhaseProbabilityForNeuron] = calcNeuronFreqPhase(relevantTIC,spikePhase);
+% nNeurons=numel(neuronMostFrequentPhase);
+
+% hist(roundSpikePhase,25)
+figure
+plotPhaseSpikeScatter(relevantTIC,spikePhase,relevantTIC(3,end),'Spike Phase Plot - unclustered');
+
+spikePhaseAngles=round(spikePhase(1,:)*180/pi);
+spikePhaseAngles(spikePhaseAngles<=0)=spikePhaseAngles(spikePhaseAngles<=0)+360;
+hist(spikePhaseAngles,360)
+
+croppedStartStimes=startTimes+ignoreSample*1000/Experiments.currentDataObj.samplingFrequency;
+croppedEndTimes=startTimes+window_tot_ms;
+binSpikes = getSpikeBinMatByChannel(ticPath,croppedStartStimes,croppedEndTimes,Experiments.currentDataObj.samplingFrequency,nCh);
+
+[spikeRate] = calcSpikeRate2(binSpikes,HTangle,100,Experiments.currentDataObj.samplingFrequency);
+plot(1:360,spikeRate)
+
+subSequenceAngles=round(HTangle_sub(1,:)*180/pi);
+subSequenceAngles(subSequenceAngles<=0)=subSequenceAngles(subSequenceAngles<=0)+360;
+average_FD = accumarray(subSequenceAngles',FD_sub_sequence(1,:),[],@(x) mean(x,1));
+figure
+plot(subSequenceAngles,FD_sub_sequence(1,:),'.','color',[1 1 1]*0.5,'LineWidth',0.5)
+hold on
+plot(unique(subSequenceAngles),average_FD,'k','LineWidth',3)
+title(['Filtered Signal vs Hilbert Phase - ch1 triggers 1:2 ignoreSample' num2str(ignoreSample)])
+legend('Filtered Data','Average')
+xlabel('Hilbert Phase [Degree]')
+ylabel('Signal [uV]')
