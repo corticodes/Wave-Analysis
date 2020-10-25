@@ -1,8 +1,15 @@
-function [crossings,hilbertAmps] = getHilbertCrossings(HTabs,HTangle)
+function [crossings,hilbertAmps] = getHilbertCrossings(HTabs,HTangle,varargin)
 %GETHILBERTCROSSINGS returns cell arrays crossings and hilberAmps which
 %contain all the upward and downward crossings, exitation and inhibition phases crossings, and the hilbert amplitudes at these times 
 %   Input: HTabs and HTanlge are the magnitude and angle of the Hilbert
 %   Transform analytic.
+%   Possible varargins (given as 'key',value pairs):
+%       -   exitationPhase [-pi,pi] - The phase associated with halfwaydown
+%       crossing. Default is calculated as half of the maximal angle in
+%       HTangle.
+%       - inhibitionPhase [-pi,pi] - The phase associated with halfwayup
+%       crossing. Default is calculated as half of the minimal angle in
+%       HTangle.
 %   Output:
 %   crossings={upCrossings,downCrosings,inhibitions,excitations} 
 %   (maxima,minima,excitations,inhibitions) in units of samples
@@ -10,6 +17,14 @@ function [crossings,hilbertAmps] = getHilbertCrossings(HTabs,HTangle)
 % Todo: make sure that all crossings has same size (paddArray?)
 
 chNum=1:size(HTabs,1);
+
+excitationPhase=max(max(HTangle))/2; %When phase is positive oscilation is going down (excitation)
+% excitationPhase=100*pi/180; %we saw that for slow waves, this is the most frequent phase
+inhibitionPhase=min(min(HTangle))/2; %When phase is negative oscilation is going up (inhibition)
+
+for i=1:2:length(varargin)
+   eval([varargin{i} '=varargin{' num2str(i+1) '};']);
+end
 
 arrayWidths=100;
 upAll=zeros(numel(chNum),arrayWidths);
@@ -20,9 +35,6 @@ Hdowns=zeros(numel(chNum),arrayWidths); %the value of Hilbert magnitude at these
 Hups=zeros(numel(chNum),arrayWidths);
 Hinhibition=zeros(numel(chNum),arrayWidths);
 Hexcitation=zeros(numel(chNum),arrayWidths); 
-
-excitationPhase=max(max(HTangle))/2; %When phase is positive oscilation is going down (excitation)
-inhibitionPhase=min(min(HTangle))/2; %When phase is negative oscilation is going up (inhibition)
 
 for i=chNum
     %downward crossing: minima. upward crossing: maxima
