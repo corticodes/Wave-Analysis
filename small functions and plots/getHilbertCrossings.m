@@ -1,6 +1,6 @@
 function [crossings,hilbertAmps] = getHilbertCrossings(HTabs,HTangle,varargin)
 %GETHILBERTCROSSINGS returns cell arrays crossings and hilberAmps which
-%contain all the upward and downward crossings, exitation and inhibition phases crossings, and the hilbert amplitudes at these times 
+%contain all the upward and downward crossings, inhibition and exitation phases crossings, and the hilbert amplitudes at these times 
 %   Input: HTabs and HTanlge are the magnitude and angle of the Hilbert
 %   Transform analytic.
 %   Possible varargins (given as 'key',value pairs):
@@ -12,7 +12,7 @@ function [crossings,hilbertAmps] = getHilbertCrossings(HTabs,HTangle,varargin)
 %       HTangle.
 %   Output:
 %   crossings={upCrossings,downCrosings,inhibitions,excitations} 
-%   (maxima,minima,excitations,inhibitions) in units of samples
+%   (maxima,minima,inhibitions,excitations) in units of samples
 %   hilbertAmps={Hups,Hdowns,Hinhibition,Hexcitation}
 % Todo: make sure that all crossings has same size (paddArray?)
 
