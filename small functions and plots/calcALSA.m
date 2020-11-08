@@ -44,7 +44,7 @@ if exist('En','var')
         end
     elseif nNearestChannels==8
          for i=1:nCh
-            [nn,nnn]=getNeighbors(channel,En);
+            [nn,nnn]=getNeighbors(i,En);
             ALSA(i,:)=(spikingRate(i,:)+sum(spikingRate(nn,:))*0.5+sum(spikingRate(nnn,:))*0.25)/4; %give nn half the weight,nnn quarter weight, and average by total weight (1+0.5*4+0.25*4)
         end
     else
