@@ -63,7 +63,7 @@ sz=25;
 if exist('Spikes','var')
     for i=chNum
        spikeInd=find(Spikes(i,:));
-       plot(spikeInd, i*ones(1,length(spikeInd)),'or');
+       plot(spikeInd, i*ones(1,length(spikeInd)),'.r');
     end
 end
 
@@ -83,7 +83,7 @@ if plotLegend
 h(1)=plot(nan,nan,'ob');
 h(2)=plot(nan,nan,'b');
 h(3)=plot(nan,nan,'--k');
-h(4)=plot(nan,nan,'or');
+h(4)=plot(nan,nan,'.r');
 end
 
 if exist('Spikes','var')    
