@@ -33,6 +33,10 @@ for i=unique(ic(1,:))
         for k=1:nTrials
             neuronSpikesInWindow=neuronSpikes(neuronSpikes>=start_times_ms(k) & neuronSpikes<=end_times_ms(k));
             neuronInd=round((neuronSpikesInWindow-start_times_ms(k))*ms2sample);
+            %make sure no bugs if spike is on the first Sample
+            if ~isempty(neuronInd) && k==1 && neuronInd(1)==0 
+                neuronInd(1)=1;
+            end   
             binSpikes(i,(k-1)*window_samples+neuronInd)=true;
         end
     end
