@@ -11,6 +11,8 @@ function [f] = plotSingleHilbertCrossing(singleCrossings,crossingsAmps,FD,crossi
 %   Varargins (given as 'Key'Value pairs:
 %      Spikes (logical nChXnSamples)
 %           Plots a red circle where Spikes is true
+%      spikesStyle (String)
+%           Style of spikes. Default is '.r'
 %      Title (string)
 %           Figure title
 %      clusterLimits (nClusterX2)
@@ -39,7 +41,8 @@ plotLegend=true;
 CrossingsVerticalOffset=0;
 plotAdditionalChannels=0;
 normalizeChannels=1;
- 
+spikesStyle='.r';
+
 f=figure;
 hold on
 
