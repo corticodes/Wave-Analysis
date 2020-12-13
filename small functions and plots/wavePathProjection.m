@@ -1,4 +1,4 @@
-function [projections,dists,projected] = wavePathProjection(waveCenterPath,dataCoordinates,maxTimeValue,varargin)
+function [projections,dists,fullPathLength,projected] = wavePathProjection(waveCenterPath,dataCoordinates,maxTimeValue,varargin)
 %wavePathProjection calculates the projection of all points in
 %dataCoordinates onto the waveCenterPath curve by finding for each data 
 %point in dataCoordinates its closest point in waveCenterPath curve 
@@ -17,7 +17,7 @@ function [projections,dists,projected] = wavePathProjection(waveCenterPath,dataC
 %       - VARARGIN:
 %           -   strechDataTemporalCoordinate - strech data temporal
 %           coordinate to the range 1:nSamples. Default is 1.
-%           -   'projectionMethod','normalPlane' - 'closestPoint'/'normalPlane'. The method 
+%           -   projectionMethod - 'closestPoint'/'normalPlane'. The method 
 %           by which a point on the curve is assigned to every. Closest
 %           point is self explanatory and default. When using normalPlane,
 %           the plane normal to the tangent of the wave path at step i is
@@ -32,7 +32,10 @@ function [projections,dists,projected] = wavePathProjection(waveCenterPath,dataC
 %       point on the curve closest to the dataCoordinates(i,:)
 %       - dists (nDatapointX1) - the distanced from the curve to the data
 %       points (euclidean)
-%       - noProj - array with indexes of channels that had no projections
+%       - fullPathLength - the full length of the wave path itself
+%       - projected - array with indexes of channels that were projected.
+%       Relevant for projection method 'normalPlane'
+%   
 
 strechDataTemporalCoordinate=1;
 projectionMethod='closestPoint';
@@ -48,6 +51,7 @@ nDataPoints=size(dataCoordinates,1);
 %calculate length along curve
 curveLocalLengths=sqrt((waveCenterPath(2:(end),1)-waveCenterPath(1:(end-1),1)).^2+(waveCenterPath(2:(end),2)-waveCenterPath(1:(end-1),2)).^2+(maxTimeValue/nSamples)^2); %layoutSize/nSamples frame is the normalized temporal distance between each point on the curve 
 cureveLength=[0 cumsum(curveLocalLengths)'];
+fullPathLength=cureveLength(end);
 
 %strech temporal data coordinates
 if strechDataTemporalCoordinate
