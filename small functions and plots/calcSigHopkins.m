@@ -17,6 +17,8 @@ function [sigHop,Y,hopkinses] = calcSigHopkins(nDataPoints,d,varargin)
 %       madRange for d=2
 %       - nMedianDeviations,centerIsAverage - values relevant for madRange.
 %       Default are 2,1
+%       - tempSaveFile - if given, function saves the calculated hopkins in
+%       this location every 1000 iterations.
 
 hopkinsIterations=1000;
 simulationIterations=1000000;
@@ -38,6 +40,9 @@ hopkinses=zeros(1,simulationIterations);
 for i=1:simulationIterations
     if mod(i,1000)==0
         disp(num2str(i))
+        if exist('tempSaveFile','var')
+            save(tempSaveFile,'hopkinses')
+        end
     end
     if d==1
     dataPoints=[rand(nDataPoints,1) ones(nDataPoints,1)];

@@ -12,7 +12,8 @@ function [relevantTIC,nRelevant,tIc] = getRelevantSpikes(ticPath,startTimes,wind
 %   !!!NOTICE!!! The neuron numbering in relevantTIC is different than that in
 %   tIC. tIc neuron are numbered from 1:nNeurons, and relevantTIC neurons
 %   are numbered from 1 to the number of neurons that fired in the time
-%   windows
+%   windows. Both are different from neuron numbering in ic, which counts
+%   the neurons within each channel
 
 
 

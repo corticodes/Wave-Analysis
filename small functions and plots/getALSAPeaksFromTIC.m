@@ -17,6 +17,11 @@ function [ALSA_Locs,relevantChannels] = getALSAPeaksFromTIC(ticPath,startTime,wi
 %           ALSA maxima. i.e. First all alsa maxima are found, and then the
 %           first maximum within this window is taken. Default is 
 %           [1 nSamples]
+%           - onsetType - Method for detecting local spiking onset. Can be
+%           either 'firstMax' (default) or 'stdCrossings'.
+%           - nSTD - relvent for onsetType='stdCrossings'. ALSA
+%           onset will be detected when spiking rate crosses nSTD stds.
+%           Default is 2
 %   OUPUT
 %       - ALSA_Locs (1XnRelevantChannels) - locations of first ALSA maxima, given in samples
 %       (couting from the start of the recording, not startEndWindow(1)).
@@ -25,6 +30,9 @@ function [ALSA_Locs,relevantChannels] = getALSAPeaksFromTIC(ticPath,startTime,wi
 
 spikeRateSmoothing=2000;
 startEndWave=[1 window_ms*samplingFrequency/1000];
+onsetType='firstMax';
+nSTD=2;
+
 
 for i=1:2:length(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
@@ -41,13 +49,25 @@ ALSA=calcALSA(spikingRateDataFormatSmoothed,'En',En);
 % Find each channel's first peak withihn window
 ALSA_Locs=zeros(1,nCh);
 
-for i=1:nCh
-    [~,chlocs]=findpeaks(ALSA(i,:));
-    firstPeakInWindow=find(chlocs>=startEndWave(1) & chlocs<=startEndWave(2),1);
-    if isempty(firstPeakInWindow)
-        ALSA_Locs(i)=NaN;
-    else
-        ALSA_Locs(i)=chlocs(firstPeakInWindow);
+if strcmp(onsetType,'firstMax')
+    for i=1:nCh
+        [~,chlocs]=findpeaks(ALSA(i,:));
+    %     firstPeakInWindow=find(chlocs>=startEndWave(1) & chlocs<=startEndWave(2),1);
+        if isempty(chlocs) || chlocs(1)<startEndWave(1) || chlocs(1)>startEndWave(2)
+            ALSA_Locs(i)=NaN;
+        else
+            ALSA_Locs(i)=chlocs(1);
+        end
+    end
+else 
+    chSTDs=std(ALSA,0,2);
+    for i=1:nCh
+        chLoc=find(ALSA(i,1:end-1)<nSTD*chSTDs(i)&ALSA(i,2:end)>=nSTD*chSTDs(i),1);
+        if isempty(chLoc) || chLoc<startEndWave(1) || chLoc>startEndWave(2)
+            ALSA_Locs(i)=NaN;
+        else
+            ALSA_Locs(i)=chLoc;
+        end
     end
 end
 
