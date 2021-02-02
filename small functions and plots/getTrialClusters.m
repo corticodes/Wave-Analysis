@@ -1,6 +1,9 @@
 function [clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedChannels] = getTrialClusters(crossings,En,maxTempDist,minChannelInWave,binSpikes,varargin)
 %FINDCONTINUOUSCLUSTERS finds the start and end times of spatiotemporal 
 % continuous crossing clusters, representing waves. 
+%       Example usage:
+%   [clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedChannels] = getTrialClusters(crossings{crossingType},En,1500,80,binSpikes,'plotTrialsClusters',1,'hilbertAmps',hilbertAmps{crossingType},'plotStyles',{'b.','g.'});
+
 %       Input:
 %       -   crossings: nChXnCrossings crossings times (one of the 4 
 %       "crossings" matrices given by getHilbertCrossings)
