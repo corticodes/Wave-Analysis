@@ -17,6 +17,7 @@ function [ALSA_Locs,relevantChannels] = getALSAPeaksFromTIC(ticPath,startTime,wi
 %           ALSA maxima. i.e. First all alsa maxima are found, and then the
 %           first maximum within this window is taken. Default is 
 %           [1 nSamples]
+%           - outputUnits - 'samples' (default) or 'ms'
 %           - onsetType - Method for detecting local spiking onset. Can be
 %           either 'firstMax' (default) or 'stdCrossings'.
 %           - nSTD - relvent for onsetType='stdCrossings'. ALSA
@@ -32,7 +33,7 @@ spikeRateSmoothing=2000;
 startEndWave=[1 window_ms*samplingFrequency/1000];
 onsetType='firstMax';
 nSTD=2;
-
+outputUnits='samples';
 
 for i=1:2:length(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
@@ -75,5 +76,8 @@ relevantChannels=find(~isnan(ALSA_Locs));
 irrelevantChannels=setdiff(1:nCh,relevantChannels);
 ALSA_Locs(irrelevantChannels)=[];
 
+if strcmp(outputUnits,'ms')
+   ALSA_Locs=ALSA_Locs/samplingFrequency*1000;
+end
 end
 
