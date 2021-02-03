@@ -14,6 +14,8 @@ function [ALSAPhases,ALSAPhasesAngles,lockCoef,FD,HTabs,HTangle] = getBandALSAPh
 %           - minHilbertAmp - only count hilbert phases with hilbert
 %           amplitudes larger then this value. Default is 0.
 %           - FD,HTabs,HTangle - if they were already calculated use it to save time
+%           - cropSamples - if given, uses only FD(:,:,cropSamples(1):cropSamples(1))
+%           (same goes to HTabs,HTangle). Default is [1 size(data,3)]
 
 %
 %   OUTPUT:
@@ -26,10 +28,13 @@ function [ALSAPhases,ALSAPhasesAngles,lockCoef,FD,HTabs,HTangle] = getBandALSAPh
 
 
 minHilbertAmp=0;
-checkLockingOf='ALSA';
 
 for i=1:2:length(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
+end
+
+if ~exist('cropSamples','var')
+   cropSamples=[1 size(data,3)];
 end
 
 nTrials=size(data,2);
@@ -38,10 +43,13 @@ if ~(exist('FD','var') && exist('HTabs','var') && exist('HTangle','var'))
     [FD,~,HTabs,HTangle] = BPnHilbert(data,band);
 end
 
+croppedHTangle=HTangle(:,:,cropSamples(1):cropSamples(2));
+croppedHTabs=HTabs(:,:,cropSamples(1):cropSamples(2));
+
 ALSAPhases=[];
 for i=1:nTrials
-    phases=HTangle(sub2ind(size(HTangle),ALSAPeakChannels{i},i*ones(1,length(ALSAPeakLocs{i})),ALSAPeakLocs{i}));
-    amps=HTabs(sub2ind(size(HTabs),ALSAPeakChannels{i},i*ones(1,length(ALSAPeakLocs{i})),ALSAPeakLocs{i}));
+    phases=croppedHTangle(round(sub2ind(size(croppedHTangle),ALSAPeakChannels{i},i*ones(1,length(ALSAPeakLocs{i})),round(ALSAPeakLocs{i}))));
+    amps=croppedHTabs(sub2ind(size(croppedHTabs),ALSAPeakChannels{i},i*ones(1,length(ALSAPeakLocs{i})),round(ALSAPeakLocs{i})));
     ALSAPhases=[ALSAPhases phases(amps>minHilbertAmp)];
 end
 
