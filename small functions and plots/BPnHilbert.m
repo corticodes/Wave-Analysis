@@ -10,13 +10,18 @@ function [FD,HT,HTabs,HTangle] = BPnHilbert(data,bandpass,varargin)
 %   angle is the hilbert phase.
 %   For Low/High pass use bandpass=[0 LP] or bandpass=[HP 0] respectively
 %   Varargin:
-%       -   cutwidths: cutwidths(1) to the right of bandpass(1), 
-%       cutwidths(2) to the left of bandpass(2). Default is [2 2]
+%       -   usePassStop - Use pass and stop frequencies for BP
+%       frequencies. When False (default), filter is designed using 
+%       highPassCutoff,lowPassCutoff. When true it uses lowPassStopCutoff, 
+%       lowPassPassCutoff, highPassStopCutoff and highPassPassCutoff/
+%       -   cutwidths: when usePassStop is true, 
+%       F.highPassStopCutoff=bandpass(1)-cutwidths(1) and
+%       lowPassStopCutoff=bandpass(2)+cutwidths(2). Default is [2 2].
 %       -   SamplingFrequency - self explanatory
 
 %TODO: QA high pass
 
-
+usePassStop=0;
 cutwidths=[2 2]; %
 SamplingFrequency=20000;
 for i=1:2:length(varargin)
@@ -26,10 +31,15 @@ end
 F=filterData(SamplingFrequency);
 F.padding=true;
 if all(bandpass) %no zeros
-    F.lowPassStopCutoff=bandpass(2)+cutwidths(2); %low-pass cutoff frequency
-    F.lowPassPassCutoff=bandpass(2);
-    F.highPassStopCutoff=bandpass(1)-cutwidths(1); %high-pass cutoff frequency
-    F.highPassPassCutoff=bandpass(1);
+    if usePassStop
+        F.lowPassStopCutoff=bandpass(2)+cutwidths(2); %low-pass cutoff frequency
+        F.lowPassPassCutoff=bandpass(2);
+        F.highPassStopCutoff=bandpass(1)-cutwidths(1); %high-pass cutoff frequency
+        F.highPassPassCutoff=bandpass(1);
+    else
+        F.highPassCutoff=bandpass(1);
+        F.lowPassCutoff=bandpass(2);
+    end
     F=F.designBandPass;
 elseif bandpass(1)==0 %low pass filter
     F.lowPassCutoff=bandpass(2);
