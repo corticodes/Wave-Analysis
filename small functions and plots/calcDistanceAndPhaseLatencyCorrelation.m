@@ -19,7 +19,7 @@ chPos = calcChannelsPosition(En);
 %leave only relevant channels
 
 %get first channel to cross
-waveStartCh=channels(crossingTimes==min(crossingTimes));
+waveStartCh=channels(find(crossingTimes==min(crossingTimes),1));
 %calc dists from the channel
 
 dists=sqrt((chPos(:,1)-chPos(waveStartCh,1)).^2+(chPos(:,2)-chPos(waveStartCh,2)).^2);
