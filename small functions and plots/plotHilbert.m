@@ -1,4 +1,4 @@
-function [] = plotHilbert(FD_SC,HTabs_SC,HTangle_SC,time,trig,singleChannel,markPhase)
+function [f] = plotHilbert(FD_SC,HTabs_SC,HTangle_SC,time,trig,singleChannel,markPhase)
 %PLOTHILBERT plots the hilbert amplitude HTAbs_SC and phase HTangle_SC against
 %the filtered data FD_SC from which it was calculated.
 %   FD_SC,HTabs_SC and HTangle are the filtered data, hilbert amplitude and
@@ -11,6 +11,9 @@ function [] = plotHilbert(FD_SC,HTabs_SC,HTangle_SC,time,trig,singleChannel,mark
 if  exist('markPhase','var')
     findPhaseRadShifted=markPhase*pi/180;
     phaseInd=find(HTangle_SC(1:end-1)<findPhaseRadShifted & HTangle_SC(2:end)>=findPhaseRadShifted);
+end
+if nargout>0
+    f=figure;
 end
 
 if ~isempty(time)
