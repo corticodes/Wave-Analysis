@@ -25,7 +25,7 @@ function [ALSA_Locs,relevantChannels] = getALSAPeaksFromTIC(ticPath,startTime,wi
 %           Default is 2
 %   OUPUT
 %       - ALSA_Locs (1XnRelevantChannels) - locations of first ALSA maxima, given in samples
-%       (couting from the start of the recording, not startEndWindow(1)).
+%       (couting from the startTime, not startEndWindow(1)).
 %       - relevantChannels (1XnRelevantChannels) - List of the channels 
 %       that had an ALSA max within window
 
