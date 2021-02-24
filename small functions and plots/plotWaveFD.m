@@ -35,8 +35,8 @@ for i=1:nRepresentativeChannels
 end
 
 %     pos=get(gcf,'Position')
-set(gcf,'Position',[611   682   777   245]);
-
+% set(gcf,'Position',[681   635   380   380]);
+axis square
 xlabel('Time [ms]','FontSize',20)
 ylabel('Filtered Data','FontSize',20)
 set(gca,'ytick',[])
