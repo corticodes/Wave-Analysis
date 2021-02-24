@@ -31,6 +31,7 @@ function [PLM,f] = plotCrossingsPhysical(selectedCrossings,startEndWave,En,hilbe
 f=figure;
 Units='ms';
 plotElectrodeNumbers=false;
+plotSizeBar=0;
 
 for i=1:2:length(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
@@ -60,7 +61,7 @@ pT=(pT-firstCrossing);
 
 %plot the times of crossing in physical space
 % [hCbar]=IntensityPhysicalSpacePlot(chNum,pT,En,'plotElectrodeNumbers',0);
-[hCbar]=IntensityPhysicalSpacePlot(chNum,pT,En,'plotElectrodeNumbers',plotElectrodeNumbers,'markerSize',hAmp*60/max(hAmp),'plotSizeBar',0);
+[hCbar]=IntensityPhysicalSpacePlot(chNum,pT,En,'plotElectrodeNumbers',plotElectrodeNumbers,'markerSize',hAmp*60/max(hAmp),'plotSizeBar',plotSizeBar);
 % [hCbar]=IntensityPhysicalSpacePlot(chNum,pT,En,'plotElectrodeNumbers',0,'saturations',hAmp);
 
 ylabel(hCbar,['Time From First Crossing [' Units ']']);
