@@ -66,7 +66,7 @@ sz=25;
 if exist('Spikes','var')
     for i=chNum
        spikeInd=find(Spikes(i,:));
-       plot(spikeInd, i*ones(1,length(spikeInd)),'.r');
+       plot(spikeInd, i*ones(1,length(spikeInd)),'.k');
     end
 end
 
