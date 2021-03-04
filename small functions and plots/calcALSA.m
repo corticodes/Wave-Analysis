@@ -40,12 +40,12 @@ if exist('En','var')
     if nNearestChannels==4
         for i=1:nCh
             [nn,~]=getNeighbors(i,En);
-            ALSA(i,:)=(spikingRate(i,:)+sum(spikingRate(nn,:))*0.5)/3; %give nn half the weight, and average by total weight (1+0.5*4)
+            ALSA(i,:)=(spikingRate(i,:)+sum(spikingRate(nn,:))*0.5)/(1+0.5*length(nn)); %give nn half the weight, and average by total weight (1+0.5*4)
         end
     elseif nNearestChannels==8
          for i=1:nCh
             [nn,nnn]=getNeighbors(i,En);
-            ALSA(i,:)=(spikingRate(i,:)+sum(spikingRate(nn,:))*0.5+sum(spikingRate(nnn,:))*0.25)/4; %give nn half the weight,nnn quarter weight, and average by total weight (1+0.5*4+0.25*4)
+            ALSA(i,:)=(spikingRate(i,:)+sum(spikingRate(nn,:))*0.5+sum(spikingRate(nnn,:))*0.25)/(1+0.5*length(nn)+0.25*length(nnn)); %give nn half the weight,nnn quarter weight, and average by total weight (1+0.5*4+0.25*4)
         end
     else
         error('If Electrode En array is given, nNearestChannels must be either 4 or 8')
