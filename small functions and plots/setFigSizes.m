@@ -27,7 +27,7 @@ if ~isempty(ax.Legend)
 end
 
 if ~isempty(ax.Colorbar)
-    ax.Colorbar.FontSize=colorbarSize;
+    ax.Colorbar.FontSize=legendSize;
 end
 
 end
