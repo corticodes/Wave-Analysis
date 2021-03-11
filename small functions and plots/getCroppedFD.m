@@ -21,6 +21,8 @@ function [data,time,FD,HT,HTabs,HTangle] = getCroppedFD(recObj,startTimes,window
 %       - trialsInBatch - if returnAVG is set to 1, this variable can be
 %       used to calculate the average in batches. Default is all trials,
 %       i.e. length(startTimes). This must be a divisor of numer of trials.
+%       - smoothFD - if true, spatially smoothes FD before calculating
+%       Hilbert transform (only for non-average for now). Default is false.
 %   OUTPUT:
 %       if returnAVG=1, data will only contain the data from last batch
 %
@@ -38,6 +40,7 @@ function [data,time,FD,HT,HTabs,HTangle] = getCroppedFD(recObj,startTimes,window
 nTrials=length(startTimes);
 returnAVG=0;
 trialsInBatch=nTrials;
+smoothFD=false;
 
 for i=1:2:length(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
@@ -53,7 +56,15 @@ windenBySamples=widenBy*recObj.samplingFrequency/1000;
 
 if ~returnAVG
     [data,time]=recObj.getData([],startTimes-widenBy,window_ms+2*widenBy);
-    [FD,HT,HTabs,HTangle] = BPnHilbert(data,band);
+    if smoothFD
+        if exist('GaussSigma','var')
+            [FD,HT,HTabs,HTangle] = BPnHilbert(data,band,'smoothFD',smoothFD,'En',En,'GaussSigma',GaussSigma);
+        else
+            [FD,HT,HTabs,HTangle] = BPnHilbert(data,band,'smoothFD',smoothFD,'En',En);
+        end
+    else
+         [FD,HT,HTabs,HTangle] = BPnHilbert(data,band);
+    end
 else
     FDsum=zeros(recObj.totalChannels,trialsInBatch,window_sample+2*windenBySamples);
     fprintf('\nBatch Num (/%d) : ',nBatches);

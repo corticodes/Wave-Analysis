@@ -18,12 +18,20 @@ function [FD,HT,HTabs,HTangle] = BPnHilbert(data,bandpass,varargin)
 %       F.highPassStopCutoff=bandpass(1)-cutwidths(1) and
 %       lowPassStopCutoff=bandpass(2)+cutwidths(2). Default is [2 2].
 %       -   SamplingFrequency - self explanatory
+%       - smoothFD - if true, spatially smoothes FD before calculating
+%       Hilbert transform (only for non-average for now). Default is false.
+%       requires En.
+%       - En - needed for smoothing - electrode map
+%       - GaussSigma - gaussian width. default 3
 
 %TODO: QA high pass
 
 usePassStop=0;
 cutwidths=[2 2]; %
 SamplingFrequency=20000;
+smoothFD=false;
+GaussSigma=3;
+
 for i=1:2:length(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
 end
@@ -51,9 +59,18 @@ end
 
 FD=F.getFilteredData(data);
 
+if smoothFD
+    hsize=size(En);
+    h=fspecial('gaussian',hsize,GaussSigma);
+    for i=1:size(FD,2)
+        FDmovie=convertChannelsToMovie(squeeze(FD(:,i,:)),En,'BGVal',0,'flipEn',0);
+        FDmovieFiltered=imfilter(FDmovie,h);
+        FD(:,i,:)=convertMovieToChannels(FDmovieFiltered,En);
+    end
+end
+
 if nargout>1
     HT=zeros(size(FD));
-
     for i=1:size(FD,2)
         HT(:,i,:)=hilbert(squeeze(FD(:,i,:))').';
     end
