@@ -9,7 +9,9 @@ function movieData = convertChannelsToMovie(chData,En,varargin)
 %       corners). Default value is min(chData(:)) (or min of Channels)
 %   Channels (1XnCh):
 %       Channels to export - all other channels will contain BGVal
+%   flipEn (logical) - if false En is not flipped. Defualt true.
 
+flipEn=1;
 
 for i=1:2:numel(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
@@ -40,7 +42,9 @@ nCh=max(En(:));
 
 movieData=BGVal*ones(frameHeight,frameWidth,size(chData,2));
 
-En=flipud(En);
+if flipEn
+    En=flipud(En);
+end
 for i=1:nCh
     [chPosY,chPosX]=find(En==i);
     movieData(chPosY,chPosX,:)=chData(i,:);
