@@ -29,7 +29,8 @@ end
 
 saveas(f,[savePath imgName '.jpg'])
 if saveEPS
-    saveas(f,[savePath imgName],'epsc')
+%     saveas(f,[savePath imgName],'epsc')
+    print(f,'-r300',[savePath imgName '.eps'],'-depsc','-tiff')
 end
 savefig(f,[figSaveDir imgName '.fig'])
 end
