@@ -1,4 +1,4 @@
-function [h] = plotWaveFD(time,FD,waveChannels,waveTimes,pathChannels,samplingFrequency)
+function [h] = plotWaveFD(time,FD,waveChannels,waveTimes,pathChannels,samplingFrequency,varargin)
 %PLOTWAVEFD Plots the filtered data FD of examplary channels through which
 %the waveCenterPath goes through. 
 %   INPUT:
@@ -12,6 +12,11 @@ function [h] = plotWaveFD(time,FD,waveChannels,waveTimes,pathChannels,samplingFr
 %   - waveChannels,waveTimes - channels and crossings times of wave
 %   pattern, as given by getClusterFirstCrossings or getRelevantWaveTimes
 
+scatterSize=75;
+
+for i=1:2:length(varargin)
+   eval([varargin{i} '=varargin{' num2str(i+1) '};']);
+end
 
 if size(FD,2)>1
    warning('FD array contains more than one trial!') 
@@ -31,7 +36,7 @@ hold on
 for i=1:nRepresentativeChannels
     crossingSample=waveTimes(waveChannels==pathChannels(nRepresentativeChannels+1-i));
     crossingHeight=baseCumSum(i)+representativeChannelsFD(crossingSample,i);
-    scatter(crossingSample/samplingFrequency*1000,crossingHeight,75,cm(nRepresentativeChannels+1-i,:),'filled')
+    scatter(crossingSample/samplingFrequency*1000,crossingHeight,scatterSize,cm(nRepresentativeChannels+1-i,:),'filled')
 end
 
 %     pos=get(gcf,'Position')
