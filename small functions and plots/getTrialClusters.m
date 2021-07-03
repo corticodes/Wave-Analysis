@@ -31,6 +31,13 @@ function [clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedCh
 %           So if you want triplets of clusters to be bluee,red,green dots
 %           repeatedly then use {'.b','.r','.g'}. Default is {'.b'}. 
 %           -   plotSpikes - logical - Default is true.
+%           -   timeInms - logical. Display crossings times in ms, using
+%           sample2ms. Default is 0.
+%           -   sample2ms - 1000/samplingFrequency
+%           -   plotColorbar - logical
+%           -   sz - circles size. default is 25.
+%           -   markersize - detected clusters' markersize
+
 %
 %       Output:
 %       -   clusterLimits (nGoodClustersX2) - position (samples) of the
@@ -48,6 +55,11 @@ plotTrialsClusters=false;
 minHilbertAmp=0;
 plotStyles={'b.'};
 plotSpikes=1;
+timeInms=0;
+sample2ms=1; %assuming no conversion
+plotColorbar=1;
+sz=25;
+markersize=6;
 
 for i=1:2:length(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
@@ -82,9 +94,9 @@ if plotTrialsClusters
         error('hilbertAmps must be given as varagin in order to plot crossings');
     end
     if plotSpikes
-        plotSingleHilbertCrossing(crossings,hilbertAmps,0,'',1,'Spikes',binSpikes,'plotLegend',false);
+        plotSingleHilbertCrossing(crossings,hilbertAmps,0,'',1,'Spikes',binSpikes,'plotLegend',false,'timeInms',timeInms,'sample2ms',sample2ms,'plotColorbar',plotColorbar,'sz',sz);
     else
-        plotSingleHilbertCrossing(crossings,hilbertAmps,0,'',1,'plotLegend',false);
+        plotSingleHilbertCrossing(crossings,hilbertAmps,0,'',1,'plotLegend',false,'timeInms',timeInms,'sample2ms',sample2ms,'plotColorbar',plotColorbar,'sz',sz);
     end
 end
 
@@ -139,8 +151,8 @@ end
 nStyles=numel(plotStyles);
 if plotTrialsClusters && nGoodClusters>0
     for i=1:size(clusterLimits,1)
-        plot(clusterLimits(i,:),[0 0],'LineWidth',2,'Color','k')
-        plot(times{i},channels{i},plotStyles{mod(i-1,nStyles)+1})
+        plot(clusterLimits(i,:)*sample2ms,[0 0],'LineWidth',2,'Color','k')
+        plot(times{i}*sample2ms,channels{i},plotStyles{mod(i-1,nStyles)+1},'markerSize',markersize)
     end
 end
 end
