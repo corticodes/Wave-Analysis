@@ -8,12 +8,12 @@ if nargin<=1
     if nargin==0
         ax=gca;
     end
-    titleSize=20;
-    axesLabelsSize=20;
-    tickLabelskSize=15;
-    legendSize=15;
-    if nargin==6
-        colorbarSize=15;
+    titleSize=10;
+    axesLabelsSize=10;
+    tickLabelskSize=8;
+    legendSize=8;
+    if nargin<6
+        colorbarSize=8;
     end
 end
 
