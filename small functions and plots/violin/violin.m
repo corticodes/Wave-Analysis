@@ -45,6 +45,8 @@ function violin( x, y, varargin)
 %               will be in the same as the data limits. Otherwise it is 
 %               extended beyond (which was the original way the violin was 
 %               plotted)
+%   'medianWidth' - added by Yuval. Width of median line. Defualt set by
+%               linewidth 
 %
 % EXAMPLE
 % figure(1); clf;
@@ -105,6 +107,8 @@ for k = 1:2:length(varargin)
             kernelwidth = varargin{k+1};
         case 'valuelimits'
             valueLimits=varargin{k+1};
+        case 'medianwidth'
+            medianWidth=varargin{k+1};
         otherwise
             error('''%s'' is not a valid key input argument for violin',varargin{k});
     end
@@ -173,6 +177,9 @@ end
 
 if ~exist('valueLimits','var') || isempty(valueLimits)
     valueLimits = true;
+end
+if ~exist('medianWidth','var') || isempty(medianWidth)
+    medianWidth = linewidth;
 end
 
 switch style
@@ -285,6 +292,6 @@ if withmdn
     
     % beautify
     set(medianplot, 'Color', linecolor );
-    set(medianplot, 'LineWidth', linewidth );
+    set(medianplot, 'LineWidth', medianWidth );
     
 end
