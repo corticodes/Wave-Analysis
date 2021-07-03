@@ -55,14 +55,15 @@ end
 
 ALSAPhasesAngles=round(ALSAPhases(1,:)*180/pi);
 ALSAPhasesAngles(ALSAPhasesAngles<=0)=ALSAPhasesAngles(ALSAPhasesAngles<=0)+360;
-[N,edges] = histcounts(ALSAPhasesAngles,36,'Normalization','probability');
+
+% % % [N,edges] = histcounts(ALSAPhasesAngles,36,'Normalization','probability');
 
 % [maxVal,maxInd]=max(N);
 % [minVal,minInd]=min(N);
 % lockCoef=(edges(maxInd)+edges(maxInd+1))/2
-maxVal=max(N);
-minVal=min(N);
-lockCoef=maxVal/minVal;
+% % % maxVal=max(N);
+% % % minVal=min(N);
+% % % lockCoef=maxVal/minVal;
 % histogram
 
 end

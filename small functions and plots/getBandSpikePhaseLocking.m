@@ -47,14 +47,14 @@ ind=logical(allBinSpikes);
 spikesPhases=spikesPhases';
 spikesPhasesAngles=round(spikesPhases*180/pi);
 spikesPhasesAngles(spikesPhasesAngles<=0)=spikesPhasesAngles(spikesPhasesAngles<=0)+360;
-[N,edges] = histcounts(spikesPhasesAngles,36,'Normalization','probability');
+% % % [N,edges] = histcounts(spikesPhasesAngles,36,'Normalization','probability');
 
 % [maxVal,maxInd]=max(N);
 % [minVal,minInd]=min(N);
 % lockCoef=(edges(maxInd)+edges(maxInd+1))/2
-maxVal=max(N);
-minVal=min(N);
-lockCoef=maxVal/minVal;
+% % % maxVal=max(N);
+% % % minVal=min(N);
+% % % lockCoef=maxVal/minVal;
 % histogram
 
 end
