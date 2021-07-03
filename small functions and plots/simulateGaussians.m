@@ -23,7 +23,11 @@ function simulatedPulses = simulateGaussians(layoutSize,gauss1Cov,gauss2Cov,puls
 %       'Channels' (pixels) but can be changes to 'Sigma' if gauss1Cov is
 %       a 1x1 scalar, in which case distance will be in units of
 %       sqrt(gauss1Cov) (i.e. the std of the first gaussian)
-%
+%       - saveSpatialShapes: logical. save the simulated gaussian shapes
+%       (1,2 and the sum of them) if true. defult is false. if true,
+%       saveDir should be given
+%       - saveDir - folder in which to save gaussian shapes. required for when 
+%       saveSpatialShapes is true. Must have filesep at the end
 %   Output:
 %   
 %   simulatedPulses is an layoutSizeXlayoutSizeXt_tot (default t_tot is 
@@ -39,10 +43,16 @@ distUnits='Channels';
 
 temporalFunc=sin(linspace(0,pi,pulseFrames)).^2;
 
+saveSpatialShapes=0; 
+
 %overwrite any of these using varargin pairs
 
 for i=1:2:length(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
+end
+
+if saveSpatialShapes && ~exist('saveDir','var')
+    error('For saving spatial shapes (saveSpatialShapes=1) saveDir must be also given')
 end
 
 if strcmp(distUnits,'Sigma')
@@ -83,6 +93,23 @@ for i=1:layoutSize
         gauss1(i,j)=exp(-(pos-mu1)*(gauss1Cov^-1)*(pos-mu1)'/2);
         gauss2(i,j)=exp(-(pos-mu2)*(gauss2Cov^-1)*(pos-mu2)'/2);
    end
+end
+
+if saveSpatialShapes
+    imagesc(gauss1)
+    saveJpegAndFig(gcf,saveDir,'Gauss 1',1);
+    close gcf
+    imagesc(gauss2)
+    saveJpegAndFig(gcf,saveDir,'Gauss 2',1);
+    close gcf
+    imagesc(gauss1+gauss2)
+    saveJpegAndFig(gcf,saveDir,'Gauss 1+2',1);
+    close gcf
+% else
+%     figure
+%     imagesc(gauss1)
+%     figure
+%     imagesc(gauss2)
 end
 
 pulse1=repmat(gauss1,1,1,pulseFrames).*shiftdim(repmat(temporalFunc,layoutSize,1,layoutSize),2);
