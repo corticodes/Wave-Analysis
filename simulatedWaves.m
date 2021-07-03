@@ -59,13 +59,14 @@ waveName=[gaussTXT '_gaussSigma' num2str(gaussSigma) '_distInSigmasX' num2str(di
 
 %% simulate gaussian and export
 
-%radial
-saveDir='E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\';
-saveParamsName='Radial Wave';
-videoDir=[saveDir filesep waveName];    
-
+% %radial
+% saveDir='E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\';
+% saveParamsName='Radial Wave';
+% videoDir=[saveDir filesep waveName];    
+tempOverlapInPulseFrames=0.7;
+gaussSigma=[3 6];
 radialWave=simulateGaussians(layoutSize,gaussSigma(1)^2,gaussSigma(2)^2,pulseFrames,distInSigmas,tempOverlapInPulseFrames,'x1',layoutSize/2,'y1',layoutSize/2,'distUnits','Sigma');
-exportVideo(radialWave,videoDir,30,pixelsPerChannel);
+% exportVideo(radialWave,videoDir,30,pixelsPerChannel);
 
 HT=hilbert(squeeze(convertMovieToChannels(radialWave,En))').';
 HTabs=abs(HT);
@@ -76,6 +77,7 @@ HTangle=angle(HT);
 startEndWave=[1 size(radialWave,3)]; %twoGausses
 
 plotCrossingsPhysical(crossings{1},startEndWave,flipud(En),hilbertAmps{1},'Units','frames')
+% plotCrossingsPhysical(crossings{1},startEndWave,flipud(En),ones(length(hilbertAmps{1})),'Units','frames')
 saveas(gcf,['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\' waveName ' - Physical Lag.jpg'])
 savefig(['E:\Yuval\Analysis\DataAnalysis\waves and spike sorting\simulations\' waveName ' - Physical Lag.fig'])
 close gcf
