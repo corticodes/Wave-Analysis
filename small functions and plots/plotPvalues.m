@@ -1,7 +1,8 @@
-function [f] = plotPvalues(p1,p2,varargin)
+function [f,PoD] = plotPvalues(p1,p2,varargin)
 %PLOTPVALUES Summary of this function goes here
 %   p1 is the left one, p2 is the right one
-
+%   PoD is the probability of decrease (ratio of trials in which
+%   p1>p2 out of all trials)
 
 nSamples=length(p1);
 if length(p2)~=nSamples
@@ -22,11 +23,11 @@ withmdn=1;
 style=1;
 p1Label='LFP';
 p2Label='ALSA';
-yLabelLeft='DIP Test p-Values';
+yLabelLeft='DIP Test P-Values';
 yLabelRight='LFP-ALSA Pairwise Difference';
 probOfDecrease=sum((p1-p2)>0)/nSamples;
 Title='LFP and ALSA Comparison';
-xLabelText=['Prob of Decrease: ' num2str(probOfDecrease) ' (Out of ' num2str(nSamples) ' Trials)'];
+% xLabelText=['Prob of Decrease: ' num2str(probOfDecrease) ' (Out of ' num2str(nSamples) ' Trials)'];
 plotMeanLine=1;
 plotHalfOfLines=1;
 valueLimits=1;
@@ -128,7 +129,7 @@ ylim([0 1])
 yticks([0 0.5 1])
 ylabel(yLabelLeft)
 title(Title)
-xlabel(xLabelText)
+% xlabel(xLabelText)
 % annotation('textbox',[0.1 0 .1 .2],'String',boxText,'FitBoxToText','on','FontSize',8)
 
 if ~plotLines 
@@ -139,6 +140,9 @@ if nargout
    f=fig;
 end
 
+if nargout>1
+   PoD=probOfDecrease;
+end
 
 end
 
