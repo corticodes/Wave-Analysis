@@ -29,23 +29,19 @@ function [ALSA_Locs,relevantChannels] = getALSAPeaksFromTIC(ticPath,startTime,wi
 %       - relevantChannels (1XnRelevantChannels) - List of the channels 
 %       that had an ALSA max within window
 
-spikeRateSmoothing=2000;
-startEndWave=[1 window_ms*samplingFrequency/1000];
 onsetType='firstMax';
 nSTD=2;
 outputUnits='samples';
+spikeRateSmoothing=2000;
+startEndWave=[1 window_ms*samplingFrequency/1000];
+nCh=max(En(:));
 
 for i=1:2:length(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
 end
 
-%calc and smooth spiking rate
-spikingRateDataFormat=tic2FireRate(ticPath,startTime,window_ms,En,samplingFrequency,'outputFormat','dataFormat','slidingWindowSize',spikeRateSmoothing);
-spikingRateDataFormatSmoothed=smoothdata(spikingRateDataFormat','gaussian',spikeRateSmoothing)';
-nCh=size(spikingRateDataFormat,1);
-
-%calculate ALSA
-ALSA=calcALSA(spikingRateDataFormatSmoothed,'En',En);
+%calc ALSA
+ALSA = getALSAFromTIC(ticPath,startTime,window_ms,En,samplingFrequency,'spikeRateSmoothing',spikeRateSmoothing);
 
 % Find each channel's first peak withihn window
 ALSA_Locs=zeros(1,nCh);
