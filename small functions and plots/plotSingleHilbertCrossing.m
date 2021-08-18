@@ -41,7 +41,7 @@ function [f] = plotSingleHilbertCrossing(singleCrossings,crossingsAmps,FD,crossi
 %       - spikeMarkerSize - default 6
 %       - minHilbertAmp - only show crossings with whose hilbert amplitude
 %       is above minHilbertAmp. Default is 0
-
+%       - order - order in which to plot channels
 
 %%QA make sure that ms2sample and timeInms works
 
@@ -56,7 +56,7 @@ timeInms=0;
 spikeMarkerSize=6;
 sz=25;
 minHilbertAmp=0;
-
+order=1:size(singleCrossings,1);
 
 f=figure;
 hold on
@@ -79,6 +79,8 @@ end
 
 chNum=1:size(singleCrossings,1);
 
+[~,chOrder]=sort(order);
+
 if plotSpikes
     for i=chNum
        spikeInd=find(Spikes(i,:));
@@ -87,7 +89,7 @@ if plotSpikes
               error('To plot time in ms instead of seconds sample2ms must be given') 
            end
        end
-       plot(spikeInd*sample2ms, i*ones(1,length(spikeInd)),'.k','markerSize',spikeMarkerSize);
+       plot(spikeInd*sample2ms, chOrder(i)*ones(1,length(spikeInd)),'.k','markerSize',spikeMarkerSize);
     end
 end
 
@@ -96,10 +98,10 @@ end
 singleCrossings(crossingsAmps<=minHilbertAmp)=0;
 crossingsAmps(crossingsAmps<=minHilbertAmp)=0;
 
-h(1)=scatter(singleCrossings(chNum(1),singleCrossings(chNum(1),:)~=0)*sample2ms,chNum(1)*ones(1,numel(singleCrossings(chNum(1),singleCrossings(chNum(1),:)~=0)))+CrossingsVerticalOffset,sz,squeeze(crossingsAmps(1,singleCrossings(chNum(1),:)~=0))');
+h(1)=scatter(singleCrossings(chNum(1),singleCrossings(chNum(1),:)~=0)*sample2ms,chOrder(chNum(1))*ones(1,numel(singleCrossings(chNum(1),singleCrossings(chNum(1),:)~=0)))+CrossingsVerticalOffset,sz,squeeze(crossingsAmps(1,singleCrossings(chNum(1),:)~=0))');
 hold on
 for i=chNum(2:end)
-        scatter(singleCrossings(i,singleCrossings(chNum(i),:)~=0)*sample2ms,i*ones(1,numel(singleCrossings(i,singleCrossings(chNum(i),:)~=0)))+CrossingsVerticalOffset,sz,crossingsAmps(i,singleCrossings(chNum(i),:)~=0)'); %make crossingsAmp column vec to avoid RGB syntex in case there is only 3 element
+        scatter(singleCrossings(i,singleCrossings(i,:)~=0)*sample2ms,chOrder(i)*ones(1,numel(singleCrossings(i,singleCrossings(i,:)~=0)))+CrossingsVerticalOffset,sz,crossingsAmps(i,singleCrossings(i,:)~=0)'); %make crossingsAmp column vec to avoid RGB syntex in case there is only 3 element
 end
 % h(2)=plot(1:length(FD)*sample2ms,'b');
 % h(3)=plot((0:numel(FD))*sample2ms,channelShown*ones(1,numel(FD)+1)+CrossingsVerticalOffset,'--k');

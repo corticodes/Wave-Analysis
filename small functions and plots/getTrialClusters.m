@@ -37,7 +37,7 @@ function [clusterLimits,channels,times,spikesPerCluster,allSeedSamples,allSeedCh
 %           -   plotColorbar - logical
 %           -   sz - circles size. default is 25.
 %           -   markersize - detected clusters' markersize
-
+%           -   order
 %
 %       Output:
 %       -   clusterLimits (nGoodClustersX2) - position (samples) of the
@@ -60,11 +60,13 @@ sample2ms=1; %assuming no conversion
 plotColorbar=1;
 sz=25;
 markersize=6;
+order=1:max(En(:));
 
 for i=1:2:length(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
 end
 
+[~,chOrder]=sort(order);
 
 if isempty(binSpikes)
     nSamples=max(crossings(:));
@@ -94,9 +96,9 @@ if plotTrialsClusters
         error('hilbertAmps must be given as varagin in order to plot crossings');
     end
     if plotSpikes
-        plotSingleHilbertCrossing(crossings,hilbertAmps,0,'',1,'Spikes',binSpikes,'plotLegend',false,'timeInms',timeInms,'sample2ms',sample2ms,'plotColorbar',plotColorbar,'sz',sz);
+        plotSingleHilbertCrossing(crossings,hilbertAmps,0,'',1,'Spikes',binSpikes,'plotLegend',false,'timeInms',timeInms,'sample2ms',sample2ms,'plotColorbar',plotColorbar,'sz',sz,'order',order);
     else
-        plotSingleHilbertCrossing(crossings,hilbertAmps,0,'',1,'plotLegend',false,'timeInms',timeInms,'sample2ms',sample2ms,'plotColorbar',plotColorbar,'sz',sz);
+        plotSingleHilbertCrossing(crossings,hilbertAmps,0,'',1,'plotLegend',false,'timeInms',timeInms,'sample2ms',sample2ms,'plotColorbar',plotColorbar,'sz',sz,'order',order);
     end
 end
 
@@ -152,7 +154,7 @@ nStyles=numel(plotStyles);
 if plotTrialsClusters && nGoodClusters>0
     for i=1:size(clusterLimits,1)
         plot(clusterLimits(i,:)*sample2ms,[0 0],'LineWidth',2,'Color','k')
-        plot(times{i}*sample2ms,channels{i},plotStyles{mod(i-1,nStyles)+1},'markerSize',markersize)
+        plot(times{i}*sample2ms,chOrder(channels{i}),plotStyles{mod(i-1,nStyles)+1},'markerSize',markersize)
     end
 end
 end
