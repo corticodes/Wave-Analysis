@@ -2,9 +2,11 @@ function spikingRate = tic2FireRate(ticPath,startTime,window_ms,En,samplingFrequ
 %tic2FireRate calculates the spiking rate (spike/s) for each channel
 %starting from startTime to startTime+window_ms and returns it as 3d 
 %matrix: (frameHeightXFrameWidthXFrames) according to channel layout in En
+%If length(startTime)>1, tic2FireRate returns the average across trials
 %   Input:
 %       -   ticPath: The path to t,ic containg saved mat
-%       -   startTime: 1X2 array with the start and end of the wave in ms
+%       -   startTime (ms): 1XnTrials array with the start time of the 
+%           wave. If nTrials>1 spikingRate returns the average over trials
 %       -   En: Electrode layout
 %       -   Varargs (given as 'Name','Value' pairs):
 %       	-   slidingWindowSize (1X1): size of the moving window in units
@@ -31,9 +33,20 @@ for i=1:2:numel(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
 end
 
-binSpikes = getSpikeBinMatByChannel(ticPath,startTime,startTime+window_ms,samplingFrequency,max(En(:)));
+nCh=max(En(:));
+nSamples=window_ms*samplingFrequency/1000;
+nTrials=length(startTime);
 
-spikingRate = binSpikes2fireRate(binSpikes,samplingFrequency,'slidingWindowSize',slidingWindowSize);
+spikingRate=zeros(nCh,nSamples);
+
+for i=1:nTrials
+    binSpikes = getSpikeBinMatByChannel(ticPath,startTime(i),startTime(i)+window_ms,samplingFrequency,max(En(:)));
+
+    spikingRate = spikingRate+binSpikes2fireRate(binSpikes,samplingFrequency,'slidingWindowSize',slidingWindowSize);
+end
+
+spikingRate=spikingRate/nTrials;
+
 
 if strcmp(outputFormat,'movieFormat')
     spikingRate=convertChannelsToMovie(spikingRate,En);
