@@ -1,6 +1,7 @@
 
 *.fig
 *.jpg
+*.eps
 *.asv
 *.mat
 *.mldatx
