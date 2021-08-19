@@ -2,7 +2,7 @@ function waveCenterPath = drawWavePath(singleCrossings,singleHilbertAmps,startEn
 %DRAWWAVEPATH Draws the path of the wave by calculating in each frame the 
 %"center of mass" of all crossings WITHIN WAVE, normalized by temporal 
 %distance and hilbert amplitude. Will only look at first crossing within
-%wave
+%wave 
 %INPUT:
 %   singleCrossings (channelsXcrossings)
 %       All the crossings times. One of the four arrays that are recived in

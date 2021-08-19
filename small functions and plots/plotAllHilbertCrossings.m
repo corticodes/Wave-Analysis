@@ -8,7 +8,7 @@ function [f] = plotAllHilbertCrossings(crossings,hilbertAmps,FD,channelShown,var
 %   Varargins (given as 'Key'Value pairs:
 %      Spikes (logical nChXnSamples)
 %           Plots a red circle where Spikes is true
-%      Title (string)
+%      Title (string) 
 %           Figure title
 
 for i=1:2:length(varargin)

@@ -6,7 +6,7 @@ function [t,ic] = coordinatesToTIC(spikesCoordinates, startTime_ms,En,samplingFr
 %   Obviously this way there will be only 1 neuron per channel
 %   To leave t unchaned (i.e. it is already in ms), set samplingFrequency 
 %   to 1000 
-
+ 
 nCh=max(En(:));
 t=[];
 ic(1,:)=1:nCh;

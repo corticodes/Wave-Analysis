@@ -1,4 +1,4 @@
-function dcor = distcorr(x,y)
+function dcor = distcorr(x,y) 
 % This function calculates the distance correlation between x and y.
 % Reference: http://en.wikipedia.org/wiki/Distance_correlation 
 % Date: 18 Jan, 2013

@@ -4,7 +4,7 @@ function sampleCrossings=getCrossingsBySamples(crossings,hilbertAmps,varargin)
 %indicates the hilbert amplitude in the relevant channel at the time of 
 %of the crossing. If hilbertAmp is an empty array, the value of each
 %sample is 1. nSamples equals the sample of the last crossing in
-%crossings.
+%crossings. 
 %   Varargin:
 %       - nSamples - if given, sampleCrossings will have nSamples columns,
 %       filled with zeros after the last crossings (use this option to get

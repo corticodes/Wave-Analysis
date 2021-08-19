@@ -2,7 +2,7 @@ function ringPixels = createBinaryCircle(imageSizeX,imageSizeY,centerX,centerY,r
 %CREATEBINARYCIRCLE creates logical imageSizeY by imageSizeX matrix with
 %ones on the circumfrance of a circle located at centerX,centerY 
 %   plotCircle is an option to also plot the circle
-
+ 
 [columnsInImage, rowsInImage] = meshgrid(1:imageSizeX, 1:imageSizeY);
 % Next create the circle in the image.
 

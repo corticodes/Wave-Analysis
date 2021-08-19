@@ -6,7 +6,7 @@ function [roundSpikePhase,neuronMostFrequentPhase,neuronMostFrequentPhaseCount,f
 %   TIC is the combined array of t,ic. Every column is a spike, and rows
 %   are time,channel,neuron number.
 %   spikePhase are the phases of each spike (1XnSpikes) in rads (from -pi
-%   to pi)
+%   to pi) 
 %   Varargins:
 %       phaseInDegree - if true, returns the returns the most frequent 
 %       phases in degrees (1:360). Otherwise reutrns same as input

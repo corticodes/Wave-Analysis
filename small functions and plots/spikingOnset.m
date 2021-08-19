@@ -17,7 +17,7 @@ function [onsetTimes,inactiveChannels] = spikingOnset(fireRate,varargin)
 %       (onsetTimes(inactiveChannels)=NaNs)
 
 nCh=size(fireRate,1);
-
+ 
 for i=1:2:length(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
 end

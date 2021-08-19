@@ -1,7 +1,7 @@
 function [firstCrossings,spikesPeakTime,channels,cor] = CrossingVSSpikePeak(selectedCrossings,binSpikes,samplingFrequency,varargin)
 %CrossingVSSpikePeak returns the times of first crossings and spiking
 %peak for each channel. 
-%INPUT:
+%INPUT: 
 %   -   selectedCrossings (channelsXcrossings): The specific crossings 
 %   (upwards, downwards, inhibition or excitation) as recived by getHilbertCrossings
 %   -   binSpikes (nChXnSamples logical): logical matrix with ones marking

@@ -2,7 +2,7 @@ function ALSA = getALSAFromTIC(ticPath,startTime,window_ms,En,samplingFrequency,
 %GETALSAPEAKSFROMTIC Calculates ALSA (average local spiking activity) from
 %startTime to startTime+window_ms. If length(startTime)>1, getALSAFromTIC
 %returns the average across trials
-%   INPUT:
+%   INPUT: 
 %       - ticPath: full path to .mat file containing recording's t,ic 
 %       - startTime (ms) (1XnTrials) - Time from the recording begining for 
 %       which to calculate ALSA. If an array, getALSAFromTIC returns

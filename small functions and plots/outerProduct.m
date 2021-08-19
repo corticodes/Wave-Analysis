@@ -5,7 +5,7 @@ function C = outerProduct(A,B)
 %   copied numel(A) times, each time multiplies by a different member of A
 %   and placed where this member was places.
 %   For example, if A=[1 2 3;4,5,6;7,8,9] and B=ones(3) then
-%   C is
+%   C is 
 %{
      1     1     1     2     2     2     3     3     3
      1     1     1     2     2     2     3     3     3

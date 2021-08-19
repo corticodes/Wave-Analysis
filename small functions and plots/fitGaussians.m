@@ -1,6 +1,6 @@
 function [gaussParams] = fitGaussians(dataMatrix)
 %FITFIRERATEASGAUSSIANS fits a gaussian for each row of dataMatrix using 
-%   input:
+%   input: 
 %       dataMatrix: nXm matrix with n time series of length m
 %   output:
 %       gaussParams: nX4 with fitted gaussian centers,sigmas,amplitude and

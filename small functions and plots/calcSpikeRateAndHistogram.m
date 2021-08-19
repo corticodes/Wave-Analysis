@@ -7,7 +7,7 @@ function [closestHistogram,spikeRate] = calcSpikeRateAndHistogram(HTangle,timeSe
 %   spikesPerChannel is cell array where spikesPerChannel{i} are all the
 %   spike times of channel i.
 %   ignoeSample are the number of samples ignored in the sequence by
-%   getDataSequenec. 
+%   getDataSequenec.  
 %   Output:
 %   For each angle calcSpikeRateAndHistogram looks at timeBin (ms) around
 %   it and finds the time to the closest spike. It returns closestHistogram 

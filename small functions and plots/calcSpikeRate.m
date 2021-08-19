@@ -4,7 +4,7 @@ function [spikeRate] = calcSpikeRate(HT,startTimes,nAngles,spikesPerChannel,igno
 %   of spike within two window sizes timeBin1,timeBin2 (in ms) around each
 %   angles, and normalizes it to get the rate. It return the two spikeRate
 %   vectors spikeRate1,spikeRate2 (1xnAngles) which correspond to the two
-%   timeBins.
+%   timeBins. 
 
 angles = getAngles(nAngles,0);
 croppedHT=HT(:,:,ignoreSample+1:end);
