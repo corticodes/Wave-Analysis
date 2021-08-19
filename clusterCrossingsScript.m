@@ -6,7 +6,7 @@ band=[12 34];
 % spikeFrameLength=50;
 % frameRate=200;
 % expandStartEndWave=300;
-
+ 
 %clustering params
 
 maxTempDist=40;
