@@ -39,9 +39,11 @@ plotGridLines=0;
 figSizeUnits='centimeters';
 axesPosition=[2.14,0.34,0.19,1.9];
 hCbarFontSize=12;
-hCbarPosition=[13.8113    8.4667    5.9267    2.6458];
+% hCbarPosition=[13.8113    8.4667    5.9267    2.6458];
+hCbarPosition=[12.3826,7.8052,0.7143,2.4871];
 hCbarYlabel={'Latency','[ms]'};
-hCbarTextPosition=[-4,0.5,0];
+% hCbarTextPosition=[-4,0.5,0];
+hCbarTextPosition=[1.26,0.52,0];
 hCbarFontUnits='points';
 hCbarYlablFontSize=8;
 markerSize=18;
@@ -83,8 +85,8 @@ else
     [hCbar,ax]=IntensityPhysicalSpacePlot(chNum,pT,En,'plotElectrodeNumbers',plotElectrodeNumbers,'markerSize',markerSize,'plotColorBar',plotColorBar,'plotGridLines',plotGridLines);
 end
 
-set(gcf,'Units',figSizeUnits,'Position',figPosition);
-set(gca,'Units',figSizeUnits,'Position',axesPosition);
+% set(gcf,'Units',figSizeUnits,'Position',figPosition);
+% set(gca,'Units',figSizeUnits,'Position',axesPosition);
 
 if plotColorBar
     hCbar.Units=figSizeUnits;
