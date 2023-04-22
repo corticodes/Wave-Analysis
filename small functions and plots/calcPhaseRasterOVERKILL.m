@@ -2,7 +2,7 @@ function [neuronFiringPhaseRate,phaseBinCenters,f] = calcPhaseRaster(TIC,spikePh
 %PLOTPHASERASTER calculates the "spike phase-rate" (spikes per phase). It 
 % can also smooth and plot a raster plot with phase as horizontal axis instead of time. 
 % This function is different from plotPhaseSpikeScatter which plots the spikes themselves
-%as scatter 
+%as scatter
 %   Input: 
 %   TIC is 3 by nNeurons. It is the combined array of t,ic. Every column is a spike, and rows
 %   are time,channel,neuron number. 

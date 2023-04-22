@@ -7,7 +7,7 @@ function f = plotPhaseSpikeScatter(TIC,spikePhase,nNeurons,titleTXT,neuronsOrder
 %   the neuron fired
 %   If entered, plotPhaseSpikeScatter will plot the neurons according to
 %   neuronsOrder. Otherwise, order will be 1:nNeurons
- 
+
 f=figure;
 if nargin==4
    neuronsOrder=1:nNeurons;

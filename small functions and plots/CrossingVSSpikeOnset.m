@@ -2,7 +2,7 @@ function [firstCrossings,spikesOnset,channels,cor] = CrossingVSSpikeOnset(select
 %CrossingVSSpikeOnset returns the times of first crossings and spiking
 %onset for each channel. Spiking onset is defined by the first time the 
 %smoothed spiking rate crosses the channel's median
-%INPUT: 
+%INPUT:
 %   -   selectedCrossings (channelsXcrossings): The specific crossings 
 %   (upwards, downwards, inhibition or excitation) as recived by getHilbertCrossings
 %   -   binSpikes (nChXnSamples logical): logical matrix with ones marking

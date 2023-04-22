@@ -1,5 +1,5 @@
 %% Settings
- 
+
 trig=1;
 singleChannel=113;
 window_ms=1500; %ms

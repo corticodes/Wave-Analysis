@@ -11,7 +11,7 @@ figure
 [gPlot,scaleFac,En]=activityTracePhysicalSpacePlot([],Experiments.currentDataObj.channelNumbers,HTangle,En);
 title('angle plot')
 
- 
+
 
 
 for i=chNum

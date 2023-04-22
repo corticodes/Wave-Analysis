@@ -1,7 +1,7 @@
 function [] = plotBP(data,FD,plotTitle,bp)
 %PLOTBP Plots the data (1XnSamples) and the banpass filtered data (1XnSamples)
 %   bp (1X2) is the bandpass to which FD was filtered [Hz]
- 
+
 plot(data,'k')
 hold on
 plot(FD,'b');

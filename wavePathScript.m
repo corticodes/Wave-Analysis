@@ -15,13 +15,14 @@ waveData=simulateGaussians(layoutSize,gaussSigma^2,gaussSigma^2,pulseFrames,dist
 simulatedWaveData=waveData;
 waveData=simulatedWaveData;
 
-HT=hilbert(squeeze(convertMovieToChannels(waveData,En))').';
+% HT=hilbert(squeeze(convertMovieToChannels(waveData,En))').';
+HT=hilbert(simulated_recording);
 HTabs=abs(HT);
 HTangle=angle(HT);
 [crossings,hilbertAmps] = getHilbertCrossings(HTabs,HTangle);
 
-startEndWave=[1 size(waveData,3)]; %twoGausses
-plotCrossingsPhysical(crossings{1},startEndWave,flipud(En),hilbertAmps{1},'Units','frames')
+startEndWave=[1 size(simulated_recording,2)]; %twoGausses
+plotCrossingsPhysical(crossings{2},startEndWave,flipud(En),[],'Units','frames')
 
 % spikesCoordinates=simulateSpikes(waveData,0.005);
 spikesCoordinates=simulateSpikes(waveData,0.01);

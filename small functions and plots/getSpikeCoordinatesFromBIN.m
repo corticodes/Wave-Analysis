@@ -1,7 +1,7 @@
 function [spikeCoordinates] = getSpikeCoordinatesFromBIN(binSpikes,En)
 %GETSPIKECOORDINATESFROMBIN returns the y,x,sample coordinates of spikes
 %given by the logical matrix binSpikes 
-%   INPUT: 
+%   INPUT:
 %       - binSpikes - logical matrix indicating spike positions. Can be
 %       either XxYxSamples for binSpikes for movies, or nChxSamples for
 %       arrays coming from getSpikeBinMatByChannel

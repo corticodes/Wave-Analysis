@@ -98,16 +98,18 @@ end
 singleCrossings(crossingsAmps<=minHilbertAmp)=0;
 crossingsAmps(crossingsAmps<=minHilbertAmp)=0;
 
-h(1)=scatter(singleCrossings(chNum(1),singleCrossings(chNum(1),:)~=0)*sample2ms,chOrder(chNum(1))*ones(1,numel(singleCrossings(chNum(1),singleCrossings(chNum(1),:)~=0)))+CrossingsVerticalOffset,sz,squeeze(crossingsAmps(1,singleCrossings(chNum(1),:)~=0))');
+h(1)=scatter(singleCrossings(chNum(1),singleCrossings(chNum(1),:)~=0)*sample2ms,chOrder(chNum(1))*ones(1,numel(singleCrossings(chNum(1),singleCrossings(chNum(1),:)~=0)))+CrossingsVerticalOffset,sz,squeeze(crossingsAmps(1,singleCrossings(chNum(1),:)~=0))','Tag',"chPhase"+1);
 hold on
 for i=chNum(2:end)
-        scatter(singleCrossings(i,singleCrossings(i,:)~=0)*sample2ms,chOrder(i)*ones(1,numel(singleCrossings(i,singleCrossings(i,:)~=0)))+CrossingsVerticalOffset,sz,crossingsAmps(i,singleCrossings(i,:)~=0)'); %make crossingsAmp column vec to avoid RGB syntex in case there is only 3 element
+    scatter(singleCrossings(i,singleCrossings(i,:)~=0)*sample2ms,chOrder(i)*ones(1,numel(singleCrossings(i,singleCrossings(i,:)~=0)))+CrossingsVerticalOffset,sz,crossingsAmps(i,singleCrossings(i,:)~=0)','Tag',"chPhase"+1); %make crossingsAmp column vec to avoid RGB syntex in case there is only 3 element
 end
 % h(2)=plot(1:length(FD)*sample2ms,'b');
 % h(3)=plot((0:numel(FD))*sample2ms,channelShown*ones(1,numel(FD)+1)+CrossingsVerticalOffset,'--k');
 
 h(2)=plot((1:length(FD))*sample2ms,FD,'b');
-h(3)=plot(0:numel(FD),channelShown*ones(1,numel(FD)+1)+CrossingsVerticalOffset,'--k');
+if ~isempty(channelShown)
+    h(3)=plot(0:numel(FD),channelShown*ones(1,numel(FD)+1)+CrossingsVerticalOffset,'--k');
+end
 
 
 if plotLegend
@@ -136,7 +138,7 @@ end
 if exist('clusterLimits','var')
     nClusters=size(clusterLimits,1);
     for i=1:nClusters
-        plot(clusterLimits(i,:)*sample2ms,[0 0],'LineWidth',2,'Color','k')
+        plot(clusterLimits(i,:)*sample2ms,[0 0],'LineWidth',2,'Color','k','Tag',"cluster"+i)
         if plotLegend
         %remove added legend
             hLegend = findobj(gcf, 'Type', 'Legend');

@@ -1,7 +1,7 @@
 function [clusterLimits,channels,times,spikesPerCluster] = findContinuousClusters(crossings,hilbertAmps,En,maxTempDist,minChannelInWave,minAVGAmp,binSpikes,varargin)
 %FINDCONTINUOUSCLUSTERS finds the start and end times of spatiotemporal 
 % continuous crossing clusters, representing waves. 
-%       Input: 
+%       Input:
 %       -   crossings: nChXnCrossings crossings times (one of the 4 
 %       "crossings" matrices given by getHilbertCrossings)
 %       -   hilbertAmps: nChXnCrossings hilbert amplitudes at crossings the

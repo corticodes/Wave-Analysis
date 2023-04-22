@@ -17,7 +17,7 @@ function simulatedWave = simulateGaussianWave(layoutSize,gaussSigma,waveFrames,v
 %   
 %   simulatedWave is an layoutSizeXlayoutSizeXwaveFrames
 
- 
+
 gaussCenterPath=round([linspace(1,layoutSize,waveFrames)',linspace(1,layoutSize,waveFrames)']);
 
 for i=1:2:length(varargin)

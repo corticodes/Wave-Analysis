@@ -12,7 +12,7 @@ function [pmin,imin] = calcDip(spikeCoordinates,varargin)
 %       pmin: The p-value calculated from the 'view point' of the 'Observer' 
 %       (a data point) which has the lowest p-value.
 %       imin: the minimizing observer
- 
+
 plotHist=0;
 
 for i=1:2:numel(varargin)

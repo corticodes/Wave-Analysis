@@ -5,7 +5,7 @@ function [binSpikes] = getSpikeBINFromCoordinates(spikeCoordinates,nSamples,nCha
 %   spikeCoordinates are nSpikesX3, columns are y,x,sample
 %   nSamples the second dimension of binSpikes
 %THIS FUNCTION HAS NOT BEEN QA-ed!!!!!
- 
+
     binSpikes=false(nChannels,nSamples);
     nSpikes=size(spikeCoordinates,1);
     for i=1:nSpikes

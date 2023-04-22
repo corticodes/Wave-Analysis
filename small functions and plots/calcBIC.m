@@ -5,7 +5,7 @@ function [BIC] = calcBIC(normedData,cidx,cmeans)
 K=max(cidx); %number of clusters
 N=size(normedData,1); %number of datapoints
 variance=0;
- 
+
 for i=1:K
     variance=variance+sum(sum((normedData(cidx==i,:)-cmeans(i,:)).^2));
 end

@@ -1,7 +1,7 @@
 function [f1,f2,f3,f4,f5]=plotPhaseAndSpikeStatistics(spikeRate,timeBin,innerWindowMs,closestHistogram,angles,trigsNums,neuronMostFrequentPhase,frequentPhaseProbabilityForNeuron,TIC,spikePhase,nNeurons,nCh)
 %PLOTSPIKEPHASE Summary of this function goes here
 %   Detailed explanation goes here
- 
+
 titleTXT=[num2str(innerWindowMs(1)) '-' num2str(innerWindowMs(2)) 'ms'];
 
 f1=figure;

@@ -5,7 +5,7 @@ function [distMat] = calcSpikeDists(spikeCoordinates,varargin)
 %       'Symmetric' (1X1 logical): 
 %           Controlls whether to return the matrix of dists symmetric
 %           (true,default) or with zeros in all entries below (and on) the
-%           diagonal. 
+%           diagonal.
 %   output
 %       distMat (nNeuronsXnNeurons):
 %             Euclidean distance matrix - nNeuronsXnNeurons(i,j) is the

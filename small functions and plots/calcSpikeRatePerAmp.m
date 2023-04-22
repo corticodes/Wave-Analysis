@@ -5,7 +5,7 @@ function [ampRateW1,ampRateW2,nTimeStampsW1,nTimeStampsW2] = calcSpikeRatePerAmp
 chNum=1:size(HTabs,1);
 
 amplitudes = getAmplitudes(HTabs,nHilAmps);
- 
+
 ampRateW1=zeros(1,nHilAmps); %average rate (neurons per s)
 nTimeStampsW1=zeros(1,nHilAmps);
 ampRateW2=zeros(1,nHilAmps);
