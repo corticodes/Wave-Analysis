@@ -2,7 +2,7 @@ function ALSA = getALSAFromTIC(ticPath,startTime,window_ms,En,samplingFrequency,
 %GETALSAPEAKSFROMTIC Calculates ALSA (average local spiking activity) from
 %startTime to startTime+window_ms. If length(startTime)>1, getALSAFromTIC
 %returns the average across trials
-%   INPUT: 
+%   INPUT:
 %       - ticPath: full path to .mat file containing recording's t,ic 
 %       - startTime (ms) (1XnTrials) - Time from the recording begining for 
 %       which to calculate ALSA. If an array, getALSAFromTIC returns
@@ -18,6 +18,8 @@ function ALSA = getALSAFromTIC(ticPath,startTime,window_ms,En,samplingFrequency,
 %           ALSA maxima. i.e. First all alsa maxima are found, and then the
 %           first maximum within this window is taken. Default is 
 %           [1 nSamples]
+%           - nNearestChannels - number of nearest neighbors to calc ALSA
+%           over (4 or 8). Default is 4.
 % 
 %   OUPUT
 %       - ALSA (nChannelsXnSamples) - the average ALSA over trials.
@@ -25,6 +27,7 @@ function ALSA = getALSAFromTIC(ticPath,startTime,window_ms,En,samplingFrequency,
 
 spikeRateSmoothing=2000;
 startEndWave=[1 window_ms*samplingFrequency/1000];
+nNearestChannels=4;
 
 for i=1:2:length(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
@@ -43,7 +46,7 @@ for i=1:nTrials
     spikingRateDataFormatSmoothed=smoothdata(spikingRateDataFormat','gaussian',spikeRateSmoothing)';
 
     %calculate ALSA
-    ALSA=ALSA+calcALSA(spikingRateDataFormatSmoothed,'En',En);
+    ALSA=ALSA+calcALSA(spikingRateDataFormatSmoothed,'En',En,'nNearestChannels',nNearestChannels);
 end
 
 ALSA=ALSA/nTrials;

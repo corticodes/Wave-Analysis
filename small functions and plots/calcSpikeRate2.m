@@ -10,7 +10,7 @@ function [spikeRate] = calcSpikeRate2(binSpikes,HTangle,rateBinSize,samplingFreq
 %   normalized
 %   Output:
 %   spikeRate is the average spike rate [spikes/s] per angle. It
-%   corresponds to the angle vector 1:360 
+%   corresponds to the angle vector 1:360
 
 
 binSamples = rateBinSize*samplingFrequency/1000; 

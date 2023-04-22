@@ -1,5 +1,5 @@
 %% E26
- 
+
 % dataObj=MCRackRecording('\\sil2\Data\Turtle\E26_270313\Right_Vent_5uM_Gabazine_0001.mcd');
 % dataObj=MCRackRecording('\\sil2\Data\Turtle\E26_270313\Right_Vent_10uM_Gabazine_0001.mcd');
 % dataObj=MCRackRecording('\\sil2\Data\Turtle\E26_270313\Right_Vent_50uM_Gabazine_0001.mcd');

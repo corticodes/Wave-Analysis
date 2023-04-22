@@ -9,7 +9,7 @@ function [crossings2d,hilbertAmps2d] = crossingsTo2D(singleCrossings,En,startEnd
 %   crossings. For this to work, singleHilbertAmps must be given as varargin
 %   (as a pair of 'value',key i.e. 'singleHilbertAmps',singleHilbertAmps. singleHilbertAmps
 %   is one of the 4 arrays of 'hilbertAmps' given as output from getHilbertCrossings
- 
+
 for i=1:2:length(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
 end

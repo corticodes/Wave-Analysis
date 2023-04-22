@@ -1,7 +1,7 @@
 function [] = plotCrossings3d(selectedCrossings,startEndWave,settingsMap,En,crossingType,samplingRate,nullValue)
 %GETCROSSINGSINSPECIFICWINDOW uses IntensityPhysicalSpacePlot to plot the
 %time to the first crossing in selectedCrossings for each channel. It looks
-%at the window defined by startEndWave 
+%at the window defined by startEndWave
 %   selectedCrossings is is all the crossings (channelsXcrossings)
 %   startEndWave is 1x2 array with the sample numbers which define the
 %   start and end of the window in which the first crossing is looked for.

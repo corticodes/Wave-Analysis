@@ -23,6 +23,9 @@ function [ALSA_Locs,relevantChannels] = getALSAPeaksFromTIC(ticPath,startTime,wi
 %           - nSTD - relvent for onsetType='stdCrossings'. ALSA
 %           onset will be detected when spiking rate crosses nSTD stds.
 %           Default is 2
+%           - nNearestChannels - number of nearest neighbors to calc ALSA
+%           over (4 or 8). Default is 4.
+%
 %   OUPUT
 %       - ALSA_Locs (1XnRelevantChannels) - locations of first ALSA maxima, given in samples
 %       (couting from the startTime, not startEndWindow(1)).
@@ -35,13 +38,14 @@ outputUnits='samples';
 spikeRateSmoothing=2000;
 startEndWave=[1 window_ms*samplingFrequency/1000];
 nCh=max(En(:));
+nNearestChannels=4;
 
 for i=1:2:length(varargin)
    eval([varargin{i} '=varargin{' num2str(i+1) '};']);
 end
 
 %calc ALSA
-ALSA = getALSAFromTIC(ticPath,startTime,window_ms,En,samplingFrequency,'spikeRateSmoothing',spikeRateSmoothing);
+ALSA = getALSAFromTIC(ticPath,startTime,window_ms,En,samplingFrequency,'spikeRateSmoothing',spikeRateSmoothing,'nNearestChannels',nNearestChannels);
 
 % Find each channel's first peak withihn window
 ALSA_Locs=zeros(1,nCh);

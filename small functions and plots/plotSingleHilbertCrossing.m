@@ -107,7 +107,9 @@ end
 % h(3)=plot((0:numel(FD))*sample2ms,channelShown*ones(1,numel(FD)+1)+CrossingsVerticalOffset,'--k');
 
 h(2)=plot((1:length(FD))*sample2ms,FD,'b');
-h(3)=plot(0:numel(FD),channelShown*ones(1,numel(FD)+1)+CrossingsVerticalOffset,'--k');
+if ~isempty(channelShown)
+    h(3)=plot(0:numel(FD),channelShown*ones(1,numel(FD)+1)+CrossingsVerticalOffset,'--k');
+end
 
 
 if plotLegend

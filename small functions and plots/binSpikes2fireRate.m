@@ -10,7 +10,7 @@ function spikingRate = binSpikes2fireRate(binSpikes,samplingFrequency,varargin)
 %       	of samples. Default is 10000 (0.5s for 20kHz)
 %   Output:
 %       - spikingRate: (nChXnSamples) the firing rate (spikes/sec)
- 
+
 slidingWindowSize=10000; %samples
 
 for i=1:2:numel(varargin)

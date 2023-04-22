@@ -1,7 +1,7 @@
 function [closestHistogram,spikeRate,binSpikes,relevantTIC,nRelevant,roundSpikePhase,neuronMostFrequentPhase,neuronMostFrequentPhaseCount,frequentPhaseProbabilityForNeuron,nNeurons,spikesPerChannel,HTabs,HTangle,FDsequence,HTsequence,timeSequence,data,FD,HT] = calcPhaseAndSpikeStatistics(ignoreSample,window_tot_ms,startTimes,dataObj,bandpass,ticPath,nAngles,nCh,timeBin)
 %CALCPHASEANDSPIKESTATISTICS Summary of this function goes here
 %   Detailed explanation goes here
- 
+
 [FDsequence,HTsequence,timeSequence,data,FD,HT] = getDataSequence(dataObj,startTimes,window_tot_ms,ignoreSample,bandpass);
 HTabs=abs(HTsequence);
 HTangle=angle(HTsequence);

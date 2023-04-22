@@ -1,6 +1,6 @@
 window_ms=1500; %ms
 band=[12 34];
- 
+
 maxTempDist=40;
 minChannelInWave=80;
 minHilbertAmp=32;

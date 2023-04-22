@@ -9,6 +9,6 @@ for i=1:nCh
     [row,col]=find(En==i);
     channelData(i,:)=movie(row,col,:);
 end
- 
+
 end
 

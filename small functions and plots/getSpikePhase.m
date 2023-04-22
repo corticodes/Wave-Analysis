@@ -2,7 +2,7 @@ function [spikePhase] = getSpikePhase(TIC,HTangle,timeSequence)
 %GETSPIKEPHASE returns the phase in which the channel's oscilation was 
 %when the neuron fired. This function can also be used for any other
 %feature of the data simply by changing the input to the relevant variable
-%   Input: 
+%   Input:
 %       TIC is the combined array of t,ic. Every column is a spike, and rows
 %       are time,channel,neuron number.
 %       HTangle (nChXnSequenceSamples) is the phase of oscilation in each

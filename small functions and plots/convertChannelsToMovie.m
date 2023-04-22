@@ -47,7 +47,9 @@ if flipEn
 end
 for i=1:nCh
     [chPosY,chPosX]=find(En==i);
-    movieData(chPosY,chPosX,:)=chData(i,:);
+    if size(chPosY)>0
+        movieData(chPosY,chPosX,:)=chData(i,:);
+    end
 end
 
 end

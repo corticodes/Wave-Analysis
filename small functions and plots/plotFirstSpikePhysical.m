@@ -1,6 +1,6 @@
 function [f,firstSpikes] = plotFirstSpikePhysical(ticPath,startTime,window_ms,samplingFrequency,En,varargin)
 %TIMETOFIRSTSPIKEPHYSICALPLOT uses IntensityPhysicalSpacePlot to plot the
-%time to the first spike for each channel. It looks 
+%time to the first spike for each channel. It looks
 %at the window defined by startTime,startTime+window_ms in the t,IC file. 
 %Values of selectedCrossings and startEndWave must have the same units and
 %starting time. spike times are in ms, counting from startTime

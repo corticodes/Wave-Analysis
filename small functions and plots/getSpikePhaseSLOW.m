@@ -3,7 +3,7 @@ function [spikePhase] = getSpikePhase(TIC,HTangle,timeSequence)
 %when the neuron fired
 %   TIC is the combined array of t,ic. Every column is a spike, and rows
 %   are time,channel,neuron number.
- 
+
 nSpikes=size(TIC,2);
 
 spikePhase=zeros(1,nSpikes);
