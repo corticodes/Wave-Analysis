@@ -153,8 +153,8 @@ end
 nStyles=numel(plotStyles);
 if plotTrialsClusters && nGoodClusters>0
     for i=1:size(clusterLimits,1)
-        plot(clusterLimits(i,:)*sample2ms,[0 0],'LineWidth',2,'Color','k')
-        plot(times{i}*sample2ms,chOrder(channels{i}),plotStyles{mod(i-1,nStyles)+1},'markerSize',markersize)
+        plot(clusterLimits(i,:)*sample2ms,[0 0],'LineWidth',2,'Color','k','Tag',"clusterTimeLine"+i)
+        plot(times{i}*sample2ms,chOrder(channels{i}),plotStyles{mod(i-1,nStyles)+1},'markerSize',markersize,'Tag',"clusterMarker"+i)
     end
 end
 end
